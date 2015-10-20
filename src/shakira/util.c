@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <string.h>
 
-#include "heap.h"
+#include "abstract_heap.h"
 
 /*
  * Saturating addition.
@@ -46,37 +46,6 @@ void print_len(word_t l) {
   } else {
     printf("%d", l);
   }
-}
-
-void print_concrete(concrete_heapt *heap) {
-  int i;
-  word_t y;
-
-  printf("Successors:");
-
-  for (i = 0; i < NNODES; i++) {
-    if (i % LINEWIDTH == 0) {
-      printf("\n");
-    }
-
-    y = heap->succ[i];
-
-    printf("%d -> %d;   ", i, y);
-  }
-
-  printf("\nPointers:");
-
-  for (i = 0; i < NPROG; i++) {
-    if (i % LINEWIDTH == 0) {
-      printf("\n");
-    }
-
-    y = heap->ptr[i];
-
-    print_ptr(i); printf(" == %d;  ", y);
-  }
-
-  printf("\n");
 }
 
 void print_abstract_heap(abstract_heapt *heap) {

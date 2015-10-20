@@ -1,4 +1,4 @@
-#include "heap.h"
+#include "abstract_heap.h"
 
 extern int pre(abstract_heapt *heap, abstract_heapt *post);
 extern int cond(abstract_heapt *heap);

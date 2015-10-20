@@ -1,4 +1,4 @@
-#include "heap.h"
+#include "abstract_heap.h"
 
 ptr_t x = 1;
 ptr_t y = 2;
