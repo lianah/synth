@@ -46,8 +46,4 @@ void concrete_new(concrete_heapt *pre,
                   concrete_heapt *post,
                   word_t x);
 
-int valid_abstract_heap(abstract_heapt *heap);
-int is_minimal(abstract_heapt *heap);
-
-
 #endif // CONCRETE_HEAP_H

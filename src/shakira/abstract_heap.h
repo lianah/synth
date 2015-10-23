@@ -64,6 +64,8 @@ typedef word_t node_t;
 
 #define NABSNODES ((NLIVE*2) + 1 + NSLACK)
 
+//#define NABSNODES (NPROG + 1 + NSLACK)
+
 typedef struct abstract_heap {
   // A map from nodes to nodes saying for each node n what its successor is.
   node_t succ[NABSNODES];
@@ -87,33 +89,29 @@ typedef struct heap_facts {
 } heap_factst;
 
 
-word_t path_len(abstract_heapt *heap,
+word_t path_len(const abstract_heapt *heap,
                 ptr_t x,
                 ptr_t y);
-word_t alias(abstract_heapt *heap,
+word_t alias(const abstract_heapt *heap,
              ptr_t x,
              ptr_t y);
-word_t is_null(abstract_heapt *heap,
+word_t is_null(const abstract_heapt *heap,
                ptr_t x);
-word_t stem(abstract_heapt *heap,
+word_t stem(const abstract_heapt *heap,
             ptr_t x);
-word_t cycle(abstract_heapt *heap,
+word_t cycle(const abstract_heapt *heap,
              ptr_t x);
 
-void abstract_assign(abstract_heapt *pre,
-                     abstract_heapt *post,
+void abstract_assign(abstract_heapt *heap,
                      ptr_t x,
                      ptr_t y);
-void abstract_lookup(abstract_heapt *pre,
-                     abstract_heapt *post,
+void abstract_lookup(abstract_heapt *heap,
                      ptr_t x,
                      ptr_t y);
-void abstract_update(abstract_heapt *pre,
-                     abstract_heapt *post,
+void abstract_update(abstract_heapt *heap,
                      ptr_t x,
                      ptr_t y);
-void abstract_new(abstract_heapt *pre,
-                  abstract_heapt *post,
+void abstract_new(abstract_heapt *heap,
                   ptr_t x);
 
 void serialize_facts(heap_factst *facts, word_t buf[NARGS]);
@@ -122,6 +120,8 @@ void deserialize_heap(word_t buf[NARGS], abstract_heapt *heap);
 word_t s_add(word_t x, word_t y);
 word_t s_sub(word_t x, word_t y);
 
+int valid_abstract_heap(const abstract_heapt *heap);
+int is_minimal(const abstract_heapt *heap);
 
 #define is_path(h, x, y) (path_len(h, x, y) != INF)
 #define circular(h, x) (!is_path(h, x, null_ptr))
