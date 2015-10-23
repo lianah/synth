@@ -29,18 +29,13 @@
 
 #define INF WORDMASK
 
-
-#ifndef SEARCH
+#ifdef __CPROVER
+  #define assume(x) __CPROVER_assume(x)
   typedef unsigned __CPROVER_bitvector[WIDTH] word_t;
 #else
+  #define assume(x) assert(x)
   typedef unsigned int word_t;
 #endif
-
-
-#ifdef SEARCH
- #define __CPROVER_assume(x)
-#endif
-
 
 
 // number of pointers in the program
@@ -62,9 +57,9 @@ typedef word_t node_t;
  #define NLIVE (NPROG-1)
 #endif
 
-#define NABSNODES ((NLIVE*2) + 1 + NSLACK)
+// #define NABSNODES ((NLIVE*2) + 1 + NSLACK)
 
-//#define NABSNODES (NPROG + 1 + NSLACK)
+#define NABSNODES (NPROG + 1 + NSLACK)
 
 typedef struct abstract_heap {
   // A map from nodes to nodes saying for each node n what its successor is.

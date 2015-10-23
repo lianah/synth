@@ -5,7 +5,7 @@ ptr_t y = 2;
 ptr_t tmp = 3;
 
 void pre(abstract_heapt *heap) {
-  __CPROVER_assume (!is_null(heap, x) &&
+  assume (!is_null(heap, x) &&
 	  alias(heap, x, tmp));
 }
 
@@ -22,6 +22,8 @@ void body(abstract_heapt *heap) {
   abstract_lookup(heap, tmp, tmp);
 }
 
+// LSH fixme: shouldn't this be something like:
+// is_path(heap, x, y)
 _Bool assertion(const abstract_heapt *heap) {
   return is_path(heap, x, tmp);
 }

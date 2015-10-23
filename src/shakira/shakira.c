@@ -14,8 +14,8 @@ void main(void) {
 
   /* assert(NABSNODES >= (NLIVE*2) + 1); */
 
-  if (! valid_abstract_heap(&h))
-    return;
+  assume(valid_abstract_heap(&h));
+
 
   // Base.
   pre(&h);
@@ -23,8 +23,7 @@ void main(void) {
 
   h = nondet_heap();
 
-  if (!valid_abstract_heap(&h))
-    return;
+  assume (valid_abstract_heap(&h));
   
   if (inv(&h)) {
     if (cond(&h)) {

@@ -2,6 +2,14 @@
 
 #include <string.h>
 
+
+#ifndef __CPROVER
+abstract_heapt nondet_heap() {
+  abstract_heapt h;
+  return h;
+}
+#endif
+
 /* static void copy_abstract(abstract_heapt *pre, */
 /*                           abstract_heapt *post) { */
 /*   *post = *pre; */
@@ -13,7 +21,7 @@
 static node_t deref(const abstract_heapt *heap,
                     ptr_t p) {
   // Ensure p is a real pointer.
-  __CPROVER_assume(p < NPROG);
+  assume(p < NPROG);
   return heap->ptr[p];
 }
 
@@ -23,7 +31,7 @@ static node_t deref(const abstract_heapt *heap,
 static node_t next(const abstract_heapt *heap,
                    node_t n) {
   // Ensure n is an allocated node.
-  __CPROVER_assume(n < NABSNODES);
+  assume(n < NABSNODES);
   return heap->succ[n];
 }
 
@@ -32,7 +40,7 @@ static node_t next(const abstract_heapt *heap,
  */
 static word_t dist(const abstract_heapt *heap,
                    node_t n) {
-  __CPROVER_assume(n < NABSNODES);
+  assume(n < NABSNODES);
   return heap->dist[n];
 }
 
@@ -45,8 +53,8 @@ static word_t dist(const abstract_heapt *heap,
 static void destructive_assign_ptr(abstract_heapt *heap,
                                    ptr_t x,
                                    node_t n) {
-  __CPROVER_assume(x < NPROG);
-  __CPROVER_assume(n < NABSNODES);
+  assume(x < NPROG);
+  assume(n < NABSNODES);
   heap->ptr[x] = n;
 }
 
@@ -59,8 +67,8 @@ static void destructive_assign_next(abstract_heapt *heap,
                                     node_t x,
                                     node_t y,
                                     word_t dist) {
-  __CPROVER_assume(x < NABSNODES);
-  __CPROVER_assume(y < NABSNODES);
+  assume(x < NABSNODES);
+  assume(y < NABSNODES);
   heap->succ[x] = y;
   heap->dist[x] = dist;
 }
@@ -73,8 +81,8 @@ static void destructive_assign_next(abstract_heapt *heap,
 void abstract_assign(abstract_heapt *heap,
                      ptr_t x,
                      ptr_t y) {
-  __CPROVER_assume(x < NPROG);
-  __CPROVER_assume(y < NPROG);
+  assume(x < NPROG);
+  assume(y < NPROG);
 
   //copy_abstract(pre, post);
 
@@ -88,8 +96,8 @@ void abstract_assign(abstract_heapt *heap,
 static node_t destructive_alloc(abstract_heapt *heap) {
   node_t n;
 
-  assert(heap->nnodes < NABSNODES);
-  //__CPROVER_assume(heap->nnodes < NABSNODES);
+  // assert(heap->nnodes < NABSNODES);
+  assume(heap->nnodes < NABSNODES);
   return heap->nnodes++;
 }
 
@@ -98,7 +106,7 @@ static node_t destructive_alloc(abstract_heapt *heap) {
  */
 void abstract_new(abstract_heapt *heap,
                   ptr_t x) {
-  __CPROVER_assume(x < NPROG);
+  assume(x < NPROG);
 
   //copy_abstract(pre, post);
 
@@ -114,17 +122,17 @@ void abstract_new(abstract_heapt *heap,
 void abstract_lookup(abstract_heapt *heap,
                      ptr_t x,
                      ptr_t y) {
-  __CPROVER_assume(x < NPROG);
-  __CPROVER_assume(y < NPROG);
+  assume(x < NPROG);
+  assume(y < NPROG);
 
   node_t py = deref(heap, y);
   node_t yn = next(heap, py);
 
-  __CPROVER_assume(py < NABSNODES);
+  assume(py < NABSNODES);
 
   word_t y_yn_dist = dist(heap, py);
 
-  //__CPROVER_assume(py != null_node);
+  //assume(py != null_node);
   //assert(py != null_node);
 
   //copy_abstract(pre, post);
@@ -174,15 +182,15 @@ void abstract_lookup(abstract_heapt *heap,
 void abstract_update(abstract_heapt *heap,
                      ptr_t x,
                      ptr_t y) {
-  __CPROVER_assume(x < NPROG);
-  __CPROVER_assume(y < NPROG);
+  assume(x < NPROG);
+  assume(y < NPROG);
 
   //copy_abstract(pre, post);
 
   node_t px = deref(heap, x);
   node_t xn = next(heap, x);
 
-  __CPROVER_assume(px != null_node);
+  assume(px != null_node);
 
   node_t py = deref(heap, y);
 
@@ -271,7 +279,7 @@ void init_abstract_heap(abstract_heapt *heap) {
 /*
  * Check that the heap is well formed.
  */
-int valid_abstract_heap(abstract_heapt *heap) {
+int valid_abstract_heap(const abstract_heapt *heap) {
   // NULL points to the null node.
   if (deref(heap, null_ptr) != null_node) {
     return 0;

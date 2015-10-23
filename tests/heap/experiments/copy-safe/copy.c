@@ -1,4 +1,4 @@
-#include "heap.h"
+#include "abstract_heap.h"
 
 ptr_t x = 1;
 ptr_t y = 2;
@@ -6,73 +6,44 @@ ptr_t tmpx = 3;
 ptr_t tmpy = 4;
 ptr_t cell = 5;
 
-int pre(abstract_heapt *pre, abstract_heapt *post) {
-  if (is_null(pre, x)) {
-    return 0;
-  }
+void pre(abstract_heapt *heap) {
+  assume (! is_null(heap, x)
+	  && is_path(heap, x, null_ptr)
+	  && is_null(heap, y)
+	  && is_null(heap, tmpx)
+	  && is_null(heap, tmpy)
+	  && is_null(heap, cell));
 
-  if (!is_null(pre, y) ||
-      !is_null(pre, tmpx) ||
-      !is_null(pre, tmpy) ||
-      !is_null(pre, cell)) {
-    return 0;
-  }
-
-  abstract_heapt t1, t2;
-
-  abstract_new(pre, &t1, y);
-  abstract_lookup(&t1, &t2, tmpx, x);
-  abstract_assign(&t2, post, tmpy, y);
-
-  return 1;
+  // y = new ()
+  abstract_new(heap, y);
+  // tmpx = x-> next
+  abstract_lookup(heap, tmpx, x);
+  // tmpy = y
+  abstract_assign(heap, tmpy, y);
 }
 
-int cond(abstract_heapt *heap) {
+_Bool cond(abstract_heapt *heap) {
   return !is_null(heap, tmpx);
 }
 
-int body(abstract_heapt *pre, abstract_heapt *post) {
-  abstract_heapt t1, t2;
-
-  *post = *pre;
-
-  if (!is_null(pre, x) ||
-      !is_null(pre, cell)) {
-    return 1;
-  }
-
-  abstract_new(pre, &t1, cell);
-
-  if (is_null(&t1, cell) ||
-      is_null(&t1, tmpx) ||
-      is_null(&t1, tmpy)) {
-    return 0;
-  }
-
-  abstract_update(&t1, &t2, tmpy, cell);
-
-  if (is_null(&t2, tmpx)) {
-    return 0;
-  }
-
-  abstract_lookup(&t2, post, tmpx, tmpx);
-
-  return 1;
+void body(abstract_heapt *heap) {
+  // cell = new ()
+  abstract_new(heap, cell);
+  // tmpy->next = cell
+  abstract_update(heap, tmpy, cell);
+  // tmpy = tmpy->next
+  abstract_lookup(heap, tmpy, tmpy);
+  // tmpx = tmpx->next
+  abstract_lookup(heap, tmpx, tmpx);
 }
 
-int assertion(abstract_heapt *heap) {
-  if (alias(heap, tmpy, null_ptr)) {
-    return 0;
-  }
-
-  if (!is_path(heap, y, null_ptr)) {
-    return 0;
-  }
-
-  return 1;
+_Bool assertion(abstract_heapt *heap) {
+  return path_len(heap, y, null_ptr) == path_len(heap, x, null_ptr);
 }
 
-int inv(abstract_heapt *heap) {
-  return !is_null(heap, tmpy) &&
-         is_path(heap, y, null_ptr);
+_Bool inv(abstract_heapt *heap) {
+  return path_len(heap, y, null_ptr) + path_len(heap, tmpx, null_ptr) == path_len(heap, x, null_ptr)
+    && is_path(heap, x, tmpx)
+    && is_path(heap, y, tmpy)
+    && path_len(heap, tmpy, null_ptr) == 1;
 }

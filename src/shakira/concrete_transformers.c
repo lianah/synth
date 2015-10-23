@@ -25,7 +25,7 @@ void concrete_lookup(concrete_heapt *pre,
   word_t py = pre->ptr[y];
   word_t yn = pre->succ[py];
 
-  __CPROVER_assume(py != 0);
+  assume(py != 0);
 
   copy_concrete(pre, post);
   post->ptr[x] = yn;
@@ -38,7 +38,7 @@ void concrete_update(concrete_heapt *pre,
   word_t py = pre->ptr[y];
   word_t px = pre->ptr[x];
 
-  __CPROVER_assume(px != 0);
+  assume(px != 0);
 
   copy_concrete(pre, post);
   post->succ[px] = py;
@@ -81,7 +81,7 @@ void concrete_new(concrete_heapt *pre,
   }
 
   // we'll use this node as the new allocated node
-  __CPROVER_assume(new_node != null_node); 
+  assume(new_node != null_node); 
 
   copy_concrete(pre, post);
   post->ptr[x] = new_node;
