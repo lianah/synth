@@ -295,41 +295,41 @@ int valid_abstract_heap(const abstract_heapt *heap) {
   }
 
   
-  // We have no more nodes than we expect.
-  if (heap->nnodes > NABSNODES) {
-    return 0;
-  }
+  /* // We have no more nodes than we expect. */
+  /* if (heap->nnodes > NABSNODES) { */
+  /*   return 0; */
+  /* } */
 
-  // Each program variable points to a valid node.
-  ptr_t p;
+  /* // Each program variable points to a valid node. */
+  /* ptr_t p; */
 
-  for (p = 0; p < NPROG; p++) {
-    if (deref(heap, p) >= heap->nnodes) {
-      return 0;
-    }
-  }
+  /* for (p = 0; p < NPROG; p++) { */
+  /*   if (deref(heap, p) >= heap->nnodes) { */
+  /*     return 0; */
+  /*   } */
+  /* } */
   
   
-  // Each node's next pointer points to a valid node.
-  node_t n;
+  /* // Each node's next pointer points to a valid node. */
+  /* node_t n; */
 
-  for (n = 0; n < NABSNODES; n++) {
-    if (next(heap, n) >= heap->nnodes) {
-      return 0;
-    }
-  }
+  /* for (n = 0; n < NABSNODES; n++) { */
+  /*   if (next(heap, n) >= heap->nnodes) { */
+  /*     return 0; */
+  /*   } */
+  /* } */
   
   
-  // Each node, except null, is > 0 away from its successor.
-  for (n = 0; n < NABSNODES; n++) {
-    if (n != null_node && dist(heap, n) <= 0) {
-      return 0;
-    }
+  /* // Each node, except null, is > 0 away from its successor. */
+  /* for (n = 0; n < NABSNODES; n++) { */
+  /*   if (n != null_node && dist(heap, n) <= 0) { */
+  /*     return 0; */
+  /*   } */
 
-    if (dist(heap, n) >= INF) {
-      return 0;
-    }
-  }
+  /*   if (dist(heap, n) >= INF) { */
+  /*     return 0; */
+  /*   } */
+  /* } */
   
 
   return is_minimal(heap);

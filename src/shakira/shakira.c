@@ -32,7 +32,7 @@ void main(void) {
       assert(inv(&h));
     }  else { 
        // Property. 
-       assert(assertion(&h)); 
+      assert(assertion(&h)); 
      } 
   }
 }
