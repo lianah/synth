@@ -341,11 +341,11 @@ int is_minimal(const abstract_heapt *heap) {
 
   // Count the reachable nodes and find the indegrees of each node in the
   // reachable subheap.
-  word_t is_reachable[NABSNODES];
+  //word_t is_reachable[NABSNODES];
   //word_t indegree[NABSNODES];
   word_t nreachable = 0;
 
-  memset(is_reachable, 0, sizeof(is_reachable));
+  //memset(is_reachable, 0, sizeof(is_reachable));
   // LSH no indegree
   // memset(indegree, 0, sizeof(indegree));
 
@@ -354,6 +354,7 @@ int is_minimal(const abstract_heapt *heap) {
   word_t i;
   word_t last_reachable = 0;
 
+  // check that named nodes have succ n + 1
   for (p = 0; p < NPROG; p++) {
     n = deref(heap, p);
     is_named[n] = 1;
@@ -362,42 +363,72 @@ int is_minimal(const abstract_heapt *heap) {
       return 0;
     }
 
-    // LSH: maybe sort lists by length
-    for (i = 0; i < NABSNODES-1; i++) {
-      if (!is_reachable[n]) {
-        if (n >= heap->nnodes) {
-          return 0;
-        }
-
-        if (dist(heap, n) >= INF) {
-          return 0;
-        }
-
-        if (n != null_node && dist(heap, n) <= 0) {
-          return 0;
-        }
-
-        if (n < last_reachable) {
-          // The heap is not topologically ordered.
-          return 0;
-        }
-
-        last_reachable = n;
-
-        is_reachable[n] = 1;
-        nreachable++;
-
-	if (next(heap, n) != null_node &&
-	    n + 1 != next(heap, n)) {
-	  return 0;
-	}
-	
-        n = next(heap, n);
-
-
-        // indegree[n]++;
-      }
+    if (next(heap, n) != null_node &&
+	n + 1 != next(heap, n)) {
+      return 0;
     }
+  }
+
+  // check that all nodes are named
+
+  for (i = 0; i < NABSNODES-1; i++) {
+    nreachable += is_named[i];
+    if (is_named[i] && !is_named[next(heap, i)]) {
+      return 0;
+    }
+    if (i != null_node && dist(heap, i) <= 0) {
+      return 0;
+    }
+  }
+
+  // If we're a fully reduced graph, we don't have any unreachable nodes.
+  if (heap->nnodes != nreachable) {
+    return 0;
+  }
+
+  //LSH size
+  //if (nreachable > NLIVE*2 + 1) {
+  if (nreachable > NLIVE + 2) {
+    return 0;
+  }
+  
+  for (i = 0; i < NABSNODES-1; i++) {
+    if(i < heap->nnodes&& !is_named[i])
+      return 0;
+    /*   if (!is_reachable[n]) { */
+    /*     if (n >= heap->nnodes) { */
+    /*       return 0; */
+    /*     } */
+
+    /*     if (dist(heap, n) >= INF) { */
+    /*       return 0; */
+    /*     } */
+
+    /*     if (n != null_node && dist(heap, n) <= 0) { */
+    /*       return 0; */
+    /*     } */
+
+    /*     if (n < last_reachable) { */
+    /*       // The heap is not topologically ordered. */
+    /*       return 0; */
+    /*     } */
+
+    /*     last_reachable = n; */
+
+    /*     is_reachable[n] = 1; */
+    /*     nreachable++; */
+
+    /* 	if (next(heap, n) != null_node && */
+    /* 	    n + 1 != next(heap, n)) { */
+    /* 	  return 0; */
+    /* 	} */
+	
+    /*     n = next(heap, n); */
+
+
+    /*     // indegree[n]++; */
+    /*   } */
+    /* } */
   }
 
   // Check there are no unnamed, reachable nodes with indegree <= 1.
@@ -409,16 +440,6 @@ int is_minimal(const abstract_heapt *heap) {
   /* } */
   // LSH: what if we have x= new(); x = y (i.e. memory leak)
   
-  // If we're a fully reduced graph, we don't have any unreachable nodes.
-  if (heap->nnodes != nreachable) {
-    return 0;
-  }
-
-  // LSH size
-  //if (nreachable > NLIVE*2 + 1) {
-  if (nreachable > NLIVE + 2) {
-    return 0;
-  }
 
   return 1;
 }
