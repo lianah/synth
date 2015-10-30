@@ -346,6 +346,7 @@ int is_minimal(const abstract_heapt *heap) {
   word_t nreachable = 0;
 
   memset(is_reachable, 0, sizeof(is_reachable));
+  // LSH no indegree
   memset(indegree, 0, sizeof(indegree));
 
   ptr_t p;
@@ -361,6 +362,7 @@ int is_minimal(const abstract_heapt *heap) {
       return 0;
     }
 
+    // LSH: maybe sort lists by length
     for (i = 0; i < NABSNODES-1; i++) {
       if (!is_reachable[n]) {
         if (n >= heap->nnodes) {
@@ -394,18 +396,21 @@ int is_minimal(const abstract_heapt *heap) {
   }
 
   // Check there are no unnamed, reachable nodes with indegree <= 1.
+  // LSH: this says that the anonymous edges were smoothen
   for (n = 0; n < NABSNODES; n++) {
     if (!is_named[n] && is_reachable[n] && indegree[n] <= 1) {
       return 0;
     }
   }
-
+  // LSH: what if we have x= new(); x = y (i.e. memory leak)
   // If we're a fully reduced graph, we don't have any unreachable nodes.
   if (heap->nnodes != nreachable) {
     return 0;
   }
 
-  if (nreachable > NLIVE*2 + 1) {
+  // LSH size
+  //if (nreachable > NLIVE*2 + 1) {
+  if (nreachable > NLIVE + 2) {
     return 0;
   }
 
