@@ -342,12 +342,12 @@ int is_minimal(const abstract_heapt *heap) {
   // Count the reachable nodes and find the indegrees of each node in the
   // reachable subheap.
   word_t is_reachable[NABSNODES];
-  word_t indegree[NABSNODES];
+  //word_t indegree[NABSNODES];
   word_t nreachable = 0;
 
   memset(is_reachable, 0, sizeof(is_reachable));
   // LSH no indegree
-  memset(indegree, 0, sizeof(indegree));
+  // memset(indegree, 0, sizeof(indegree));
 
   ptr_t p;
   node_t n, m;
@@ -387,22 +387,28 @@ int is_minimal(const abstract_heapt *heap) {
         is_reachable[n] = 1;
         nreachable++;
 
+	if (next(heap, n) != null_node &&
+	    n + 1 != next(heap, n)) {
+	  return 0;
+	}
+	
         n = next(heap, n);
 
 
-        indegree[n]++;
+        // indegree[n]++;
       }
     }
   }
 
   // Check there are no unnamed, reachable nodes with indegree <= 1.
   // LSH: this says that the anonymous edges were smoothen
-  for (n = 0; n < NABSNODES; n++) {
-    if (!is_named[n] && is_reachable[n] && indegree[n] <= 1) {
-      return 0;
-    }
-  }
+  /* for (n = 0; n < NABSNODES; n++) { */
+  /*   if (!is_named[n] && is_reachable[n] && indegree[n] <= 1) { */
+  /*     return 0; */
+  /*   } */
+  /* } */
   // LSH: what if we have x= new(); x = y (i.e. memory leak)
+  
   // If we're a fully reduced graph, we don't have any unreachable nodes.
   if (heap->nnodes != nreachable) {
     return 0;

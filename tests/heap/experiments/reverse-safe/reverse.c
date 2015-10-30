@@ -7,9 +7,8 @@ ptr_t next = 3;
 void pre(abstract_heapt *heap) {
   assume(is_null(heap, new_root) &&
 	 !is_null(heap, root) &&
-	 is_path(heap, root, null_ptr) &&
-	 alias(heap, root, next) &&
-	 !alias(heap, root, new_root));
+	 // alias(heap, root, next) &&
+	 path_len(heap, root, null_ptr) == 8);
 }
 
 _Bool cond(abstract_heapt *heap) {
@@ -17,17 +16,8 @@ _Bool cond(abstract_heapt *heap) {
 }
 
 void body(abstract_heapt *pre) {
-  /* if (is_null(pre, root)) { */
-  /*   return 0; */
-  /* } */
-
   // next = root->next; 
   abstract_lookup(pre, next, root);
-
-  /* if (is_null(&t1, root)) { */
-  /*   return 0; */
-  /* } */
-
   // root->next = new_root
   abstract_update(pre, root, new_root);
   // new_root = root
@@ -37,17 +27,19 @@ void body(abstract_heapt *pre) {
 }
 
 _Bool assertion(abstract_heapt *heap) {
-  return  is_path(heap, new_root, null_ptr);
+  return  path_len(heap, new_root, null_ptr) == 8;
 }
 
 
 // can we express an invariant strong enough? seems like you need to talk about the
 // annonymous sharing point (see counter-example)
 _Bool inv(abstract_heapt *heap) {
-  return is_path(heap, new_root, null_ptr)  && 
-    alias(heap, root, next) &&
-    !alias(heap, root, new_root) &&
-    is_path(heap, root, null_ptr) &&
-    ( !is_path(heap, new_root, root) ||
-      is_null(heap, root));
+  return path_len(heap, new_root, null_ptr) + path_len(heap, root, null_ptr) == 8 &&
+         !alias(heap, root, new_root);
+  /* return alias(heap, root, next) && */
+  /*   !alias(heap, root, new_root) && */
+  /*   (!is_path(heap, root, new_root) || */
+  /*    is_null(heap, new_root)) && */
+  /*   ( !is_path(heap, new_root, root) || */
+  /*     is_null(heap, root)); */
 }
