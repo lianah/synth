@@ -7,8 +7,7 @@ ptr_t next = 3;
 void pre(abstract_heapt *heap) {
   assume(is_null(heap, new_root) &&
 	 !is_null(heap, root) &&
-	 // alias(heap, root, next) &&
-	 path_len(heap, root, null_ptr) == 8);
+	 path_len(heap, root, null_ptr) == 7);
 }
 
 _Bool cond(abstract_heapt *heap) {
@@ -27,20 +26,13 @@ void body(abstract_heapt *pre) {
 }
 
 _Bool assertion(abstract_heapt *heap) {
-  return  path_len(heap, new_root, null_ptr) == 8;
+  return  path_len(heap, new_root, null_ptr) == 7;
 }
 
-
-// can we express an invariant strong enough? seems like you need to talk about the
-// annonymous sharing point (see counter-example)
+// Invariant fails inductive step: root->next = new_root
+// note that this can only happen with odd length
 _Bool inv(abstract_heapt *heap) {
-  return path_len(heap, new_root, null_ptr) + path_len(heap, root, null_ptr) == 8 &&
+  return path_len(heap, new_root, null_ptr) + path_len(heap, root, null_ptr) == 7 &&
          !alias(heap, root, new_root) &&
          ( !is_path(heap, new_root, root) || is_null(heap, root)); 
-  /* return alias(heap, root, next) && */
-  /*   !alias(heap, root, new_root) && */
-  /*   (!is_path(heap, root, new_root) || */
-  /*    is_null(heap, new_root)) && */
-  /*   ( !is_path(heap, new_root, root) || */
-  /*     is_null(heap, root)); */
 }

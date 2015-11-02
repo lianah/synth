@@ -7,7 +7,7 @@ ptr_t next = 3;
 void pre(abstract_heapt *heap) {
   assume(is_null(heap, new_root) &&
 	 !is_null(heap, root) &&
-	 // alias(heap, root, next) &&
+	 alias(heap, root, next) &&
 	 path_len(heap, root, null_ptr) == 8);
 }
 
@@ -23,7 +23,7 @@ void body(abstract_heapt *pre) {
   // new_root = root
   abstract_assign(pre, new_root, root);
   // root = next
-  abstract_assign(pre, root, next);
+  //abstract_assign(pre, root, next);
 }
 
 _Bool assertion(abstract_heapt *heap) {
@@ -36,7 +36,7 @@ _Bool assertion(abstract_heapt *heap) {
 _Bool inv(abstract_heapt *heap) {
   return path_len(heap, new_root, null_ptr) + path_len(heap, root, null_ptr) == 8 &&
          !alias(heap, root, new_root) &&
-         ( !is_path(heap, new_root, root) || is_null(heap, root)); 
+         alias(heap, root, next);
   /* return alias(heap, root, next) && */
   /*   !alias(heap, root, new_root) && */
   /*   (!is_path(heap, root, new_root) || */
