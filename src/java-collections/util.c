@@ -15,6 +15,22 @@ word_t s_add(word_t x, word_t y) {
   return ret;
 }
 
+bool_t and(bool_t x, bool_t y) {
+  // LSH TODO: clever bit-fiddling?
+  if ( x == bool_unknown || y == bool_unknown) {
+    return (x == bool_false || y == bool_false) ? bool_false : bool_unknown;
+  }
+  return x && y;
+}
+
+bool_t or(bool_t x, bool_t y) {
+  // LSH TODO: clever bit-fiddling?
+  if ( x == bool_unknown || y == bool_unknown) {
+    return (x == bool_true || y == bool_true) ? bool_true : bool_unknown;
+  }
+  return x || y;
+}
+
 /*
  * Saturating subtraction.
  */

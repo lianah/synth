@@ -6,14 +6,14 @@ extern _Bool cond(const abstract_heapt *heap);
 extern void body(abstract_heapt *pre);
 extern _Bool assertion(const abstract_heapt *heap);
 extern _Bool inv(const abstract_heapt *heap);
-
+extern void init_predicates();
 abstract_heapt nondet_heap(); 
 
 void main(void) {
    abstract_heapt h; 
 
   /* assert(NABSNODES >= (NLIVE*2) + 1); */
-
+  init_predicates();
   assume(valid_abstract_heap(&h));
 
 
