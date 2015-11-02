@@ -33,8 +33,9 @@ def processHeap(m,prefix):
   print "}"
 
 
-
-regex = 'h={[^.]*\.succ={([\d, ]*)},[^.]*\.dist={([\d, ]*)},[^.]*\.ptr={([\d, ]*)},[^.]*\.nnodes=(\d+)'
+# LSH CONTINUE HERE
+regex = 'h={[^.]*\.ptr={([\d, ]*)},[^.]*\.succ={([\d, ]*)},[^.]*\.dist={([\d, ]*)},[^.]*\.universal={([\d, ]*)},[^.]*\.existential={([\d, ]*)},[^.]*\.nnodes=(\d+)'
+# regex = 'h={[^.]*\.succ={([\d, ]*)},[^.]*\.dist={([\d, ]*)},[^.]*\.ptr={([\d, ]*)},[^.]*\.nnodes=(\d+)'
 # r = re.compile(r'h={[^.]*\.succ={([\d, ]*)},[^.]*\.dist={([\d, ]*)},[^.]*\.ptr={([\d, ]*)},[^.]*\.nnodes=(\d+)', flags=re.DOTALL)
 
 cex = sys.stdin.read()

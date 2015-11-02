@@ -8,6 +8,15 @@ abstract_heapt nondet_heap() {
   abstract_heapt h;
   return h;
 }
+
+data_t nondet_data_t() {
+  data_t d;
+  return d;
+}
+#else
+
+data_t nondet_data_t();
+
 #endif
 
 
@@ -43,18 +52,18 @@ static word_t dist(const abstract_heapt *heap,
 /*
  * What is the value of the i_th existential predicate for n ?
  */
-static bool_t exists(const abstract_heapt *heap,
+static bool_t get_exists(const abstract_heapt *heap,
 		     node_t n,
 		     predicate_index_t pi) {
   assume(n < NABSNODES);
   assume(pi < NPREDS);
-  return heap->existenial[n][pi];
+  return heap->existential[n][pi];
 }
 
 /*
  * What is the value of the i_th universal predicate for n ?
  */
-static bool_t univ(const abstract_heapt *heap,
+static bool_t get_univ(const abstract_heapt *heap,
 		     node_t n,
 		     predicate_index_t pi) {
   assume(n < NABSNODES);
@@ -102,7 +111,7 @@ static void destructive_assign_univ(abstract_heapt *heap,
 				    bool_t pred_val) {
   assume(nx < NABSNODES);
   assume(pi < NPREDS);
-  heap->universals[nx][pi] = pred_val;
+  heap->universal[nx][pi] = pred_val;
 }
 
 static void destructive_assign_exists(abstract_heapt *heap,
@@ -111,7 +120,7 @@ static void destructive_assign_exists(abstract_heapt *heap,
 				      bool_t pred_val) {
   assume(nx < NABSNODES);
   assume(pi < NPREDS);
-  heap->exists[nx][pi] = pred_val;
+  heap->existential[nx][pi] = pred_val;
 }
 
 /*
@@ -119,7 +128,7 @@ static void destructive_assign_exists(abstract_heapt *heap,
  *
  * x and y are pointers.
  */
-void abstract_assign(abstract_heapt *heap,
+void assign(abstract_heapt *heap,
                      ptr_t x,
                      ptr_t y) {
   assume(x < NPROG);
@@ -155,7 +164,7 @@ void abstract_new(abstract_heapt *heap,
   destructive_assign_ptr(heap, x, nx);
   predicate_index_t pi = 0;
   for (pi = 0; pi < NPREDS; ++pi) {
-    destructive_assign_unvis(heap, nx, pi, bool_unknown);
+    destructive_assign_univ(heap, nx, pi, bool_unknown);
     destructive_assign_exists(heap, nx, pi, bool_unknown);
   }
 }
@@ -179,7 +188,7 @@ node_t subdivide(abstract_heapt *heap,
     // Case 1:
     //
     // x's successor is one step away, so return that
-    return nx_succ;
+    return succ_nx;
   } else {
     // Case 2:
     //
@@ -200,9 +209,9 @@ node_t subdivide(abstract_heapt *heap,
     predicate_index_t pi;
     for (pi = 0; pi < NPREDS; ++pi) {
       // Only true universals are still true on the segments
-      bool_t new_univ = univ(heap, nx, pi) == bool_true? bool_true : bool_unknown;
+      bool_t new_univ = get_univ(heap, nx, pi) == bool_true? bool_true : bool_unknown;
       // Only false existentials are still false on the segments
-      bool_t new_exists = exists(heap, nx, pi) == bool_false ? bool_true : bool_unknown;
+      bool_t new_exists = get_exists(heap, nx, pi) == bool_false ? bool_true : bool_unknown;
 
       // Update predicates for nx 
       destructive_assign_univ(heap, nx, pi, new_univ);
@@ -237,23 +246,18 @@ _Bool valid_abstract_heap(const abstract_heapt *heap) {
     return 0;
   }
 
-  // null doesn't have any data
-  if (data(heap, null_node) != undef) {
-    return 0;
-  }
-
   predicate_index_t pi;
   // null predicates are all unknown
   for (pi = 0; pi < NPREDS; ++pi) {
-    if (exists(heap, null_node, pi) != bool_unknown) {
+    if (get_exists(heap, null_node, pi) != bool_unknown) {
       return 0;
     }
     
-    if (univ(heap, null_node, pi) != bool_unknown) {
+    if (get_univ(heap, null_node, pi) != bool_unknown) {
       return 0;
     }
   }
-  
+
   return is_minimal(heap);
 }
 
@@ -284,12 +288,16 @@ _Bool is_minimal(const abstract_heapt *heap) {
     }
 
     for (pi = 0; pi < NPREDS; ++pi) {
-      bool_t e = exists(heap, n, pi);
-      bool_t u = univ(heap, n, pi);
+      bool_t e = get_exists(heap, n, pi);
+      bool_t u = get_univ(heap, n, pi);
+
+      if (e > bool_unknown || u > bool_unknown)
+	return 0;
       
       // predicates are known for all nodes 
-      if (e == bool_unknown ||
-	  u == bool_unknown) {
+      if (n != null_node &&
+	  (e == bool_unknown ||
+	   u == bool_unknown)) {
 	return 0;
       }
       // if the universal holds so does the existential
@@ -362,7 +370,7 @@ word_t path_len(const abstract_heapt *heap,
   return INF;
 }
 
-word_t alias(const abstract_heapt *heap,
+_Bool alias(const abstract_heapt *heap,
              ptr_t x,
              ptr_t y) {
   node_t xn = deref(heap, x);
@@ -371,7 +379,7 @@ word_t alias(const abstract_heapt *heap,
   return xn == yn;
 }
 
-word_t is_null(const abstract_heapt *heap,
+_Bool is_null(const abstract_heapt *heap,
                ptr_t x) {
   return deref(heap, x) == null_node;
 }
@@ -380,7 +388,8 @@ bool_t exists(const abstract_heapt *heap,
 	     ptr_t x,
 	     ptr_t y,
 	     predicate_index_t pi) {
-  assert(is_path(heap, x, y));
+  // LSH: FIXME
+  //assert(is_path(heap, x, y));
   
   node_t nx = deref(heap, x);
   node_t ny = deref(heap, y);
@@ -391,7 +400,7 @@ bool_t exists(const abstract_heapt *heap,
 
   // trying to be efficient?
   if (nx == ny) {
-    return exists(heap, nx);
+    return get_exists(heap, nx, pi);
   }
   
   bool_t res = bool_false;
@@ -399,11 +408,11 @@ bool_t exists(const abstract_heapt *heap,
   for (i = 0; i < NABSNODES; ++i) {
     if (nx == ny) {
       if (nx != null_node) {
-	res = or(res, exists(heap, nx, pi));
+	res = or(res, get_exists(heap, nx, pi));
       }
       return res;
     }
-    res = or(res, exists(heap, nx, pi));
+    res = or(res, get_exists(heap, nx, pi));
     nx = succ(heap, nx);
   }
   return bool_unknown;
@@ -412,41 +421,41 @@ bool_t exists(const abstract_heapt *heap,
 bool_t forall(const abstract_heapt *heap,
 	     ptr_t x,
 	     ptr_t y,
-	     predicate_index i) {
-  assert(is_path(heap, x, y));
+	     predicate_index_t pi) {
+  // LSH: FIXME
+  // assert(is_path(heap, x, y));
   
   node_t nx = deref(heap, x);
   node_t ny = deref(heap, y);
 
-  if (nx == null_node) {
-    return bool_unknown;
+  // This is technically the empty list so everything holds
+  if (nx == ny) {
+    return bool_true;
   }
 
-  // trying to be efficient?
-  if (nx == ny) {
-    return univ(heap, nx);
-  }
+  assert (nx != null_node);
   
   bool_t res = bool_true;
   word_t i;
   for (i = 0; i < NABSNODES; ++i) {
     if (nx == ny) {
       if (nx != null_node) {
-	res = and(res, univ(heap, nx));
+	res = and(res, get_univ(heap, nx, pi));
       }
       return res;
     }
-    res = and(res, univ(heap, nx));
+    res = and(res, get_univ(heap, nx, pi));
     nx = succ(heap, nx);
   }
+  // LSH FIXME: the paper actually cehcks that the predicates entail the current predicate
   return bool_unknown;
 }
 
 bool_t sorted(const abstract_heapt *heap,
 	     ptr_t x,
 	     ptr_t y) {
-  assert(false);
-  return false;
+  assert(0);
+  return 0;
 }
 
 
@@ -457,10 +466,10 @@ bool_t sorted(const abstract_heapt *heap,
  ************************/
 
 /* Positional get */
-data_t get(const abstract_heapt *heap,
+data_t getI(const abstract_heapt *heap,
 	   ptr_t x,
 	   index_t i) {
-  assert(false);
+  assert(0);
   return 0;
 }
 
@@ -502,33 +511,28 @@ data_t get(const abstract_heapt *heap,
  ************************/
 
 /* Positional set */
-void set(abstract_heapt *heap,
+void setI(abstract_heapt *heap,
 	 ptr_t x,
 	 index_t i,
 	 data_t val) {
-  assert(false);
+  assert(0);
 }
 
 /* Positional add (only one) */
-void add(abstract_heapt *heap,
+void addI(abstract_heapt *heap,
 	 ptr_t x,
 	 index_t i,
 	 data_t val) {
-  assert(false);
+  assert(0);
 }
 
 /* Positional remove */
-void remove(abstract_heapt *heap,
+void removeI(abstract_heapt *heap,
 	    ptr_t x,
 	    index_t i) {
-  assert(false);
+  assert(0);
 }
 
-void abstract_assign(abstract_heapt *heap,
-                     ptr_t x,
-                     ptr_t y) {
-  assert(false);
-}
 
 /* Iterator set */
 void set(abstract_heapt *heap,
@@ -546,8 +550,8 @@ void set(abstract_heapt *heap,
   predicate_index_t pi;
   for (pi = 0; pi < NPREDS; ++pi) {
     _Bool val_pred = eval_pred(pi, val);
-    destructive_assign_univ(heap, nx, pi, bool_t(val_pred));
-    destructive_assign_exists(heap, nx, pi, bool_t(val_pred));
+    destructive_assign_univ(heap, nx, pi, (bool_t)val_pred);
+    destructive_assign_exists(heap, nx, pi, (bool_t)val_pred);
   }
 }
 
@@ -571,6 +575,7 @@ _Bool has_next(abstract_heapt *heap,
 
   node_t nx = deref(heap, x);
   word_t nx_dist = dist(heap, x);
-  assert ( nx != null_node);
+  // LSH: should this be assert?
+  assume ( nx != null_node);
   return nx_dist > 1 || succ(heap, nx) != null_node;
 }

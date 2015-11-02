@@ -101,51 +101,51 @@ void print_abstract_heap(abstract_heapt *heap) {
   printf("\n");
 }
 
-void print_facts(heap_factst *facts) {
-  ptr_t p, q;
-  word_t len;
+/* void print_facts(heap_factst *facts) { */
+/*   ptr_t p, q; */
+/*   word_t len; */
 
-  printf("Shortest paths:\n");
+/*   printf("Shortest paths:\n"); */
 
-  for (p = 0; p < NPROG; p++) {
-    for (q = 0; q < NPROG; q++) {
-      len = facts->dists[p][q];
-      print_ptr(p); printf(" -"); print_len(len); printf("-> "); print_ptr(q); printf("   ");
-    }
+/*   for (p = 0; p < NPROG; p++) { */
+/*     for (q = 0; q < NPROG; q++) { */
+/*       len = facts->dists[p][q]; */
+/*       print_ptr(p); printf(" -"); print_len(len); printf("-> "); print_ptr(q); printf("   "); */
+/*     } */
 
-    printf("\n");
-  }
-}
+/*     printf("\n"); */
+/*   } */
+/* } */
 
-void serialize_facts(heap_factst *facts, word_t buf[NARGS]) {
-  word_t i, j;
+/* void serialize_facts(heap_factst *facts, word_t buf[NARGS]) { */
+/*   word_t i, j; */
 
-  for (i = 0; i < NPROG; i++) {
-    for (j = 0; j < NPROG; j++) {
-      buf[i*NPROG + j] = facts->dists[i][j];
-    }
-  }
+/*   for (i = 0; i < NPROG; i++) { */
+/*     for (j = 0; j < NPROG; j++) { */
+/*       buf[i*NPROG + j] = facts->dists[i][j]; */
+/*     } */
+/*   } */
 
-  for (i = NPROG*NPROG; i < NARGS; i++) {
-    buf[i] = 0;
-  }
-}
+/*   for (i = NPROG*NPROG; i < NARGS; i++) { */
+/*     buf[i] = 0; */
+/*   } */
+/* } */
 
-void deserialize_heap(word_t buf[NARGS], abstract_heapt *heap) {
-  word_t i = 0;
-  word_t j;
+/* void deserialize_heap(word_t buf[NARGS], abstract_heapt *heap) { */
+/*   word_t i = 0; */
+/*   word_t j; */
 
-  for (j = 0; j < NABSNODES; j++) {
-    heap->succ[j] = buf[i++];
-  }
+/*   for (j = 0; j < NABSNODES; j++) { */
+/*     heap->succ[j] = buf[i++]; */
+/*   } */
 
-  for (j = 0; j < NABSNODES; j++) {
-    heap->dist[j] = buf[i++];
-  }
+/*   for (j = 0; j < NABSNODES; j++) { */
+/*     heap->dist[j] = buf[i++]; */
+/*   } */
 
-  for (j = 0; j < NPROG; j++) {
-    heap->ptr[j] = buf[i++];
-  }
+/*   for (j = 0; j < NPROG; j++) { */
+/*     heap->ptr[j] = buf[i++]; */
+/*   } */
 
-  heap->nnodes = buf[i++];
-}
+/*   heap->nnodes = buf[i++]; */
+/* } */

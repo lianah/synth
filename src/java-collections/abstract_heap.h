@@ -30,7 +30,7 @@
 #else
   #define assume(x) assert(x)
   typedef unsigned int word_t;
-  typedef char __CPROVER_bitvector[2] bool_t; 
+  typedef char bool_t; 
 #endif
 
 #ifndef NSLACK
@@ -39,6 +39,10 @@
 
 #ifndef NLIVE
  #define NLIVE (NPROG-1)
+#endif
+
+#ifndef NPREDS
+ #define NPREDS 1
 #endif
 
 #define NABSNODES (NPROG + 1 + NSLACK)
@@ -76,9 +80,9 @@ typedef struct abstract_heap {
   // successor is.
   word_t dist[NABSNODES];
   // A map from nodes to the value of the universal predicates
-  bool_t universal[NABSNODES];
+  bool_t universal[NABSNODES][NPREDS];
   // A map from nodes to the value of the existential predicates
-  bool_t existential[NABSNODES]
+  bool_t existential[NABSNODES][NPREDS];
   // How many nodes are currently allocated?
   word_t nnodes;
 } abstract_heapt;
@@ -127,9 +131,9 @@ bool_t sorted(const abstract_heapt *heap,
  ************************/
 
 /* Positional get */
-data_t get(const abstract_heapt *heap,
-	   ptr_t x,
-	   index_t i);
+data_t getI(const abstract_heapt *heap,
+	    ptr_t x,
+	    index_t i);
 
 /* Iterator get */
 data_t get(const abstract_heapt *heap,
@@ -143,26 +147,26 @@ data_t get(const abstract_heapt *heap,
  ************************/
 
 /* Positional set */
-void set(abstract_heapt *heap,
+void setI(abstract_heapt *heap,
 	 ptr_t x,
 	 index_t i,
 	 data_t val);
 
 // LSH FIXME: ListIterator actually has an add...
 /* Positional add (only one) */
-void add(abstract_heapt *heap,
-	 ptr_t x,
-	 index_t i,
-	 data_t val);
+void addI(abstract_heapt *heap,
+	  ptr_t x,
+	  index_t i,
+	  data_t val);
 
 /* Positional remove */
-void remove(abstract_heapt *heap,
+void removeI(abstract_heapt *heap,
 	    ptr_t x,
 	    index_t i);
 
-void abstract_assign(abstract_heapt *heap,
-                     ptr_t x,
-                     ptr_t y);
+void assign(abstract_heapt *heap,
+	    ptr_t x,
+	    ptr_t y);
 
 /* Iterator set */
 void set(abstract_heapt *heap,
@@ -194,7 +198,10 @@ bool_t or(bool_t x, bool_t y);
   * each node has in-degree 1
   * all reachable nodes are named
   * predicates for all reachable nodes are known
-  * if forall is true on an edge so is exists 
+  * if forall is true on an edge so is exists
+  * if exists is false then so is forall
+  * if length is 1 and existential is true so is universal
+  * check that predicates are consistent??
   * for each node x != null, succ(x) = x + 1 or succ(x) = null
   * for the null node data[null] = undef, univ[null] = bool_unknown, exist[null] = bool_unknown
   * TODO: more stuff? 

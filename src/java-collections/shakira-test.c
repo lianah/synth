@@ -7,23 +7,28 @@ extern void body(abstract_heapt *pre);
 extern _Bool assertion(const abstract_heapt *heap);
 extern _Bool inv(const abstract_heapt *heap);
 extern void init_predicates();
+
+extern void init_counterexample(abstract_heapt *heap);
+extern void inductive_counterexample(abstract_heapt *heap);
+
 abstract_heapt nondet_heap(); 
 
 void main(void) {
    abstract_heapt h; 
 
-  /* assert(NABSNODES >= (NLIVE*2) + 1); */
   init_predicates();
-  
-  assume(valid_abstract_heap(&h));
 
+  init_counterexample(&h);
+  
+  assert (valid_abstract_heap(&h));
+  
   // Base.
   pre(&h);
   assert(inv(&h));
 
-  h = nondet_heap();
+  inductive_counterexample(&h);
 
-  assume (valid_abstract_heap(&h));
+  assert (valid_abstract_heap(&h));
   
   if (inv(&h)) {
     if (cond(&h)) {
@@ -31,7 +36,7 @@ void main(void) {
       body(&h);
       assert(inv(&h));
     }  else { 
-       // Property. 
+       // Property.
       assert(assertion(&h)); 
      } 
   }
