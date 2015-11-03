@@ -15,7 +15,7 @@ void main(void) {
   /* assert(NABSNODES >= (NLIVE*2) + 1); */
   init_predicates();
   
-  assume(valid_abstract_heap(&h));
+  /* assume(valid_abstract_heap(&h)); */
 
   // Base.
   pre(&h);

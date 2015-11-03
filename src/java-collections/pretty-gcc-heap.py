@@ -47,12 +47,13 @@ def processHeap(m,prefix):
   print "}"
 
 
-regex = 'h={[^.]*\.ptr={([\d, ]*)},[^.]*\.succ={([\d, ]*)},[^.]*\.dist={([\d, ]*)},[^.]*\.universal={([\d,{} ]*)},[^.]*\.existential={([\d,{} ]*)},[^.]*\.nnodes=(\d+)'
+regex = 'ptr = {([\d, ]*)}, succ = {([\d, ]*)}, dist = {([\d, ]*)}, universal = {([\d,{} ]*)}, existential = {([\d,{} ]*)}, nnodes = (\d+)'
+# regex = 'ptr = {([\d, ]*)}, succ={([\d, ]*)}, dist = {([\d, ]*)}, universal = {([\d,{} ]*)}, existential = {([\d,{} ]*)}, nnodes = (\d+)'
+
 
 cex = sys.stdin.read()
 
 heaps = re.findall(regex, cex)
-
 
 print "digraph {"
 

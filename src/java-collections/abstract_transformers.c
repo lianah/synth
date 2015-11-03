@@ -53,8 +53,8 @@ static word_t dist(const abstract_heapt *heap,
  * What is the value of the i_th existential predicate for n ?
  */
 static bool_t get_exists(const abstract_heapt *heap,
-		     node_t n,
-		     predicate_index_t pi) {
+			 node_t n,
+			 predicate_index_t pi) {
   assume(n < NABSNODES);
   assume(pi < NPREDS);
   return heap->existential[n][pi];
@@ -211,7 +211,7 @@ node_t subdivide(abstract_heapt *heap,
       // Only true universals are still true on the segments
       bool_t new_univ = get_univ(heap, nx, pi) == bool_true? bool_true : bool_unknown;
       // Only false existentials are still false on the segments
-      bool_t new_exists = get_exists(heap, nx, pi) == bool_false ? bool_true : bool_unknown;
+      bool_t new_exists = get_exists(heap, nx, pi) == bool_false ? bool_false : bool_unknown;
 
       // Update predicates for nx 
       destructive_assign_univ(heap, nx, pi, new_univ);
@@ -439,9 +439,11 @@ bool_t forall(const abstract_heapt *heap,
   word_t i;
   for (i = 0; i < NABSNODES; ++i) {
     if (nx == ny) {
-      if (nx != null_node) {
-	res = and(res, get_univ(heap, nx, pi));
-      }
+      // no need to take into account the ny predicate
+      // since the interval is [nx, ny)
+      /* if (nx != null_node) { */
+      /* 	res = and(res, get_univ(heap, nx, pi)); */
+      /* } */
       return res;
     }
     res = and(res, get_univ(heap, nx, pi));
@@ -572,10 +574,10 @@ void next(abstract_heapt *heap,
 /* Iterator has succ */
 _Bool has_next(abstract_heapt *heap,
 	       ptr_t x) {
-
-  node_t nx = deref(heap, x);
-  word_t nx_dist = dist(heap, x);
-  // LSH: should this be assert?
-  assume ( nx != null_node);
-  return nx_dist > 1 || succ(heap, nx) != null_node;
+  return !is_null(heap, x);
+  /* node_t nx = deref(heap, x); */
+  /* word_t nx_dist = dist(heap, x); */
+  /* // LSH: should this be assert? */
+  /* assume ( nx != null_node); */
+  /* return nx_dist > 1 || succ(heap, nx) != null_node; */
 }

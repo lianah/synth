@@ -30,7 +30,7 @@
 #else
   #define assume(x) assert(x)
   typedef unsigned int word_t;
-  typedef char bool_t; 
+  typedef int bool_t; 
 #endif
 
 #ifndef NSLACK
@@ -101,27 +101,27 @@ typedef struct edge {
 
 word_t path_len(const abstract_heapt *heap,
                 ptr_t x,
-                ptr_t y);
+		ptr_t y);
 _Bool alias(const abstract_heapt *heap,
-             ptr_t x,
-             ptr_t y);
+	    ptr_t x,
+	    ptr_t y);
 _Bool is_null(const abstract_heapt *heap,
 	      ptr_t x);	      
 
 // return bool_t since there is loss of precision
 bool_t exists(const abstract_heapt *heap,
-	     ptr_t x,
-	     ptr_t y,
-	     predicate_index_t i);
+	      ptr_t x,
+	      ptr_t y,
+	      predicate_index_t pi);
 
 bool_t forall(const abstract_heapt *heap,
-	     ptr_t x,
-	     ptr_t y,
-	     predicate_index_t i);
+	      ptr_t x,
+	      ptr_t y,
+	      predicate_index_t pi);
 
 bool_t sorted(const abstract_heapt *heap,
-	     ptr_t x,
-	     ptr_t y);
+	      ptr_t x,
+	      ptr_t y);
 
 
 /*************************
@@ -210,7 +210,7 @@ bool_t or(bool_t x, bool_t y);
 _Bool valid_abstract_heap(const abstract_heapt *heap);
 _Bool is_minimal(const abstract_heapt *heap);
 
-/* #define is_path(h, x, y) (path_len(h, x, y) != INF) */
+#define is_path(h, x, y) (path_len(h, x, y) != INF)
 /* #define circular(h, x) (!is_path(h, x, null_ptr)) */
 
 

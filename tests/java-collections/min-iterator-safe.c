@@ -1,6 +1,24 @@
-#include "abstract_heap.h"
+/*
+ListIterator<Integer> it = list.listIterator();
+Integer min = it.next();
 
-// Run with -DNPROG=3 and -DNPRED=1
+while(it.hasNext()) {
+    //Inv: forall(list,i,min <=v) && exists(list,i, min == v)
+    
+    Integer current = it.next();
+    if (current < min) {
+	min = current;
+    }
+}
+
+//assert(forall(list,n,min <= v) && exists(list,n,min == v));
+*/
+
+
+
+include "abstract_heap.h"
+
+// Run with -DNPROG=3 and -DNPRED=2
 
 
 ptr_t list = 1;
@@ -11,7 +29,8 @@ _Bool isFour(data_t val) {
 }
 
 void init_predicates() {
-  predicates[0] = isFour;
+  predicates[0] = smaller();
+  predicates[1] = exists();
 }
 
 void pre(abstract_heapt *heap) {
@@ -36,9 +55,7 @@ _Bool assertion(abstract_heapt *heap) {
 }
 
 _Bool inv(abstract_heapt *heap) {
-  return (!is_null(heap, list) || is_null(heap, iterator)) &&
-    //is_path(heap, list, iterator) &&
-         forall(heap, list, iterator, 0) == bool_true;
+  return forall(heap, list, iterator, 0) == bool_true;
   // LSH: ORDER MATTERS:
   // if forall is before disjunction, transformer assert fails?
 }
