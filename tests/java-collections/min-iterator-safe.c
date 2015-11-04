@@ -14,8 +14,6 @@ while(it.hasNext()) {
 //assert(forall(list,n,min <= v) && exists(list,n,min == v));
 */
 
-
-
 include "abstract_heap.h"
 
 // Run with -DNPROG=3 and -DNPRED=2
@@ -24,19 +22,28 @@ include "abstract_heap.h"
 ptr_t list = 1;
 ptr_t iterator = 2;
 
-_Bool isFour(data_t val) {
-  return val == 4;
+word_t min; 
+word_t current; 
+
+
+_Bool smaller(data_t val) {
+  return val <= min;
+}
+
+_Bool equal(data_t val) {
+  return val == min;
 }
 
 void init_predicates() {
   predicates[0] = smaller();
-  predicates[1] = exists();
+  predicates[1] = equal();
 }
 
 void pre(abstract_heapt *heap) {
   // LSH FIXME: make special transformer?
   //ListIterator<Int> iterator = list.listIterator()
   assign(heap, iterator, list);
+  min = next(heap, iterator);
 }
 
 _Bool cond(abstract_heapt *heap) {
@@ -44,18 +51,27 @@ _Bool cond(abstract_heapt *heap) {
 }
 
 void body(abstract_heapt *heap) {
-  // iterator.set(4);
-  set(heap, iterator, 4);
-  // iterator.next();
-  next(heap, iterator);
+  data_t val = nondet_data_t(); // forall val. 
+  _Bool pre = smaller(val, min); // val <= min
+
+  current = next(heap, iterator);
+  if (current < min) {
+    min = current; 
+  }
+  min = 0;
+
+  _Bool post = smaller(val, min); // val <= min'
+  // forall val. val <= min => val <= min'
+  assert (!pre || post);
 }
 
 _Bool assertion(abstract_heapt *heap) {
-  return forall(heap, list, null_ptr, 0) == bool_true;
+  return forall(heap, list, null_ptr, 0) &&
+         exists(heap, list,  null_ptr, 1);
 }
 
 _Bool inv(abstract_heapt *heap) {
-  return forall(heap, list, iterator, 0) == bool_true;
-  // LSH: ORDER MATTERS:
-  // if forall is before disjunction, transformer assert fails?
+  return is_path(heap, list, iterator) &&
+         forall(heap, list, iterator, 0) &&
+         exists(heap, list,  iterator, 1);
 }

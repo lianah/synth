@@ -174,10 +174,8 @@ void set(abstract_heapt *heap,
 	 data_t val);
 
 /* Iterator next */
-//LSH FIXME: in the Java interface it actually returns the "next" element
-// 
-void next(abstract_heapt *heap,
-	  ptr_t x);
+word_t next(abstract_heapt *heap,
+	    ptr_t x);
 
 /* Iterator has next */
 _Bool has_next(abstract_heapt *heap,

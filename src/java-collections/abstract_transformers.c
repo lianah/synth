@@ -422,8 +422,8 @@ bool_t forall(const abstract_heapt *heap,
 	     ptr_t x,
 	     ptr_t y,
 	     predicate_index_t pi) {
-  // LSH: FIXME
-  // assert(is_path(heap, x, y));
+  // LSH think about it!
+ assume(is_path(heap, x, y));
   
   node_t nx = deref(heap, x);
   node_t ny = deref(heap, y);
@@ -433,7 +433,7 @@ bool_t forall(const abstract_heapt *heap,
     return bool_true;
   }
 
-  assert (nx != null_node);
+  // assert (nx != null_node);
   
   bool_t res = bool_true;
   word_t i;
@@ -558,7 +558,7 @@ void set(abstract_heapt *heap,
 }
 
 /* Iterator next */
-void next(abstract_heapt *heap,
+word_t next(abstract_heapt *heap,
 	  ptr_t x) {
   assume(x < NPROG);
 
@@ -569,6 +569,7 @@ void next(abstract_heapt *heap,
   node_t succ_nx = subdivide(heap, nx);
  
   destructive_assign_ptr(heap, x, succ_nx);
+  return nondet_data_t();
 }
 
 /* Iterator has succ */

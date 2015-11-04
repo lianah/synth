@@ -2,7 +2,6 @@
 
 // Run with -DNPROG=3 and -DNPRED=1
 
-
 ptr_t list = 1;
 ptr_t iterator = 2;
 
@@ -25,8 +24,10 @@ _Bool cond(abstract_heapt *heap) {
 }
 
 void body(abstract_heapt *heap) {
-  // iterator.set(4);
-  set(heap, iterator, 4);
+  //if (get(heap, iterator) > 0) {
+    // iterator.set(4);
+    set(heap, iterator, 4);
+    //}
   // iterator.next();
   next(heap, iterator);
 }
@@ -36,7 +37,7 @@ _Bool assertion(abstract_heapt *heap) {
 }
 
 _Bool inv(abstract_heapt *heap) {
-  return forall(heap, list, iterator, 0) == bool_true;
+  return exists(heap, list, iterator, 0) == bool_true;
   // LSH: ORDER MATTERS:
   // if forall is before disjunction, transformer assert fails?
 }

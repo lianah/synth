@@ -36,8 +36,7 @@ _Bool assertion(abstract_heapt *heap) {
 }
 
 _Bool inv(abstract_heapt *heap) {
-  return (!is_null(heap, list) || is_null(heap, iterator)) &&
-    //is_path(heap, list, iterator) &&
+  return is_path(heap, list, iterator) &&
          forall(heap, list, iterator, 0) == bool_true;
   // LSH: ORDER MATTERS:
   // if forall is before disjunction, transformer assert fails?
