@@ -71,18 +71,27 @@ typedef struct abstract_heap {
   // A map from pointers to nodes, saying for each pointer which node it points
   // to.
   node_t ptr[NPROG];
+
   // A map from nodes to the data stored in each node. 
   // data_t data[NABSNODES];
   // A map from nodes to nodes saying for each node n what its successor is.
   node_t succ[NABSNODES];
 
+  // A map from nodes to the data stored in each node. 
+  // data_t data[NABSNODES];
+  // A map from nodes to nodes saying for each node n what its successor is.
+  data_t data[NABSNODES];
+
   // A map from nodes to distances, saying for each node n how far away its
   // successor is.
   word_t dist[NABSNODES];
+
   // A map from nodes to the value of the universal predicates
   bool_t universal[NABSNODES][NPREDS];
+
   // A map from nodes to the value of the existential predicates
   bool_t existential[NABSNODES][NPREDS];
+
   // How many nodes are currently allocated?
   word_t nnodes;
 } abstract_heapt;
@@ -131,13 +140,13 @@ bool_t sorted(const abstract_heapt *heap,
  ************************/
 
 /* Positional get */
-data_t getI(const abstract_heapt *heap,
+data_t getP(const abstract_heapt *heap,
 	    ptr_t x,
 	    index_t i);
 
-/* Iterator get */
-data_t get(const abstract_heapt *heap,
-	   ptr_t x);
+/* Iterator get (does not exist!) */
+data_t getI(const abstract_heapt *heap,
+	    ptr_t x);
 
 		 
 /*************************
@@ -146,32 +155,62 @@ data_t get(const abstract_heapt *heap,
  * 
  ************************/
 
-/* Positional set */
-void setI(abstract_heapt *heap,
+/* Adds element at end of list */
+void add(abstract_heapt *heap,
 	 ptr_t x,
-	 index_t i,
 	 data_t val);
-
-// LSH FIXME: ListIterator actually has an add...
-/* Positional add (only one) */
-void addI(abstract_heapt *heap,
-	  ptr_t x,
-	  index_t i,
-	  data_t val);
-
-/* Positional remove */
-void removeI(abstract_heapt *heap,
-	    ptr_t x,
-	    index_t i);
 
 void assign(abstract_heapt *heap,
 	    ptr_t x,
 	    ptr_t y);
 
-/* Iterator set */
-void set(abstract_heapt *heap,
+/* Removes all elements from list */
+void clear(abstract_heapt *heap,
+	   ptr_t x);
+
+/*************************
+ *  Positional operators
+ ************************/
+
+
+/* Positional set */
+void setP(abstract_heapt *heap,
+	  ptr_t x,
+	  index_t i,
+	  data_t val);
+
+
+/* Positional add */
+void addP(abstract_heapt *heap,
+	  ptr_t x,
+	  index_t i,
+	  data_t val);
+
+/* Positional remove */
+void removeP(abstract_heapt *heap,
+	    ptr_t x,
+	    index_t i);
+
+/*************************
+ *  Iterator operators
+ ************************/
+
+
+/* Iterator add */
+void addI(abstract_heapt *heap,
 	 ptr_t x,
 	 data_t val);
+
+// LSH FIXME: this is not the actual Java semantics (in Java it sets the
+// last value returned!), same for remove
+/* Iterator set */
+void setI(abstract_heapt *heap,
+	  ptr_t x,
+	  data_t val);
+
+/* Iterator remove */
+void removeI(abstract_heapt *heap,
+	     ptr_t x);
 
 /* Iterator next */
 word_t next(abstract_heapt *heap,
@@ -181,6 +220,11 @@ word_t next(abstract_heapt *heap,
 _Bool has_next(abstract_heapt *heap,
 	       ptr_t x);
 
+/* Return the next index pointed to by iterator */
+index_t nextIndex(abstract_heapt *heap,
+		  ptr_t x);
+
+// TODO: previous not yet supported
 
 /* void serialize_facts(heap_factst *facts, word_t buf[NARGS]); */
 /* void deserialize_heap(word_t buf[NARGS], abstract_heapt *heap); */
@@ -209,6 +253,10 @@ _Bool valid_abstract_heap(const abstract_heapt *heap);
 _Bool is_minimal(const abstract_heapt *heap);
 
 #define is_path(h, x, y) (path_len(h, x, y) != INF)
+#define is_empty(h, x) is_null(h, x)
+#define iterator(h, it, list) assign(h, it, list)
+#define has_next(h, it) !is_null(h, it)
+
 /* #define circular(h, x) (!is_path(h, x, null_ptr)) */
 
 

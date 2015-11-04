@@ -123,22 +123,6 @@ static void destructive_assign_exists(abstract_heapt *heap,
   heap->existential[nx][pi] = pred_val;
 }
 
-/*
- * x = y;
- *
- * x and y are pointers.
- */
-void assign(abstract_heapt *heap,
-                     ptr_t x,
-                     ptr_t y) {
-  assume(x < NPROG);
-  assume(y < NPROG);
-
-  //copy_abstract(pre, post);
-
-  node_t py = deref(heap, y);
-  destructive_assign_ptr(heap, x, py);
-}
 
 /*
  * Allocate a new node.
@@ -468,7 +452,7 @@ bool_t sorted(const abstract_heapt *heap,
  ************************/
 
 /* Positional get */
-data_t getI(const abstract_heapt *heap,
+data_t getP(const abstract_heapt *heap,
 	   ptr_t x,
 	   index_t i) {
   assert(0);
@@ -476,8 +460,8 @@ data_t getI(const abstract_heapt *heap,
 }
 
 /* Iterator get */
-data_t get(const abstract_heapt *heap,
-	   ptr_t x) {
+data_t getI(const abstract_heapt *heap,
+	    ptr_t x) {
   // non-deterministic value
   data_t val = nondet_data_t();
   // LSH TODO: finish
@@ -512,35 +496,76 @@ data_t get(const abstract_heapt *heap,
  * 
  ************************/
 
-/* Positional set */
-void setI(abstract_heapt *heap,
+/* Adds element at end of list */
+void add(abstract_heapt *heap,
 	 ptr_t x,
-	 index_t i,
 	 data_t val) {
   assert(0);
 }
 
-/* Positional add (only one) */
-void addI(abstract_heapt *heap,
-	 ptr_t x,
-	 index_t i,
-	 data_t val) {
+void assign(abstract_heapt *heap,
+	    ptr_t x,
+	    ptr_t y) {
+  assume(x < NPROG);
+  assume(y < NPROG);
+
+  //copy_abstract(pre, post);
+
+  node_t py = deref(heap, y);
+  destructive_assign_ptr(heap, x, py);
+}
+
+/* Removes all elements from list */
+void clear(abstract_heapt *heap,
+	   ptr_t x) {
+  assert(0);
+}
+
+/*************************
+ *  Positional operators
+ ************************/
+
+
+/* Positional set */
+void setP(abstract_heapt *heap,
+	  ptr_t x,
+	  index_t i,
+	  data_t val) {
+  assert(0);
+}
+
+
+/* Positional add */
+void addP(abstract_heapt *heap,
+	  ptr_t x,
+	  index_t i,
+	  data_t val) {
   assert(0);
 }
 
 /* Positional remove */
-void removeI(abstract_heapt *heap,
-	    ptr_t x,
-	    index_t i) {
+void removeP(abstract_heapt *heap,
+	     ptr_t x,
+	     index_t i)  {
   assert(0);
 }
 
+/*************************
+ *  Iterator operators
+ ************************/
 
-/* Iterator set */
-void set(abstract_heapt *heap,
+
+/* Iterator add */
+void addI(abstract_heapt *heap,
 	 ptr_t x,
-	 data_t val) {
+	 data_t val);
 
+// LSH FIXME: this is not the actual Java semantics (in Java it sets the
+// last value returned!), same for remove
+/* Iterator set */
+void setI(abstract_heapt *heap,
+	  ptr_t x,
+	  data_t val)  {
   assume(x < NPROG);
   
   node_t nx = deref(heap, x);
@@ -557,9 +582,15 @@ void set(abstract_heapt *heap,
   }
 }
 
+/* Iterator remove */
+void removeI(abstract_heapt *heap,
+	     ptr_t x)  {
+  assert(0);
+}
+
 /* Iterator next */
 word_t next(abstract_heapt *heap,
-	  ptr_t x) {
+	    ptr_t x) {
   assume(x < NPROG);
 
   node_t nx = deref(heap, x);
@@ -572,13 +603,87 @@ word_t next(abstract_heapt *heap,
   return nondet_data_t();
 }
 
-/* Iterator has succ */
-_Bool has_next(abstract_heapt *heap,
-	       ptr_t x) {
-  return !is_null(heap, x);
-  /* node_t nx = deref(heap, x); */
-  /* word_t nx_dist = dist(heap, x); */
-  /* // LSH: should this be assert? */
-  /* assume ( nx != null_node); */
-  /* return nx_dist > 1 || succ(heap, nx) != null_node; */
+/* Return the next index pointed to by iterator */
+index_t nextIndex(abstract_heapt *heap,
+		  ptr_t x) {
+  assert(0);
+  return -1;
 }
+
+		 
+/* /\************************* */
+/*  * */
+/*  *  Abstract transformers */
+/*  *  */
+/*  ************************\/ */
+
+/* /\* Positional set *\/ */
+/* void setI(abstract_heapt *heap, */
+/* 	 ptr_t x, */
+/* 	 index_t i, */
+/* 	 data_t val) { */
+/*   assert(0); */
+/* } */
+
+/* /\* Positional add (only one) *\/ */
+/* void addI(abstract_heapt *heap, */
+/* 	 ptr_t x, */
+/* 	 index_t i, */
+/* 	 data_t val) { */
+/*   assert(0); */
+/* } */
+
+/* /\* Positional remove *\/ */
+/* void removeI(abstract_heapt *heap, */
+/* 	    ptr_t x, */
+/* 	    index_t i) { */
+/*   assert(0); */
+/* } */
+
+
+/* /\* Iterator set *\/ */
+/* void set(abstract_heapt *heap, */
+/* 	 ptr_t x, */
+/* 	 data_t val) { */
+
+/*   assume(x < NPROG); */
+  
+/*   node_t nx = deref(heap, x); */
+/*   assert (nx != null_node); */
+
+/*   subdivide(heap, nx); */
+
+/*   // Update predicates */
+/*   predicate_index_t pi; */
+/*   for (pi = 0; pi < NPREDS; ++pi) { */
+/*     _Bool val_pred = eval_pred(pi, val); */
+/*     destructive_assign_univ(heap, nx, pi, (bool_t)val_pred); */
+/*     destructive_assign_exists(heap, nx, pi, (bool_t)val_pred); */
+/*   } */
+/* } */
+
+/* /\* Iterator next *\/ */
+/* word_t next(abstract_heapt *heap, */
+/* 	  ptr_t x) { */
+/*   assume(x < NPROG); */
+
+/*   node_t nx = deref(heap, x); */
+/*   assert (nx != null_node);   */
+/*   // subdivide creates new node at distance 1 and */
+/*   // updates predicates */
+/*   node_t succ_nx = subdivide(heap, nx); */
+ 
+/*   destructive_assign_ptr(heap, x, succ_nx); */
+/*   return nondet_data_t(); */
+/* } */
+
+/* /\* Iterator has succ *\/ */
+/* _Bool has_next(abstract_heapt *heap, */
+/* 	       ptr_t x) { */
+/*   return !is_null(heap, x); */
+/*   /\* node_t nx = deref(heap, x); *\/ */
+/*   /\* word_t nx_dist = dist(heap, x); *\/ */
+/*   /\* // LSH: should this be assert? *\/ */
+/*   /\* assume ( nx != null_node); *\/ */
+/*   /\* return nx_dist > 1 || succ(heap, nx) != null_node; *\/ */
+/* } */
