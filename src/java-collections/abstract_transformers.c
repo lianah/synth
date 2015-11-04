@@ -50,6 +50,17 @@ static word_t dist(const abstract_heapt *heap,
 }
 
 /*
+ * How far away is n's successor?
+ */
+static word_t data(const abstract_heapt *heap,
+                   node_t n) {
+  assume(n < NABSNODES);
+  assert(n != null_node);
+  return heap->data[n];
+}
+
+
+/*
  * What is the value of the i_th existential predicate for n ?
  */
 static bool_t get_exists(const abstract_heapt *heap,
@@ -90,11 +101,6 @@ static void destructive_assign_ptr(abstract_heapt *heap,
   heap->ptr[x] = n;
 }
 
-/*
- * x.n = y;
- *
- * x and y are nodes.
- */
 static void destructive_assign_succ(abstract_heapt *heap,
                                     node_t x,
                                     node_t y,
@@ -104,6 +110,15 @@ static void destructive_assign_succ(abstract_heapt *heap,
   heap->succ[x] = y;
   heap->dist[x] = dist;
 }
+
+static void destructive_assign_data(abstract_heapt *heap,
+                                    node_t x,
+                                    data_t val) {
+  assume(x < NABSNODES);
+  assert (x != null_node);
+  heap->data[x] = val;
+}
+
 
 static void destructive_assign_univ(abstract_heapt *heap,
 				    node_t nx,
@@ -192,18 +207,31 @@ node_t subdivide(abstract_heapt *heap,
     word_t new_dist = s_sub(nx_dist, 1);
     predicate_index_t pi;
     for (pi = 0; pi < NPREDS; ++pi) {
+      bool_t new_univ = get_univ(heap, nx, pi);
+      bool_t new_exists = get_exists(heap, nx, pi);
+      // Assume the predicates for the values stored at nx and nnew
       // Only true universals are still true on the segments
-      bool_t new_univ = get_univ(heap, nx, pi) == bool_true? bool_true : bool_unknown;
+      if (new_univ == bool_true) {
+	assume(eval_pred(pi, data(heap, nx)));
+	assume(eval_pred(pi, data(heap, nnew)));
+      } 
       // Only false existentials are still false on the segments
-      bool_t new_exists = get_exists(heap, nx, pi) == bool_false ? bool_false : bool_unknown;
+      if (get_exists == bool_false) {
+	assume(!eval_pred(pi, data(heap, nx)));
+	assume(!eval_pred(pi, data(heap, nnew)));
+      }
 
-      // Update predicates for nx 
-      destructive_assign_univ(heap, nx, pi, new_univ);
-      destructive_assign_exists(heap, nx, pi, new_exists);
-      // Update predicates for the newly allocated node nnew 
-      destructive_assign_univ(heap, nnew, pi, new_univ);
-      destructive_assign_exists(heap, nnew, pi, new_exists);
+      // Update predicates for the newly allocated node nnew
+      if (new_dist == 1) {
+	// If the distance is 1 predicates vacuously hold
+	destructive_assign_univ(heap, nnew, pi, bool_true);
+	destructive_assign_exists(heap, nnew, pi, bool_true);
+      } else {
+	destructive_assign_univ(heap, nnew, pi, new_univ);
+	destructive_assign_exists(heap, nnew, pi, new_exists);
+      }
     }
+
     // Reassign nnew's succ pointer to nx's successor succ_nx
     destructive_assign_succ(heap, nnew, succ_nx, new_dist);
     // Reassign nx's succ pointer to the newly allocated node.
@@ -275,6 +303,11 @@ _Bool is_minimal(const abstract_heapt *heap) {
       bool_t e = get_exists(heap, n, pi);
       bool_t u = get_univ(heap, n, pi);
 
+      // edges of length 1 have the predicates true
+      if (dist(heap, n) != 1 &&
+	  (e != bool_true || u != bool_true))
+	return 0;
+      
       if (e > bool_unknown || u > bool_unknown)
 	return 0;
       
@@ -462,31 +495,9 @@ data_t getP(const abstract_heapt *heap,
 /* Iterator get */
 data_t getI(const abstract_heapt *heap,
 	    ptr_t x) {
-  // non-deterministic value
-  data_t val = nondet_data_t();
-  // LSH TODO: finish
-  
-  /* node_t nx = deref(heap, x); */
-
-  /* assert (nx != null_node); */
-  
-  /* _Bool preds = true; */
-  /* word_t nx_dist = dist(heap, x); */
-  /* predicate_index_t pi; */
-  /* for (pi = 0; pi < NPREDS; ++pi) { */
-  /*   bool_t univ = univ(heap, nx, pi); */
-  /* } */
-  /* if (nx_dist == 1) { */
-  /*   for (pi = 0; pi < NPREDS; ++pi) { */
-  /*     bool_t exists = exists(heap, nx, pi); */
-  /*     res  */
-  /*   } */
-  /* } */
-  /* // if distance is 1 assume all existentials */
-  /* // assume all universals */
-  
-  /* assume(preds); */
-  return val;
+  node_t nx = deref(heap, x);
+  assert (nx != null_node);
+  return data(heap, nx);
 }
 
 		 
@@ -571,15 +582,7 @@ void setI(abstract_heapt *heap,
   node_t nx = deref(heap, x);
   assert (nx != null_node);
 
-  subdivide(heap, nx);
-
-  // Update predicates
-  predicate_index_t pi;
-  for (pi = 0; pi < NPREDS; ++pi) {
-    _Bool val_pred = eval_pred(pi, val);
-    destructive_assign_univ(heap, nx, pi, (bool_t)val_pred);
-    destructive_assign_exists(heap, nx, pi, (bool_t)val_pred);
-  }
+  destructive_assign_data(heap, x, val);
 }
 
 /* Iterator remove */
@@ -594,13 +597,14 @@ word_t next(abstract_heapt *heap,
   assume(x < NPROG);
 
   node_t nx = deref(heap, x);
-  assert (nx != null_node);  
+  assert (nx != null_node);
+
+  word_t valx = data(heap, nx);
   // subdivide creates new node at distance 1 and
   // updates predicates
   node_t succ_nx = subdivide(heap, nx);
- 
   destructive_assign_ptr(heap, x, succ_nx);
-  return nondet_data_t();
+  return valx;
 }
 
 /* Return the next index pointed to by iterator */
@@ -610,80 +614,3 @@ index_t nextIndex(abstract_heapt *heap,
   return -1;
 }
 
-		 
-/* /\************************* */
-/*  * */
-/*  *  Abstract transformers */
-/*  *  */
-/*  ************************\/ */
-
-/* /\* Positional set *\/ */
-/* void setI(abstract_heapt *heap, */
-/* 	 ptr_t x, */
-/* 	 index_t i, */
-/* 	 data_t val) { */
-/*   assert(0); */
-/* } */
-
-/* /\* Positional add (only one) *\/ */
-/* void addI(abstract_heapt *heap, */
-/* 	 ptr_t x, */
-/* 	 index_t i, */
-/* 	 data_t val) { */
-/*   assert(0); */
-/* } */
-
-/* /\* Positional remove *\/ */
-/* void removeI(abstract_heapt *heap, */
-/* 	    ptr_t x, */
-/* 	    index_t i) { */
-/*   assert(0); */
-/* } */
-
-
-/* /\* Iterator set *\/ */
-/* void set(abstract_heapt *heap, */
-/* 	 ptr_t x, */
-/* 	 data_t val) { */
-
-/*   assume(x < NPROG); */
-  
-/*   node_t nx = deref(heap, x); */
-/*   assert (nx != null_node); */
-
-/*   subdivide(heap, nx); */
-
-/*   // Update predicates */
-/*   predicate_index_t pi; */
-/*   for (pi = 0; pi < NPREDS; ++pi) { */
-/*     _Bool val_pred = eval_pred(pi, val); */
-/*     destructive_assign_univ(heap, nx, pi, (bool_t)val_pred); */
-/*     destructive_assign_exists(heap, nx, pi, (bool_t)val_pred); */
-/*   } */
-/* } */
-
-/* /\* Iterator next *\/ */
-/* word_t next(abstract_heapt *heap, */
-/* 	  ptr_t x) { */
-/*   assume(x < NPROG); */
-
-/*   node_t nx = deref(heap, x); */
-/*   assert (nx != null_node);   */
-/*   // subdivide creates new node at distance 1 and */
-/*   // updates predicates */
-/*   node_t succ_nx = subdivide(heap, nx); */
- 
-/*   destructive_assign_ptr(heap, x, succ_nx); */
-/*   return nondet_data_t(); */
-/* } */
-
-/* /\* Iterator has succ *\/ */
-/* _Bool has_next(abstract_heapt *heap, */
-/* 	       ptr_t x) { */
-/*   return !is_null(heap, x); */
-/*   /\* node_t nx = deref(heap, x); *\/ */
-/*   /\* word_t nx_dist = dist(heap, x); *\/ */
-/*   /\* // LSH: should this be assert? *\/ */
-/*   /\* assume ( nx != null_node); *\/ */
-/*   /\* return nx_dist > 1 || succ(heap, nx) != null_node; *\/ */
-/* } */

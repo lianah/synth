@@ -224,7 +224,7 @@ _Bool has_next(abstract_heapt *heap,
 index_t nextIndex(abstract_heapt *heap,
 		  ptr_t x);
 
-// TODO: previous not yet supported
+// TODO: PREVIOUS not yet supported
 
 /* void serialize_facts(heap_factst *facts, word_t buf[NARGS]); */
 /* void deserialize_heap(word_t buf[NARGS], abstract_heapt *heap); */
@@ -234,6 +234,10 @@ word_t s_sub(word_t x, word_t y);
 
 bool_t and(bool_t x, bool_t y);
 bool_t or(bool_t x, bool_t y);
+
+/* _Bool and_preds(predicate_t x, predicate_t y); */
+/* _Bool or_preds(bool_t x, bool_t y); */
+
 
 /*
   A valid abstract heap has the following properties:

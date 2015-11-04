@@ -52,17 +52,20 @@ _Bool cond(abstract_heapt *heap) {
 
 void body(abstract_heapt *heap) {
   data_t val = nondet_data_t(); // forall val. 
-  _Bool pre = smaller(val, min); // val <= min
-
+  _Bool pre0 = smaller(val, min); // val <= min
+  _Bool pre1 = equal(val, min); // val == min
+  
   current = next(heap, iterator);
   if (current < min) {
     min = current; 
   }
   min = 0;
 
-  _Bool post = smaller(val, min); // val <= min'
+  _Bool post0 = smaller(val, min); // val <= min'
+  _Bool post1 = equal(val, min); // val == min'
   // forall val. val <= min => val <= min'
-  assert (!pre || post);
+  assert (!pre0 || post0);
+  assert (!pre1 || post1);
 }
 
 _Bool assertion(abstract_heapt *heap) {
