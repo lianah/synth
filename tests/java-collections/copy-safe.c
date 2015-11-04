@@ -9,8 +9,8 @@ ptr_t it = 3;
 data_t current; 
 
 void pre(abstract_heapt *heap) {
-  assume(empty(heap, copy));
-  iterator(heap, list, it);
+  abstract_new(heap, copy);
+  iterator(heap, it, list);
 }
 
 _Bool pred(data_t val) {
@@ -23,11 +23,11 @@ void init_predicates() {
 }
 
 _Bool cond(abstract_heapt *heap) {
-  return has_next(heap, iterator);
+  return has_next(heap, it);
 }
 
 void body(abstract_heapt *heap) {
-  current = next(heap, iterator);
+  current = next(heap, it);
   add(heap, copy, current);
 }
 
@@ -39,6 +39,9 @@ _Bool assertion(abstract_heapt *heap) {
 
 _Bool inv(abstract_heapt *heap) {
   return path_len(heap, copy, null_ptr) == path_len(heap, list, it) &&
-    forall(heap, list, iterator, 0) == forall(heap, copy, null_ptr, 0) &&
-    exists(heap, list, iterator, 0) == exists(heap, copy, null_ptr, 0);
+    !is_path(heap, copy, list) &&
+    (!is_path(heap, list, copy) || is_null(heap, copy))  &&
+    is_path(heap, list, it) &&
+    forall(heap, list, it, 0) == forall(heap, copy, null_ptr, 0) &&
+    exists(heap, list, it, 0) == exists(heap, copy, null_ptr, 0);
 }

@@ -155,6 +155,10 @@ data_t getI(const abstract_heapt *heap,
  * 
  ************************/
 
+/* Creates a new list */
+void abstract_new(abstract_heapt *heap,
+                  ptr_t x);
+
 /* Adds element at end of list */
 void add(abstract_heapt *heap,
 	 ptr_t x,
@@ -257,7 +261,7 @@ _Bool valid_abstract_heap(const abstract_heapt *heap);
 _Bool is_minimal(const abstract_heapt *heap);
 
 #define is_path(h, x, y) (path_len(h, x, y) != INF)
-#define is_empty(h, x) is_null(h, x)
+#define empty(h, x) is_null(h, x)
 #define iterator(h, it, list) assign(h, it, list)
 #define has_next(h, it) !is_null(h, it)
 
