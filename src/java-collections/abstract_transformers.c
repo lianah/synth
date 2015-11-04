@@ -209,17 +209,21 @@ node_t subdivide(abstract_heapt *heap,
     for (pi = 0; pi < NPREDS; ++pi) {
       bool_t new_univ = get_univ(heap, nx, pi);
       bool_t new_exists = get_exists(heap, nx, pi);
-      // Assume the predicates for the values stored at nx and nnew
-      // Only true universals are still true on the segments
+      // Assume the predicates for the values stored at nnew
+      // Only true universals are still true on the data
       if (new_univ == bool_true) {
-	assume(eval_pred(pi, data(heap, nx)));
+	// assume(eval_pred(pi, data(heap, nx)));
 	assume(eval_pred(pi, data(heap, nnew)));
       } 
-      // Only false existentials are still false on the segments
+      // Only false existentials are still false on the data
       if (get_exists == bool_false) {
-	assume(!eval_pred(pi, data(heap, nx)));
+	// assume(!eval_pred(pi, data(heap, nx)));
 	assume(!eval_pred(pi, data(heap, nnew)));
       }
+
+      // The distance is 1 so predicates vacuously hold
+      destructive_assign_univ(heap, nx, pi, bool_true);
+      destructive_assign_exists(heap, nx, pi, bool_true);
 
       // Update predicates for the newly allocated node nnew
       if (new_dist == 1) {
@@ -304,7 +308,7 @@ _Bool is_minimal(const abstract_heapt *heap) {
       bool_t u = get_univ(heap, n, pi);
 
       // edges of length 1 have the predicates true
-      if (dist(heap, n) != 1 &&
+      if (dist(heap, n) == 1 &&
 	  (e != bool_true || u != bool_true))
 	return 0;
       
@@ -463,6 +467,7 @@ bool_t forall(const abstract_heapt *heap,
       /* } */
       return res;
     }
+    res = and(res, (bool_t)eval_pred(pi, data(heap, nx)));
     res = and(res, get_univ(heap, nx, pi));
     nx = succ(heap, nx);
   }
@@ -582,7 +587,7 @@ void setI(abstract_heapt *heap,
   node_t nx = deref(heap, x);
   assert (nx != null_node);
 
-  destructive_assign_data(heap, x, val);
+  destructive_assign_data(heap, nx, val);
 }
 
 /* Iterator remove */

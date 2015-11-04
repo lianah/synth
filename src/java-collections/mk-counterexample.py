@@ -5,7 +5,7 @@ import sys
 
 
 def processHeap(m):
-  [ptrs, succs, dists, univs, exists, nnodes] = [eval(g) for g in m]
+  [ptrs, succs, datas, dists, univs, exists, nnodes] = [eval(g) for g in m]
 
   for u in univs:
     assert (len(u) == 1)
@@ -14,7 +14,9 @@ def processHeap(m):
   exists = [e.pop() for e in exists]
 
   assert (len(succs) == len(dists) and \
-          len(dists) == len(univs) and len(univs) == len(exists))
+          len(dists) == len(univs) and \
+          len(univs) == len(exists) and \
+          len(datas) == len(exists))
   
   print "// set pointers"
   for i in range(len(ptrs)):
@@ -23,6 +25,11 @@ def processHeap(m):
   print "// set successors"
   for i in range(len(succs)):
       print r'heap->succ[%d] = %d;' % (i, succs[i])
+
+  print "// set data"
+  for i in range(len(succs)):
+      print r'heap->data[%d] = %d;' % (i, datas[i])
+      
       
   print "// set distances"
   for i in range(len(dists)):
@@ -38,7 +45,7 @@ def processHeap(m):
 
   print "heap->nnodes =", nnodes, ";"
 
-regex = 'h={[^.]*\.ptr={([\d, ]*)},[^.]*\.succ={([\d, ]*)},[^.]*\.dist={([\d, ]*)},[^.]*\.universal={([\d,{} ]*)},[^.]*\.existential={([\d,{} ]*)},[^.]*\.nnodes=(\d+)'
+regex = 'h={[^.]*\.ptr={([\d, ]*)},[^.]*\.succ={([\d, ]*)},[^.]*\.data={([\d, ]*)},[^.]*\.dist={([\d, ]*)},[^.]*\.universal={([\d,{} ]*)},[^.]*\.existential={([\d,{} ]*)},[^.]*\.nnodes=(\d+)'
 
 cex = sys.stdin.read()
 
