@@ -3,12 +3,13 @@
 // Run with -DNPROG=4 and -DNPRED=1
 
 ptr_t list = 1;
-ptr_t reverse = 2;
+ptr_t copy = 2;
 ptr_t it = 3;
 
 data_t current; 
 
 void pre(abstract_heapt *heap) {
+  assume(!empty(heap, list));
   assume(empty(heap, copy));
   iterator(heap, list, it);
 }

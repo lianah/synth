@@ -56,7 +56,7 @@ typedef word_t predicate_index_t;
 
 #define null_ptr (ptr_t) 0
 #define null_node (node_t) 0
-//#define undef (word_t) INF
+#define INVALID (word_t) INF
 #define bool_unknown (bool_t) 2
 #define bool_true (bool_t) 1
 #define bool_false (bool_t) 0
@@ -72,14 +72,14 @@ typedef struct abstract_heap {
   // to.
   node_t ptr[NPROG];
 
-  // A map from nodes to the data stored in each node. 
-  // data_t data[NABSNODES];
   // A map from nodes to nodes saying for each node n what its successor is.
   node_t succ[NABSNODES];
 
+  // A map from nodes to nodes saying for each node n what its predecessor is.
+  node_t prev[NABSNODES];
+
+
   // A map from nodes to the data stored in each node. 
-  // data_t data[NABSNODES];
-  // A map from nodes to nodes saying for each node n what its successor is.
   data_t data[NABSNODES];
 
   // A map from nodes to distances, saying for each node n how far away its
@@ -96,10 +96,6 @@ typedef struct abstract_heap {
   word_t nnodes;
 } abstract_heapt;
 
-typedef struct edge {
-  node_t from;
-  node_t to;
-} edge_t; 
 
 
 /*************************
@@ -221,14 +217,26 @@ word_t next(abstract_heapt *heap,
 	    ptr_t x);
 
 /* Iterator has next */
-_Bool has_next(abstract_heapt *heap,
+_Bool hasNext(abstract_heapt *heap,
 	       ptr_t x);
 
 /* Return the next index pointed to by iterator */
 index_t nextIndex(abstract_heapt *heap,
 		  ptr_t x);
 
-// TODO: PREVIOUS not yet supported
+/* Iterator next */
+word_t previous(abstract_heapt *heap,
+		ptr_t x);
+
+/* Iterator has next */
+_Bool hasPrevious(abstract_heapt *heap,
+		   ptr_t x);
+
+/* Return the next index pointed to by iterator */
+index_t previousIndex(abstract_heapt *heap,
+		      ptr_t x);
+
+
 
 /* void serialize_facts(heap_factst *facts, word_t buf[NARGS]); */
 /* void deserialize_heap(word_t buf[NARGS], abstract_heapt *heap); */
@@ -245,16 +253,30 @@ bool_t or(bool_t x, bool_t y);
 
 /*
   A valid abstract heap has the following properties:
-  * each node has in-degree 1
-  * all reachable nodes are named
-  * predicates for all reachable nodes are known
-  * if forall is true on an edge so is exists
-  * if exists is false then so is forall
-  * if length is 1 and existential is true so is universal
-  * check that predicates are consistent??
-  * for each node x != null, succ(x) = x + 1 or succ(x) = null
-  * for the null node data[null] = undef, univ[null] = bool_unknown, exist[null] = bool_unknown
-  * TODO: more stuff? 
+  
+  * Each node has in-degree 1 (except of null_node)
+
+  * All reachable nodes are named
+
+  * For each edge:
+      * if univ == bool_true then exists = bool_true
+      * if exists == bool_false then univ == bool_false
+      * all edges of length 1 have exists and forall true
+      * if length is 2 and exists == bool_true then univ = bool_true
+
+  * For each node x != null:
+      * succ(x) = x + 1 or succ(x) = null
+      * exists[x] != bool_unknown and univ[x] != bool_unknown
+      * if x is reachable then succ(x) != INVALID
+
+  * For the null node:
+      * univ[null] = bool_unknown
+      * exist[null] = bool_unknown
+      * succ(null) == null
+      * prev(null) == null
+      * dist(null) == 0
+      
+  * FIXME: check that predicates are consistent??
   * 
  */
 _Bool valid_abstract_heap(const abstract_heapt *heap);
@@ -263,7 +285,7 @@ _Bool is_minimal(const abstract_heapt *heap);
 #define is_path(h, x, y) (path_len(h, x, y) != INF)
 #define empty(h, x) is_null(h, x)
 #define iterator(h, it, list) assign(h, it, list)
-#define has_next(h, it) !is_null(h, it)
+#define hasNext(h, it) !is_null(h, it)
 
 /* #define circular(h, x) (!is_path(h, x, null_ptr)) */
 

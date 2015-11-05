@@ -41,9 +41,6 @@ _Bool assertion(abstract_heapt *heap) {
 
 _Bool inv(abstract_heapt *heap) {
   return path_len(heap, copy, null_ptr) == path_len(heap, list, it) &&
-    //!is_path(heap, copy, list) &&
-    //(!is_path(heap, list, copy) || is_null(heap, copy))  &&
-    //is_path(heap, list, it) &&
     forall(heap, list, it, 0) == forall(heap, copy, null_ptr, 0) &&
     exists(heap, list, it, 0) == exists(heap, copy, null_ptr, 0);
 }
