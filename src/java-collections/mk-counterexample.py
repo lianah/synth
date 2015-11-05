@@ -50,7 +50,14 @@ regex = 'h={[^.]*\.ptr={([\d, ]*)},[^.]*\.succ={([\d, ]*)},[^.]*\.data={([\d, ]*
 cex = sys.stdin.read()
 
 heaps = re.findall(regex, cex)
-assert (len(heaps) == 2)
+
+assert (len(heaps) == 1 or len(heaps) == 2)
+
+# It could be that the base case failed and we only have one counterexample
+# heap so we just duplicate it
+
+if(len(heaps) == 1):
+  heaps.append(heaps[0])
 
 print "#include \"abstract_heap.h\"\n"
 

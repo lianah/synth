@@ -1,6 +1,6 @@
 #include "abstract_heap.h"
 
-// Run with -DNPROG=4 and -DNPRED=1
+// Run with -DNPROG=4 -DNPRED=1
 
 ptr_t list = 1;
 ptr_t copy = 2;
@@ -9,7 +9,9 @@ ptr_t it = 3;
 data_t current; 
 
 void pre(abstract_heapt *heap) {
-  abstract_new(heap, copy);
+  assume (! empty(heap, list));
+  assume (empty(heap, copy));
+
   iterator(heap, it, list);
 }
 
@@ -39,9 +41,9 @@ _Bool assertion(abstract_heapt *heap) {
 
 _Bool inv(abstract_heapt *heap) {
   return path_len(heap, copy, null_ptr) == path_len(heap, list, it) &&
-    !is_path(heap, copy, list) &&
-    (!is_path(heap, list, copy) || is_null(heap, copy))  &&
-    is_path(heap, list, it) &&
+    //!is_path(heap, copy, list) &&
+    //(!is_path(heap, list, copy) || is_null(heap, copy))  &&
+    //is_path(heap, list, it) &&
     forall(heap, list, it, 0) == forall(heap, copy, null_ptr, 0) &&
     exists(heap, list, it, 0) == exists(heap, copy, null_ptr, 0);
 }
