@@ -25,6 +25,11 @@ def processHeap(m,prefix):
   print r'subgraph cluster_h%d {' % (prefix)
   print r'label=h%d' % (prefix)
 
+  m = list(m)
+  m[1] = m[1].replace("false", "0")
+  m[1] = m[1].replace("true", "1")
+
+  
   [ptrs, iterators, succs, prevs, datas, dists, univs, exists, nnodes] = [eval(g) for g in m]
 
   for u in univs:
@@ -48,7 +53,7 @@ def processHeap(m,prefix):
   print "}"
 
 
-regex = 'ptr = {([\d, ]*)}, is_iterator = {([FALSETRU, ]*)}, succ = {([\d, ]*)}, prev = {([\d, ]*)}, data = {([\d, ]*)}, dist = {([\d, ]*)}, universal = {([\d,{} ]*)}, existential = {([\d,{} ]*)}, nnodes = (\d+)'
+regex = 'ptr = {([\d, ]*)}, is_iterator = {([falsetru, ]*)}, succ = {([\d, ]*)}, prev = {([\d, ]*)}, data = {([\d, ]*)}, dist = {([\d, ]*)}, universal = {([\d,{} ]*)}, existential = {([\d,{} ]*)}, nnodes = (\d+)'
 
 
 cex = sys.stdin.read()

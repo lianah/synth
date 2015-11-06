@@ -33,7 +33,7 @@ void init_heap(abstract_heapt *heap) {
 }
 
 _Bool cond(abstract_heapt *heap) {
-  return has_next(heap, it);
+  return hasNext(heap, it);
 }
 
 void body(abstract_heapt *heap) {

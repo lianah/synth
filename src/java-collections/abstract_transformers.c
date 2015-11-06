@@ -162,8 +162,10 @@ static void assign_succ(abstract_heapt *heap,
   predicate_index_t pi = 0;
   if (dist == 1) {
     for (pi = 0; pi < NPREDS; ++pi) {
+      // everything is true about elments in the empty set
       assign_univ(heap, x, pi, bool_true);
-      assign_exists(heap, x, pi, bool_true);
+      // nothing exists in the empty set
+      assign_exists(heap, x, pi, bool_false);
     }
   }
 }
@@ -469,7 +471,7 @@ _Bool is_minimal(const abstract_heapt *heap) {
 
       // edges of length 1 have the predicates true
       if (dist(heap, n) == 1 &&
-	  (e != bool_true || u != bool_true))
+	  (e != bool_false || u != bool_true))
 	return 0;
       
       if (e > bool_unknown || u > bool_unknown)
@@ -588,7 +590,7 @@ bool_t exists(const abstract_heapt *heap,
 
   // This is technically the empty list so everything holds
   if (nx == ny) {
-    return bool_true;
+    return bool_false;
   }
 
   bool_t res = bool_false;

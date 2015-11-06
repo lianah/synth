@@ -16,8 +16,8 @@ def ptrname(p):
     return "ptr_%d" % p
 
 def bool_t(x):
-  assert (x < 3)
-  if x == 2:
+  #assert (x < 3)
+  if x >= 2:
     return "?"
   return str(x)
   
