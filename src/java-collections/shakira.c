@@ -16,26 +16,27 @@ void main(void) {
   abstract_heapt h; 
    
   init_predicates();
-  init_heap(&h);
-  assume(valid_abstract_heap(&h));
+  /* init_heap(&h); */
+  /* assume(valid_abstract_heap(&h)); */
 
-  // Base.
-  pre(&h);
-  assert(inv(&h));
+  /* // Base. */
+  /* pre(&h); */
+  /* assert(inv(&h)); */
 
   h = nondet_heap();
   init_heap(&h);
   assume (valid_abstract_heap(&h));
 
-
+  
   if (inv(&h)) {
     if (cond(&h)) {
       // Induction.
-      body(&h);
+      //body(&h);
+      assert(0);
       assert(inv(&h));
-    }  else {
+     }  else { 
       // Property.
-      assert(assertion(&h));
+      // assert(assertion(&h));
     }
   }
 }

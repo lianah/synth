@@ -115,6 +115,11 @@ typedef struct abstract_heap {
 word_t path_len(const abstract_heapt *heap,
                 ptr_t x,
 		ptr_t y);
+
+_Bool is_path(const abstract_heapt *heap,
+	      ptr_t x,
+	      ptr_t y);
+
 _Bool alias(const abstract_heapt *heap,
 	    ptr_t x,
 	    ptr_t y);
@@ -281,6 +286,9 @@ bool_t or(bool_t x, bool_t y);
       * exists[x] != bool_unknown and univ[x] != bool_unknown
       * if x is reachable then succ(x) != INVALID
       * if is_iterator(x) = 0 then prev(x) == null (lists cannot point to the middle of a list)
+      
+  * For each ptr p:
+      * TODO: is_path(p, null)
 
   * For the null node:
       * univ[null] = bool_unknown
@@ -296,7 +304,6 @@ bool_t or(bool_t x, bool_t y);
 _Bool valid_abstract_heap(const abstract_heapt *heap);
 _Bool is_minimal(const abstract_heapt *heap);
 
-#define is_path(h, x, y) (path_len(h, x, y) != INF)
 #define empty(h, x) is_null(h, x)
 
 

@@ -557,13 +557,39 @@ word_t path_len(const abstract_heapt *heap,
     if (n == yn) {
       return curr_dist;
     }
+    if (n == null_node) {
+      return INF;
+    }
 
     curr_dist = s_add(curr_dist, dist(heap, n));
     n = succ(heap, n);
   }
-
+  
+  assert (0);
   return INF;
 }
+
+_Bool is_path(const abstract_heapt *heap,
+	       ptr_t x,
+	       ptr_t y) {
+  word_t curr_dist = 0;
+  node_t n = deref(heap, x);
+  node_t yn = deref(heap, y);
+  word_t i;
+
+  for (i = 0; i < NABSNODES+1; i++) {
+    if (n == yn) {
+      return 1;
+    }
+    if (n == null_node)
+      return 0;
+
+    n = succ(heap, n);
+  }
+  assert (0);
+  return 0;
+}
+
 
 _Bool alias(const abstract_heapt *heap,
 	    ptr_t x,
@@ -776,10 +802,10 @@ void addI(abstract_heapt *heap,
 	  data_t val) {
 
   assert (is_iterator(heap, it));
-  node_t nit = deref(heap, it);
-  
+
   // LSH FIXME: this case not supported yet so use assume
-  assume(nit != null_node);
+  assume (!is_null(heap, it));
+  node_t nit = deref(heap, it);
   
   // create new node and set data
   node_t nnew = alloc(heap);
@@ -787,11 +813,11 @@ void addI(abstract_heapt *heap,
 
   // if the list was empty create new node
   // LSH FIXME: what if it was an iterator that reached null?
-  if ( nit == null_node) {
-    assign_succ(heap, nnew, null_node, 1);
-    assign_ptr(heap, it, nnew);
-    return;
-  }
+  /* if ( nit == null_node) { */
+  /*   assign_succ(heap, nnew, null_node, 1); */
+  /*   assign_ptr(heap, it, nnew); */
+  /*   return; */
+  /* } */
 
   //  prev_nit -----d-------> nit ---> null
   // to
