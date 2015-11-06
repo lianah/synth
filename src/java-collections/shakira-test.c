@@ -7,6 +7,7 @@ extern void body(abstract_heapt *pre);
 extern _Bool assertion(const abstract_heapt *heap);
 extern _Bool inv(const abstract_heapt *heap);
 extern void init_predicates();
+extern void init_heap(abstract_heapt *heap);
 
 extern void init_counterexample(abstract_heapt *heap);
 extern void inductive_counterexample(abstract_heapt *heap);
@@ -17,9 +18,9 @@ void main(void) {
    abstract_heapt h; 
 
   init_predicates();
-
-  init_counterexample(&h);
   
+  init_counterexample(&h);
+  init_heap(&h);  
   assert (valid_abstract_heap(&h));
   
   // Base.
@@ -27,7 +28,7 @@ void main(void) {
   assert(inv(&h));
 
   inductive_counterexample(&h);
-
+  init_heap(&h);
   assert (valid_abstract_heap(&h));
   
   if (inv(&h)) {

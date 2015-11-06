@@ -14,20 +14,26 @@ void init_predicates() {
   predicates[0] = isFour;
 }
 
+void init_heap(abstract_heapt *heap) {
+  // distinguish between predicates and iterators
+  heap->is_iterator[list] = 0;
+  heap->is_iterator[it] = 1;
+}
+
 void pre(abstract_heapt *heap) {
   //ListIt<Int> it = list.listIterator()
   iterator(heap, it, list);
 }
 
 _Bool cond(abstract_heapt *heap) {
-  return has_next(heap, it);
+  return hasNext(heap, it);
 }
 
 void body(abstract_heapt *heap) {
-  // it.set(4);
-  setI(heap, it, 4);
   // it.next();
   next(heap, it);
+  // it.set(4);
+  setI(heap, it, 4);
 }
 
 _Bool assertion(abstract_heapt *heap) {
@@ -35,7 +41,7 @@ _Bool assertion(abstract_heapt *heap) {
 }
 
 _Bool inv(abstract_heapt *heap) {
-  return is_path(heap, list, it) &&
+  return //is_path(heap, list, it) &&
          forall(heap, list, it, 0) == bool_true;
   // LSH: ORDER MATTERS:
   // if forall is before disjunction, transformer assert fails?

@@ -25,6 +25,12 @@ ptr_t iterator = 2;
 word_t min; 
 word_t current; 
 
+_Bool eval_old_pred(data_t val, predicate_t foo) {
+  aux = min;
+  min = old_min;
+  _Bool res = foo(val);
+  min = aux;
+}
 
 _Bool smaller(data_t val) {
   return val <= min;
@@ -51,6 +57,7 @@ _Bool cond(abstract_heapt *heap) {
 }
 
 void body(abstract_heapt *heap) {
+  old_min = min;
   data_t val = nondet_data_t(); // forall val. 
   _Bool pre0 = smaller(val, min); // val <= min
   _Bool pre1 = equal(val, min); // val == min

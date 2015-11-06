@@ -21,7 +21,15 @@ _Bool pred(data_t val) {
 }
 
 void init_predicates() {
+  // initialize predicates
   predicates[0] = pred;
+}
+
+void init_heap(abstract_heapt *heap) {
+  // distinguish between predicates and iterators
+  heap->is_iterator[list] = 0;
+  heap->is_iterator[copy] = 0;
+  heap->is_iterator[it] = 1;
 }
 
 _Bool cond(abstract_heapt *heap) {

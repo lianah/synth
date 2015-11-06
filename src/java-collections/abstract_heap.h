@@ -67,10 +67,18 @@ typedef _Bool (*predicate_t) (data_t);
 // (define in input file)
 predicate_t predicates[NPREDS];
 
+
+
 typedef struct abstract_heap {
-  // A map from pointers to nodes, saying for each pointer which node it points
-  // to.
+  // A map from pointers to nodes, saying for each pointer which node
+  // it points to (INVALID if the pointer has been invalidated).
+  
   node_t ptr[NPROG];
+
+  // Indicates if the pointer is an iterator or not.
+  // (initialized in input file)
+  _Bool is_iterator[NPROG];
+
 
   // A map from nodes to nodes saying for each node n what its successor is.
   node_t succ[NABSNODES];
@@ -195,11 +203,15 @@ void removeP(abstract_heapt *heap,
  *  Iterator operators
  ************************/
 
+/* Assign to it the iterator of list */
+void iterator(abstract_heapt* h,
+	      ptr_t it,
+	      ptr_t list);
 
 /* Iterator add */
 void addI(abstract_heapt *heap,
-	 ptr_t x,
-	 data_t val);
+	  ptr_t x,
+	  data_t val);
 
 // LSH FIXME: this is not the actual Java semantics (in Java it sets the
 // last value returned!), same for remove
@@ -218,7 +230,7 @@ word_t next(abstract_heapt *heap,
 
 /* Iterator has next */
 _Bool hasNext(abstract_heapt *heap,
-	       ptr_t x);
+	      ptr_t x);
 
 /* Return the next index pointed to by iterator */
 index_t nextIndex(abstract_heapt *heap,
@@ -268,6 +280,7 @@ bool_t or(bool_t x, bool_t y);
       * succ(x) = x + 1 or succ(x) = null
       * exists[x] != bool_unknown and univ[x] != bool_unknown
       * if x is reachable then succ(x) != INVALID
+      * if is_iterator(x) = 0 then prev(x) == null (lists cannot point to the middle of a list)
 
   * For the null node:
       * univ[null] = bool_unknown
@@ -275,6 +288,7 @@ bool_t or(bool_t x, bool_t y);
       * succ(null) == null
       * prev(null) == null
       * dist(null) == 0
+      * is_iterator[null] = 0
       
   * FIXME: check that predicates are consistent??
   * 
@@ -284,8 +298,7 @@ _Bool is_minimal(const abstract_heapt *heap);
 
 #define is_path(h, x, y) (path_len(h, x, y) != INF)
 #define empty(h, x) is_null(h, x)
-#define iterator(h, it, list) assign(h, it, list)
-#define hasNext(h, it) !is_null(h, it)
+
 
 /* #define circular(h, x) (!is_path(h, x, null_ptr)) */
 

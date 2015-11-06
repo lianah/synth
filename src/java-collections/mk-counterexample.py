@@ -3,9 +3,20 @@
 import re
 import sys
 
+def boolean(i):
+  if (i == "FALSE"):
+    return 0;
+  if (i == "TRUE"):
+    return 1;
+    
+  assert(False);
 
 def processHeap(m):
-  [ptrs, succs, datas, dists, univs, exists, nnodes] = [eval(g) for g in m]
+  m = list(m)
+  m[1] = m[1].replace("FALSE", "0")
+  m[1] = m[1].replace("TRUE", "1")
+  
+  [ptrs, iterators, succs, prevs, datas, dists, univs, exists, nnodes] = [eval(g) for g in m]
 
   for u in univs:
     assert (len(u) == 1)
@@ -22,12 +33,21 @@ def processHeap(m):
   for i in range(len(ptrs)):
       print r'heap->ptr[%d] = %d;' % (i, ptrs[i])
 
+  print "// set iterators"
+  for i in range(len(iterators)):
+      print r'heap->is_iterator[%d] = %d;' % (i, iterators[i])
+      
+      
   print "// set successors"
   for i in range(len(succs)):
       print r'heap->succ[%d] = %d;' % (i, succs[i])
 
+  print "// set predecessors"
+  for i in range(len(prevs)):
+      print r'heap->prev[%d] = %d;' % (i, prevs[i])
+      
   print "// set data"
-  for i in range(len(succs)):
+  for i in range(len(datas)):
       print r'heap->data[%d] = %d;' % (i, datas[i])
       
       
@@ -45,7 +65,7 @@ def processHeap(m):
 
   print "heap->nnodes =", nnodes, ";"
 
-regex = 'h={[^.]*\.ptr={([\d, ]*)},[^.]*\.succ={([\d, ]*)},[^.]*\.data={([\d, ]*)},[^.]*\.dist={([\d, ]*)},[^.]*\.universal={([\d,{} ]*)},[^.]*\.existential={([\d,{} ]*)},[^.]*\.nnodes=(\d+)'
+regex = 'h={[^.]*\.ptr={([\d, ]*)},[^.]*\.is_iterator={([FALSETRU, ]*)},[^.]*\.succ={([\d, ]*)},[^.]*\.prev={([\d, ]*)},[^.]*\.data={([\d, ]*)},[^.]*\.dist={([\d, ]*)},[^.]*\.universal={([\d,{} ]*)},[^.]*\.existential={([\d,{} ]*)},[^.]*\.nnodes=(\d+)'
 
 cex = sys.stdin.read()
 
