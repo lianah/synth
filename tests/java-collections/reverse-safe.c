@@ -51,7 +51,6 @@ _Bool cond(abstract_heapt *heap) {
 void body(abstract_heapt *heap) {
   current = next(heap, it);
   addI(heap, it2, current);
-  //assume(!is_null(heap, it2));
   iterator(heap, it2, reversed);
 }
 
@@ -62,23 +61,10 @@ _Bool assertion(abstract_heapt *heap) {
 }
 
 _Bool inv(abstract_heapt *heap) {
-	 //assume(!is_null(heap, reversed));
-  /* assume(!is_null(heap, it)); */
-  // AAAAAAAAAAAAAA
-  // THIS IS INCONSISTENT FOR UNKNOWN REASONS!!!!!!!!!!!!!!!!!!
-  //assume(is_path(heap, list, it));
-   // assume(is_path(heap, reversed, null_ptr));
-   //assume(!alias(heap, list, it));
-   // assume(path_len(heap, it2, null_ptr) == path_len(heap, list, it));
-   //assume(alias(heap, it2, reversed));
-  /* assume(alias(heap, it2, reversed)); */
-  /* assume(path_len(heap, reversed, null_ptr) == path_len(heap, list, it)); */
-  /* assert(alias(heap, reversed, null_ptr)); */
-    //assert(alias(heap, list, it));
-  
    return path_len(heap, reversed, null_ptr) == path_len(heap, list, it) && 
      forall(heap, list, it, 0) == forall(heap, reversed, null_ptr, 0) &&  
      exists(heap, list, it, 0) == exists(heap, reversed, null_ptr, 0) &&
      is_path(heap, list, it) &&
-     alias(heap, it2, reversed);
+     alias(heap, it2, reversed) &&
+     !alias(heap, list, reversed);
 }

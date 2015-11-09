@@ -204,6 +204,21 @@ static void invalidate(abstract_heapt *heap,
   }
 }
 
+static void update_ptr(abstract_heapt *heap,
+		       node_t nx,
+		       node_t nnew) {
+  assert (nx != null_node);
+  assert (nx < heap->nnodes);
+  word_t i;
+  for (i = 0; i < NPROG; ++i) {
+    if (heap->ptr[i] == nx) {
+      if (heap->is_iterator[i] == 0) {
+	// lists now point to the new node
+	heap->ptr[i] = nnew;
+      }
+    }
+  }
+}
 
 /*
  * Mark node as invalid (for remove and invalidating iterators).
@@ -823,13 +838,18 @@ void addI(abstract_heapt *heap,
   // to
   //  prev_nit -d-> nnew -1-> nit ---> null
   
+  node_t prev_nit = prev(heap, nit);
   // nnew points to nit
   assign_succ(heap, nnew, nit, 1);
-  node_t prev_nit = prev(heap, nit);
+
   // set the nprev that used to point to nit to point to nnew
   if (prev_nit != null_node) {
     assign_succ(heap, prev_nit, nnew, dist(heap, prev_nit));
     invalidate_prev(heap, nnew);
+  } else {
+    // we are adding at the beginning of the list so
+    // replace all lists pointing to nit to point to the new list head nnew
+    update_ptr(heap, nit, nnew);
   }
   invalidate_succ(heap, nit);
 }
