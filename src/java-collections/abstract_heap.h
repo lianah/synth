@@ -126,16 +126,30 @@ _Bool alias(const abstract_heapt *heap,
 _Bool is_null(const abstract_heapt *heap,
 	      ptr_t x);	      
 
-// return bool_t since there is loss of precision
+
+/* Check existential property (to be used in assert only) */
 bool_t exists(const abstract_heapt *heap,
 	      ptr_t x,
 	      ptr_t y,
 	      predicate_index_t pi);
+/* Assume existential property */
+_Bool exists_assume(const abstract_heapt *heap,
+		     ptr_t x,
+		     ptr_t y,
+		     predicate_index_t pi);
 
+/* Check universal property (to be used in assert only)*/
 bool_t forall(const abstract_heapt *heap,
 	      ptr_t x,
 	      ptr_t y,
 	      predicate_index_t pi);
+
+/* Assume universal property */
+_Bool forall_assume(const abstract_heapt *heap,
+		    ptr_t x,
+		    ptr_t y,
+		    predicate_index_t pi);
+
 
 bool_t sorted(const abstract_heapt *heap,
 	      ptr_t x,

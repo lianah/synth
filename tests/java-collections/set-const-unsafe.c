@@ -30,9 +30,10 @@ _Bool cond(abstract_heapt *heap) {
 }
 
 void body(abstract_heapt *heap) {
+  _Bool first = alias(heap, it, list);
   // it.next();
   next(heap, it);
-  if (alias(heap, it, list)) {
+  if (!first) {
     // it.set(4);
     setI(heap, it, 4);
   }
@@ -42,9 +43,10 @@ _Bool assertion(abstract_heapt *heap) {
   return forall(heap, list, null_ptr, 0) == bool_true;
 }
 
-_Bool inv(abstract_heapt *heap) {
-  return is_path(heap, list, it) &&
-         forall(heap, list, it, 0) == bool_true;
-  // LSH: ORDER MATTERS:
-  // if forall is before disjunction, transformer assert fails?
+_Bool inv_assume(abstract_heapt *heap) {
+  return forall_assume(heap, list, it, 0);
+}
+
+_Bool inv_check(abstract_heapt *heap) {
+  return forall(heap, list, it, 0) == bool_true;
 }

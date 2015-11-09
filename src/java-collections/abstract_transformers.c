@@ -386,7 +386,21 @@ static bool_t path_forall(const abstract_heapt *heap,
 			  node_t nx,
 			  node_t ny,
 			  predicate_index_t pi) {
-  assert (0);
+  // This is technically the empty list so everything holds
+  if (nx == ny) {
+    return bool_true;
+  }
+  
+  bool_t res = bool_true;
+  word_t i;
+  for (i = 0; i < NABSNODES; ++i) {
+    if (nx == ny) {
+      return res;
+    }
+    res = and(res, (bool_t)eval_pred(pi, data(heap, nx)));
+    res = and(res, get_univ(heap, nx, pi));
+    nx = succ(heap, nx);
+  }
   return bool_unknown;
 }
 
@@ -397,7 +411,21 @@ static bool_t path_exists(const abstract_heapt *heap,
 			  node_t nx,
 			  node_t ny,
 			  predicate_index_t pi) {
-  assert (0);
+  // This is technically the empty list so nothing exists
+  if (nx == ny) {
+    return bool_false;
+  }
+
+  bool_t res = bool_false;
+  word_t i;
+  for (i = 0; i < NABSNODES; ++i) {
+    if (nx == ny) {
+      return res;
+    }
+    res = or (res, (bool_t)eval_pred(pi, data(heap, nx)));
+    res = or(res, get_exists(heap, nx, pi));
+    nx = succ(heap, nx);
+  }
   return bool_unknown;
 }
 
@@ -620,61 +648,86 @@ _Bool is_null(const abstract_heapt *heap,
   return deref(heap, x) == null_node;
 }
 
+
+_Bool exists_assume(const abstract_heapt *heap,
+		    ptr_t x,
+		    ptr_t y,
+		    predicate_index_t pi) {
+  assume(is_path(heap, x, y));
+  
+  node_t nx = deref(heap, x);
+  node_t ny = deref(heap, y);
+  return path_exists(heap, nx, ny, pi) == bool_true;
+}
+
 bool_t exists(const abstract_heapt *heap,
 	      ptr_t x,
 	      ptr_t y,
-	      predicate_index_t pi) {
+	      predicate_index_t prop) {
   assume(is_path(heap, x, y));
   
   node_t nx = deref(heap, x);
   node_t ny = deref(heap, y);
 
-  // This is technically the empty list so everything holds
-  if (nx == ny) {
+  if (nx == ny)
     return bool_false;
-  }
 
-  bool_t res = bool_false;
-  word_t i;
-  for (i = 0; i < NABSNODES; ++i) {
-    if (nx == ny) {
-      return res;
+  predicate_index_t pi;
+
+  data_t val = nondet_data_t();
+  _Bool check = eval_pred(prop, val);
+  
+  for (pi = 0; pi < NPREDS; ++pi) {
+    bool_t pred = path_exists(heap, nx, ny, pi);
+    // Checking \/ (P_i (val) => prop(val))
+    if (pred == bool_true) {
+      check = check || !eval_pred(pi, val);
     }
-    res = or (res, (bool_t)eval_pred(pi, data(heap, nx)));
-    res = or(res, get_exists(heap, nx, pi));
-    nx = succ(heap, nx);
   }
-  // LSH FIXME: paper actually checks entailment
-  return bool_unknown;
+  return check ? bool_true : bool_unknown;
 }
 
+_Bool forall_assume(const abstract_heapt *heap,
+		    ptr_t x,
+		    ptr_t y,
+		    predicate_index_t pi) {
+  assume(is_path(heap, x, y));
+  node_t nx = deref(heap, x);
+  node_t ny = deref(heap, y);
+  return path_forall(heap, nx, ny, pi) == bool_true;
+}
 
 bool_t forall(const abstract_heapt *heap,
 	      ptr_t x,
 	      ptr_t y,
-	      predicate_index_t pi) {
+	      predicate_index_t prop) {
   // LSH think about it!
   assume(is_path(heap, x, y));
   
   node_t nx = deref(heap, x);
   node_t ny = deref(heap, y);
 
-  // This is technically the empty list so everything holds
-  if (nx == ny) {
+  if (nx == ny)
     return bool_true;
-  }
   
-  bool_t res = bool_true;
-  word_t i;
-  for (i = 0; i < NABSNODES; ++i) {
-    if (nx == ny) {
-      return res;
-    }
-    res = and(res, (bool_t)eval_pred(pi, data(heap, nx)));
-    res = and(res, get_univ(heap, nx, pi));
-    nx = succ(heap, nx);
+  predicate_index_t pi;
+
+  data_t val = nondet_data_t();
+  _Bool assumps = 1;
+  for (pi = 0; pi < NPREDS; ++pi) {
+    bool_t pred = path_forall(heap, nx, ny, pi);
+    if (pred == bool_true) {
+      assumps = assumps && eval_pred(pi, val);
+    } /* else if (pred == bool_false) { */
+    /*   assumps = assumps && eval_pred(pi, val) == 0; */
+    /* } */
   }
-  // LSH FIXME: the paper actually cehcks that the predicates entail the current predicate
+  _Bool prop_val = eval_pred(prop, val);
+
+  if (!assumps || prop_val)
+    return bool_true;
+  if (!assumps || !prop_val)
+    return bool_false;
   return bool_unknown;
 }
 
