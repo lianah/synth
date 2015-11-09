@@ -402,8 +402,8 @@ _Bool valid_abstract_heap(const abstract_heapt *heap) {
 
   // The null node doesn't point anywhere and
   // by convention has no predecessor.
-  if (heap->succ[null_node] != null_node/* ||
-					   heap->prev[null_node] != null_node*/) {
+  if (heap->succ[null_node] != null_node ||
+      heap->prev[null_node] != null_node) {
     return 0;
   }
 
@@ -507,7 +507,7 @@ _Bool is_minimal(const abstract_heapt *heap) {
 	has_in_edge[n])
       return 0;
     // all nodes without incoming edges have prev(x) == null
-    if (has_in_edge[i] == 1 &&
+    if (has_in_edge[i] == 0 &&
     	heap->prev[i] != null_node)
       return 0;
   }
