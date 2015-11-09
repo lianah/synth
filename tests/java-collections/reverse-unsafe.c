@@ -1,6 +1,6 @@
 #include "abstract_heap.h"
 
-// Run with -DNPROG=5 and -DNPRED=1
+// Run with -DNPROG=5 -DNPRED=1 -DNSLACK=1
 
 /*
   
@@ -50,7 +50,9 @@ _Bool cond(abstract_heapt *heap) {
 
 void body(abstract_heapt *heap) {
   current = next(heap, it);
+  addI(heap, it2, 0);
   addI(heap, it2, current);
+
   iterator(heap, it2, reversed);
 }
 

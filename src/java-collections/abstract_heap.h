@@ -212,8 +212,8 @@ void addP(abstract_heapt *heap,
 
 /* Positional remove */
 void removeP(abstract_heapt *heap,
-	    ptr_t x,
-	    index_t i);
+	     ptr_t x,
+	     index_t i);
 
 /*************************
  *  Iterator operators
@@ -236,7 +236,7 @@ void setI(abstract_heapt *heap,
 	  ptr_t x,
 	  data_t val);
 
-/* Iterator remove */
+/* Iterator remove: removes the last node returned by next */
 void removeI(abstract_heapt *heap,
 	     ptr_t x);
 
@@ -316,7 +316,7 @@ _Bool valid_abstract_heap(const abstract_heapt *heap);
 _Bool is_minimal(const abstract_heapt *heap);
 
 #define empty(h, x) is_null(h, x)
-
+#define size(h, x) path_len(h, x, null_ptr)
 
 /* #define circular(h, x) (!is_path(h, x, null_ptr)) */
 
