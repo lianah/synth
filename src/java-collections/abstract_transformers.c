@@ -96,6 +96,16 @@ static bool_t get_exists(const abstract_heapt *heap,
 }
 
 /*
+ * What is the value of the sorted predicate for n ?
+ */
+static sorted_edget get_sorted(const abstract_heapt *heap,
+			 node_t n) {
+  assume(n < NABSNODES);
+  return heap->sorted[n];
+}
+
+
+/*
  * What is the value of the i_th universal predicate for n ?
  */
 static bool_t get_univ(const abstract_heapt *heap,
@@ -666,7 +676,36 @@ bool_t forall(const abstract_heapt *heap,
 bool_t sorted(const abstract_heapt *heap,
 	      ptr_t x,
 	      ptr_t y) {
-  assert(0);
+
+  assume(is_path(heap, x, y));
+  
+  node_t nx = deref(heap, x);
+  node_t ny = deref(heap, y);
+
+  // This is technically the empty list so everything holds
+  if (nx == ny) {
+    return bool_false;
+  }
+
+  bool_t res = bool_false;
+  word_t i;
+  for (i = 0; i < NABSNODES; ++i) {
+    if (nx == ny) {
+      return res;
+    }
+    // compare min <= data val <= max
+    res = and(res, get_sorted(heap, nx).is_sorted);
+    data_t min = get_sorted(heap, nx).min;
+    // add this comparison at the end
+    //data_t max = get_sorted(heap, nx).max;
+    res = and(res, data(heap, nx) <= min);
+
+    nx = succ(heap, nx);
+  }
+
+  // LSH FIXME: paper actually checks entailment
+  return bool_unknown;
+
   return 0;
 }
 
@@ -728,6 +767,7 @@ void add(abstract_heapt *heap,
     }
     nlist = succ(heap, nlist);
   }
+
   return;
 }
 

@@ -54,6 +54,12 @@ typedef word_t data_t;
 typedef word_t index_t;
 typedef word_t predicate_index_t;
 
+typedef struct sorted_edge {
+  bool_t is_sorted;
+  data_t min;
+  data_t max;
+} sorted_edget;
+
 #define null_ptr (ptr_t) 0
 #define null_node (node_t) 0
 #define INVALID (word_t) INF
@@ -86,7 +92,6 @@ typedef struct abstract_heap {
   // A map from nodes to nodes saying for each node n what its predecessor is.
   node_t prev[NABSNODES];
 
-
   // A map from nodes to the data stored in each node. 
   data_t data[NABSNODES];
 
@@ -102,6 +107,10 @@ typedef struct abstract_heap {
 
   // How many nodes are currently allocated?
   word_t nnodes;
+
+  // A map from nodes to the value of the sorted predicate
+  sorted_edget sorted[NABSNODES];
+
 } abstract_heapt;
 
 
@@ -140,6 +149,8 @@ bool_t forall(const abstract_heapt *heap,
 bool_t sorted(const abstract_heapt *heap,
 	      ptr_t x,
 	      ptr_t y);
+//	      data_t min,
+//	      data_t max);
 
 
 /*************************
