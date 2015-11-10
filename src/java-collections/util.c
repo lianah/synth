@@ -10,7 +10,7 @@
 word_t s_add(word_t x, word_t y) {
   word_t ret = (x > INF - y) ? INF : x + y;
 
-  assume(ret != INF || x == INF || y == INF);
+  Assume(ret != INF || x == INF || y == INF);
 
   return ret;
 }
