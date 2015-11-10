@@ -54,11 +54,11 @@ typedef word_t data_t;
 typedef word_t index_t;
 typedef word_t predicate_index_t;
 
-typedef struct sorted_edge {
-  bool_t is_sorted;
-  data_t min;
-  data_t max;
-} sorted_edget;
+/* typedef struct sorted_edge { */
+/*   bool_t is_sorted; */
+/*   data_t min; */
+/*   data_t max; */
+/* } sorted_edget; */
 
 #define null_ptr (ptr_t) 0
 #define null_node (node_t) 0
@@ -109,7 +109,13 @@ typedef struct abstract_heap {
   word_t nnodes;
 
   // A map from nodes to the value of the sorted predicate
-  sorted_edget sorted[NABSNODES];
+  bool_t sorted[NABSNODES];
+
+  // A map from nodes to the min value on the edge
+  data_t min[NABSNODES];
+
+  // A map from nodes to the max value on the edge 
+  data_t max[NABSNODES];
 
 } abstract_heapt;
 

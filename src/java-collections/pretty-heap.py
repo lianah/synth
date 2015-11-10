@@ -28,20 +28,18 @@ def processHeap(m,prefix):
   m = list(m)
   m[1] = m[1].replace("FALSE", "0")
   m[1] = m[1].replace("TRUE", "1")
-
   
-  [ptrs, iterators, succs, prevs, datas, dists, univs, exists, nnodes] = [eval(g) for g in m]
+  [ptrs, iterators, succs, prevs, datas, dists, univs, exists, nnodes, sorts, mins, maxs] = [eval(g) for g in m]
 
   for u in univs:
     assert (len(u) == 1)
 
   univs = [bool_t(u.pop()) for u in univs]
   exists = [bool_t(e.pop()) for e in exists]
-  
+
   for n in xrange(nnodes):
     d = datas[n]
     print r'node%d%d [label="%s [%d]"];' % (prefix, n, nodeptrs(n, ptrs), d)
-
 
   for n in xrange(nnodes):
     s = succs[n]
@@ -49,14 +47,18 @@ def processHeap(m,prefix):
     u = univs[n]
     e = exists[n]
     p = prevs[n]
+    so = sorts[n] 
+    mi = mins[n]
+    ma = maxs[n]
     
-    print r'node%d%d -> node%d%d [label="%d U=%s E=%s"];' % (i,n, i, s, d, u, e)
+    print r'node%d%d -> node%d%d [label="%d U=%s E=%s sort=%s min=%s max=%s"];' % (i,n, i, s, d, u, e, so, mi, ma)
 
     #print r'node%d%d -> node%d%d [label="%d U=%s E=%s"];' % (i,p, i, n, d, u, e)
 
   print "}"
 
-regex = 'h={[^.]*\.ptr={([\d, ]*)},[^.]*\.is_iterator={([FALSETRU, ]*)},[^.]*\.succ={([\d, ]*)},[^.]*\.prev={([\d, ]*)},[^.]*\.data={([\d, ]*)},[^.]*\.dist={([\d, ]*)},[^.]*\.universal={([\d,{} ]*)},[^.]*\.existential={([\d,{} ]*)},[^.]*\.nnodes=(\d+)'
+regex = 'h={[^.]*\.ptr={([\d, ]*)},[^.]*\.is_iterator={([FALSETRU, ]*)},[^.]*\.succ={([\d, ]*)},[^.]*\.prev={([\d, ]*)},[^.]*\.data={([\d, ]*)},[^.]*\.dist={([\d, ]*)},[^.]*\.universal={([\d,{} ]*)},[^.]*\.existential={([\d,{} ]*)},[^.]*\.nnodes=(\d+),[^.]*\.sorted={([\d, ]*)},[^.]*\.min={([\d, ]*)},[^.]*\.max={([\d, ]*)}'
+
 
 cex = sys.stdin.read()
 

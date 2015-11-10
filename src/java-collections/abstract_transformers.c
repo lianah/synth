@@ -98,10 +98,28 @@ static bool_t get_exists(const abstract_heapt *heap,
 /*
  * What is the value of the sorted predicate for n ?
  */
-static sorted_edget get_sorted(const abstract_heapt *heap,
+static bool_t get_sorted(const abstract_heapt *heap,
 			 node_t n) {
   assume(n < NABSNODES);
   return heap->sorted[n];
+}
+
+/*
+ * What is the value of the max elem for n ?
+ */
+static data_t get_max(const abstract_heapt *heap,
+			 node_t n) {
+  assume(n < NABSNODES);
+  return heap->max[n];
+}
+
+/*
+ * What is the value of the min elem for n ?
+ */
+static data_t get_min(const abstract_heapt *heap,
+			 node_t n) {
+  assume(n < NABSNODES);
+  return heap->min[n];
 }
 
 
@@ -493,19 +511,21 @@ _Bool is_minimal(const abstract_heapt *heap) {
     for (pi = 0; pi < NPREDS; ++pi) {
       bool_t e = get_exists(heap, n, pi);
       bool_t u = get_univ(heap, n, pi);
+      bool_t s = get_sorted(heap, n);
 
       // edges of length 1 have the predicates true
       if (dist(heap, n) == 1 &&
 	  (e != bool_false || u != bool_true))
 	return 0;
       
-      if (e > bool_unknown || u > bool_unknown)
+      if (e > bool_unknown || u > bool_unknown || s > bool_unknown)
 	return 0;
       
       // predicates are known for all nodes 
       if (n != null_node &&
 	  (e == bool_unknown ||
-	   u == bool_unknown)) {
+	   u == bool_unknown || 
+	   s == bool_unknown)) {
 	return 0;
       }
       // if the universal holds so does the existential
@@ -699,21 +719,23 @@ bool_t sorted(const abstract_heapt *heap,
 
   // This is technically the empty list so everything holds
   if (nx == ny) {
-    return bool_false;
+    return bool_true;
   }
 
-  bool_t res = bool_false;
+  bool_t res = bool_true;
   word_t i;
   for (i = 0; i < NABSNODES; ++i) {
     if (nx == ny) {
+      /* if (nx != null_node) { */
+      /* 	data_t max = get_max(heap, nx); */
+      /* 	res = and(res, data(heap, nx) >= max); */
+      /* } */
       return res;
     }
     // compare min <= data val <= max
-    res = and(res, get_sorted(heap, nx).is_sorted);
-    data_t min = get_sorted(heap, nx).min;
+    res = and(res, get_sorted(heap, nx));
     // add this comparison at the end
-    //data_t max = get_sorted(heap, nx).max;
-    res = and(res, data(heap, nx) <= min);
+    //res = and(res, data(heap, nx) <= get_min(heap, nx));
 
     nx = succ(heap, nx);
   }
