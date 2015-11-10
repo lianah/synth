@@ -1,6 +1,6 @@
 #include "abstract_heap.h"
 
-// Run with -DNPROG=4 -DNPRED=1
+// Run with -DNPROG=4 -DNPRED=2
 
 ptr_t list = 1;
 ptr_t copy = 2;
@@ -9,20 +9,23 @@ ptr_t it = 3;
 data_t current; 
 
 void pre(abstract_heapt *heap) {
-  assume (! empty(heap, list));
   assume (empty(heap, copy));
-
+  // all elements of list are greater than 0
+  assume(forall_assume(heap, list, null_ptr, 1));
   iterator(heap, it, list);
 }
 
-_Bool pred(data_t val) {
-  // LSH: if we want to be fancy we can use UF to show it forall predicates
-  return val == 0;
+_Bool greaterZero(data_t val) {
+  return val >= 0;
+}
+
+_Bool greaterOne(data_t val) {
+  return val >= 1;
 }
 
 void init_predicates() {
-  // initialize predicates
-  predicates[0] = pred;
+  predicates[0] = greaterOne;
+  predicates[1] = greaterZero;
 }
 
 void init_heap(abstract_heapt *heap) {
@@ -42,16 +45,19 @@ void body(abstract_heapt *heap) {
 }
 
 _Bool assertion(abstract_heapt *heap) {
+  // prove that all elements are greater than 1 (not entailed)
   return path_len(heap, list, null_ptr) == path_len(heap, copy, null_ptr) &&
-    forall(heap, list, null_ptr, 0) == forall(heap, copy, null_ptr, 0);
+         forall(heap, copy, null_ptr, 0) == bool_true;
 }
 
 _Bool inv_assume(abstract_heapt *heap) {
   return path_len(heap, copy, null_ptr) == path_len(heap, list, it) &&
-    forall_assume(heap, list, it, 0) == forall_assume(heap, copy, null_ptr, 0);
+    forall_assume(heap, copy, null_ptr, 1) &&
+    forall_assume(heap, list, null_ptr, 1);
 }
 
 _Bool inv_check(abstract_heapt *heap) {
   return path_len(heap, copy, null_ptr) == path_len(heap, list, it) &&
-    forall(heap, list, it, 0) == forall(heap, copy, null_ptr, 0);
+    forall(heap, copy, null_ptr, 1) == bool_true &&
+    forall(heap, list, null_ptr, 1) == bool_true ;
 }

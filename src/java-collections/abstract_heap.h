@@ -98,7 +98,7 @@ typedef struct abstract_heap {
   bool_t universal[NABSNODES][NPREDS];
 
   // A map from nodes to the value of the existential predicates
-  bool_t existential[NABSNODES][NPREDS];
+  //bool_t existential[NABSNODES][NPREDS];
 
   // How many nodes are currently allocated?
   word_t nnodes;
@@ -128,15 +128,15 @@ _Bool is_null(const abstract_heapt *heap,
 
 
 /* Check existential property (to be used in assert only) */
-bool_t exists(const abstract_heapt *heap,
-	      ptr_t x,
-	      ptr_t y,
-	      predicate_index_t pi);
-/* Assume existential property */
-_Bool exists_assume(const abstract_heapt *heap,
-		     ptr_t x,
-		     ptr_t y,
-		     predicate_index_t pi);
+/* bool_t exists(const abstract_heapt *heap, */
+/* 	      ptr_t x, */
+/* 	      ptr_t y, */
+/* 	      predicate_index_t pi); */
+/* /\* Assume existential property *\/ */
+/* _Bool exists_assume(const abstract_heapt *heap, */
+/* 		     ptr_t x, */
+/* 		     ptr_t y, */
+/* 		     predicate_index_t pi); */
 
 /* Check universal property (to be used in assert only)*/
 bool_t forall(const abstract_heapt *heap,

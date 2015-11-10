@@ -1,6 +1,6 @@
 #include "abstract_heap.h"
 
-// Run with -DNPROG=4 and -DNPRED=1
+// Run with -DNPROG=4 -DNPRED=1
 
 ptr_t list = 1;
 ptr_t copy = 2;
@@ -9,7 +9,9 @@ ptr_t it = 3;
 data_t current; 
 
 void pre(abstract_heapt *heap) {
-  assume(empty(heap, copy));
+  assume (! empty(heap, list));
+  assume (empty(heap, copy));
+
   iterator(heap, it, list);
 }
 
@@ -19,6 +21,7 @@ _Bool pred(data_t val) {
 }
 
 void init_predicates() {
+  // initialize predicates
   predicates[0] = pred;
 }
 
@@ -35,18 +38,20 @@ _Bool cond(abstract_heapt *heap) {
 
 void body(abstract_heapt *heap) {
   current = next(heap, it);
-  // BUG: incrementing values
-  add(heap, copy, s_add(current, 1));
+  add(heap, copy, s_add(current,1));
 }
 
 _Bool assertion(abstract_heapt *heap) {
   return path_len(heap, list, null_ptr) == path_len(heap, copy, null_ptr) &&
-    forall(heap, list, null_ptr, 0) == forall(heap, copy, null_ptr, 0) &&
-    exists(heap, list, null_ptr, 0) == exists(heap, copy, null_ptr, 0);
+    forall(heap, list, null_ptr, 0) == forall(heap, copy, null_ptr, 0);
 }
 
-_Bool inv(abstract_heapt *heap) {
+_Bool inv_assume(abstract_heapt *heap) {
   return path_len(heap, copy, null_ptr) == path_len(heap, list, it) &&
-    forall(heap, list, it, 0) == forall(heap, copy, null_ptr, 0) &&
-    exists(heap, list, it, 0) == exists(heap, copy, null_ptr, 0);
+    forall_assume(heap, list, it, 0) == forall_assume(heap, copy, null_ptr, 0);
+}
+
+_Bool inv_check(abstract_heapt *heap) {
+  return path_len(heap, copy, null_ptr) == path_len(heap, list, it) &&
+    forall(heap, list, it, 0) == forall(heap, copy, null_ptr, 0);
 }
