@@ -160,12 +160,9 @@ static void assign_succ(abstract_heapt *heap,
   heap->dist[x] = dist;
   
   predicate_index_t pi = 0;
-  if (dist == 1) {
+  if (dist == 0) {
     for (pi = 0; pi < NPREDS; ++pi) {
-      // everything is true about elments in the empty set
       assign_univ(heap, x, pi, bool_true);
-      // nothing exists in the empty set
-      // assign_exists(heap, x, pi, bool_false);
     }
   }
 }
@@ -252,7 +249,7 @@ static void clear_node(abstract_heapt* heap,
   assert (nx < heap->nnodes);
   word_t data;
   assign_data(heap, nx, data);
-  assign_succ(heap, nx, null_node, 1);
+  assign_succ(heap, nx, null_node, 0);
 }
 
 /*
@@ -264,7 +261,7 @@ void abstract_new(abstract_heapt *heap,
 
   // Just allocate a new node and have x point to it.
   node_t nx = alloc(heap);
-  assign_succ(heap, nx, null_node, 1);
+  assign_succ(heap, nx, null_node, 0);
   assign_ptr(heap, x, nx);
 }
 
@@ -283,7 +280,7 @@ node_t subdivide(abstract_heapt *heap,
   //
   // (1): x has a direct successor, i.e. x -1> succ_nx
   // (2): x's successor is some distance > 1 away, i.e. x -k-> succ_nx
-  if (nx_dist == 1) {
+  if (nx_dist == 0) {
     // Case 1:
     //
     // x's successor is one step away, so return that
@@ -300,7 +297,7 @@ node_t subdivide(abstract_heapt *heap,
     //
     // Heap state:
     //
-    // nx -1-> nnew -(k-1)-> succ_nx
+    // nx -0-> nnew -(k-1)-> succ_nx
     //
     // Begin by allocating a new node between nx and succ_nx.
     node_t nnew = alloc(heap);
@@ -330,7 +327,7 @@ node_t subdivide(abstract_heapt *heap,
     // Reassign nnew's succ pointer to nx's successor succ_nx
     assign_succ(heap, nnew, succ_nx, new_dist);
     // Reassign nx's succ pointer to the newly allocated node.
-    assign_succ(heap, nx, nnew, 1);
+    assign_succ(heap, nx, nnew, 0);
     return nnew;
   }
 }
@@ -441,11 +438,15 @@ static void assume_consistent_node(const abstract_heapt *heap,
   
   // we can only have as many witnesses as the length
   // we only need as many as predicates since each val is unconstrained 
-  word_t num_nodes = dist(heap, nx) - 1;
+  word_t num_nodes = dist(heap, nx);
 
   word_t pi, j;
-  _Bool neg = 0; 
+
+  // indicates that there are no negated predicates
+
   for (pi = 0; pi < NPREDS; ++pi) {
+    _Bool no_neg = 1;
+    _Bool neg = 0;
     if (get_univ(heap, nx, pi) == bool_true) {
       // we assume the positive predicates hold on all the witness values
       for (j = 0; j < NPREDS; ++j) {
@@ -462,10 +463,12 @@ static void assume_consistent_node(const abstract_heapt *heap,
 	if (j >= num_nodes)
 	  continue;
 	neg = neg || !eval_pred(pi, vals[j]);
+	no_neg = 0;
       }
     }
+    assume(no_neg || neg);
   }
-  assume(neg);
+  
 }
 
 
@@ -519,7 +522,9 @@ _Bool is_minimal(const abstract_heapt *heap) {
       bool_t u = get_univ(heap, n, pi);
 
       // edges of length 1 have the predicates true
-      if (dist(heap, n) == 1 && u != bool_true)
+      if (n!= null_node &&
+	  dist(heap, n) == 0 &&
+	  u != bool_true)
 	return 0;
       
       if (u > bool_unknown)
@@ -537,9 +542,6 @@ _Bool is_minimal(const abstract_heapt *heap) {
   for (i = 0; i < NABSNODES-1; i++) {
     nreachable += is_named[i];
     if (is_named[i] && !is_named[succ(heap, i)]) {
-      return 0;
-    }
-    if (i != null_node && dist(heap, i) <= 0) {
       return 0;
     }
   }
@@ -602,7 +604,7 @@ _Bool valid_abstract_heap(const abstract_heapt *heap) {
     return 0;
   }
 
-  if (dist(heap, null_node) != 0) {
+  if (dist(heap, null_node) != 0) { 
     return 0;
   }
 
@@ -642,8 +644,8 @@ word_t path_len(const abstract_heapt *heap,
     if (n == null_node) {
       return INF;
     }
-
-    curr_dist = s_add(curr_dist, dist(heap, n));
+    // count current node as well
+    curr_dist = s_add(1, s_add(curr_dist, dist(heap, n)));
     n = succ(heap, n);
   }
   
@@ -654,7 +656,6 @@ word_t path_len(const abstract_heapt *heap,
 _Bool is_path(const abstract_heapt *heap,
 	       ptr_t x,
 	       ptr_t y) {
-  word_t curr_dist = 0;
   node_t n = deref(heap, x);
   node_t yn = deref(heap, y);
   word_t i;
@@ -730,7 +731,7 @@ _Bool forall_assume(const abstract_heapt *heap,
 		    ptr_t x,
 		    ptr_t y,
 		    predicate_index_t pi) {
-  assume(is_path(heap, x, y));
+  //assume(is_path(heap, x, y));
   node_t nx = deref(heap, x);
   node_t ny = deref(heap, y);
   return path_forall(heap, nx, ny, pi) == bool_true;
@@ -838,7 +839,7 @@ void add(abstract_heapt *heap,
     if (succ(heap, nlist) == null_node) {
       node_t nnew = alloc(heap);
       assign_succ(heap, nnew, null_node, dist(heap, nlist));      
-      assign_succ(heap, nlist, nnew, 1);
+      assign_succ(heap, nlist, nnew, 0);
     }
     nlist = succ(heap, nlist);
   }
@@ -928,18 +929,18 @@ void addI(abstract_heapt *heap,
   // if the list was empty create new node
   // LSH FIXME: what if it was an iterator that reached null?
   /* if ( nit == null_node) { */
-  /*   assign_succ(heap, nnew, null_node, 1); */
+  /*   assign_succ(heap, nnew, null_node, 0); */
   /*   assign_ptr(heap, it, nnew); */
   /*   return; */
   /* } */
 
   //  prev_nit -----d-------> nit ---> null
   // to
-  //  prev_nit -d-> nnew -1-> nit ---> null
+  //  prev_nit -d-> nnew -0-> nit ---> null
   
   node_t prev_nit = prev(heap, nit);
   // nnew points to nit
-  assign_succ(heap, nnew, nit, 1);
+  assign_succ(heap, nnew, nit, 0);
 
   // set the nprev that used to point to nit to point to nnew
   if (prev_nit != null_node) {

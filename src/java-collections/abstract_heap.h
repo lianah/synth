@@ -90,8 +90,7 @@ typedef struct abstract_heap {
   // A map from nodes to the data stored in each node. 
   data_t data[NABSNODES];
 
-  // A map from nodes to distances, saying for each node n how far away its
-  // successor is.
+  // A map from nodes to the number of nodes abstracted by the node's outgoing edge.
   word_t dist[NABSNODES];
 
   // A map from nodes to the value of the universal predicates
