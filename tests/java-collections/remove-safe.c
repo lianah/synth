@@ -1,6 +1,6 @@
 #include "abstract_heap.h"
 
-// Run with -DNPROG=3 -DNPRED=1 
+// Run with -DNPROG=3 -DNPREDS=1 
 
 /*	ListIterator<Integer> it = data.listIterator();
 	while(it.hasNext()) {

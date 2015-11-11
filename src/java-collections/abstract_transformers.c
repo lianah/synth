@@ -13,6 +13,14 @@ data_t nondet_data_t() {
   data_t d;
   return d;
 }
+
+void debug_assert (_Bool x, char* tag) {
+  if(!x) {
+    printf("\n%s\n", tag);
+  }
+  assert(x);
+}
+
 #else
 
 data_t nondet_data_t();
@@ -26,8 +34,8 @@ data_t nondet_data_t();
 static node_t deref(const abstract_heapt *heap,
                     ptr_t p) {
   // Ensure p is a real pointer.
-  assume(p < NPROG);
-  assert (heap->ptr[p] != INVALID);
+  Assume(p < NPROG);
+  Assert (heap->ptr[p] != INVALID, "INV_ERROR: deref");
   return heap->ptr[p];
 }
 
@@ -37,7 +45,7 @@ static node_t deref(const abstract_heapt *heap,
 static _Bool is_iterator(const abstract_heapt *heap,
 			 ptr_t p) {
   // Ensure p is a real pointer.
-  assume(p < NPROG);
+  Assume(p < NPROG);
   return heap->is_iterator[p];
 }
 
@@ -48,7 +56,7 @@ static _Bool is_iterator(const abstract_heapt *heap,
 static node_t succ(const abstract_heapt *heap,
                    node_t n) {
   // Ensure n is an allocated node.
-  assume(n < NABSNODES);
+  Assume(n < NABSNODES);
   return heap->succ[n];
 }
 
@@ -58,8 +66,8 @@ static node_t succ(const abstract_heapt *heap,
 static node_t prev(const abstract_heapt *heap,
                    node_t n) {
   // Ensure n is an allocated node.
-  assume(n < NABSNODES);
-  assert(n != null_node);
+  Assume(n < NABSNODES);
+  Assert(n != null_node, "INV_ERROR: prev");
   return heap->prev[n];
 }
 
@@ -69,7 +77,7 @@ static node_t prev(const abstract_heapt *heap,
  */
 static word_t dist(const abstract_heapt *heap,
                    node_t n) {
-  assume(n < NABSNODES);
+  Assume(n < NABSNODES);
   return heap->dist[n];
 }
 
@@ -78,8 +86,8 @@ static word_t dist(const abstract_heapt *heap,
  */
 static word_t data(const abstract_heapt *heap,
                    node_t n) {
-  assume(n < NABSNODES);
-  assert(n != null_node);
+  Assume(n < NABSNODES);
+  Assert(n != null_node, "INV_ERROR: data");
   return heap->data[n];
 }
 
@@ -90,8 +98,8 @@ static word_t data(const abstract_heapt *heap,
 /* static bool_t get_exists(const abstract_heapt *heap, */
 /* 			 node_t n, */
 /* 			 predicate_index_t pi) { */
-/*   assume(n < NABSNODES); */
-/*   assume(pi < NPREDS); */
+/*   Assume(n < NABSNODES); */
+/*   Assume(pi < NPREDS); */
 /*   return heap->existential[n][pi]; */
 /* } */
 
@@ -100,7 +108,7 @@ static word_t data(const abstract_heapt *heap,
  */
 static bool_t get_sorted(const abstract_heapt *heap,
 			 node_t n) {
-  assume(n < NABSNODES);
+  Assume(n < NABSNODES);
   return heap->sorted[n];
 }
 
@@ -109,7 +117,7 @@ static bool_t get_sorted(const abstract_heapt *heap,
  */
 static data_t get_max(const abstract_heapt *heap,
 			 node_t n) {
-  assume(n < NABSNODES);
+  Assume(n < NABSNODES);
   return heap->max[n];
 }
 
@@ -118,7 +126,7 @@ static data_t get_max(const abstract_heapt *heap,
  */
 static data_t get_min(const abstract_heapt *heap,
 			 node_t n) {
-  assume(n < NABSNODES);
+  Assume(n < NABSNODES);
   return heap->min[n];
 }
 
@@ -129,8 +137,8 @@ static data_t get_min(const abstract_heapt *heap,
 static bool_t get_univ(const abstract_heapt *heap,
 		       node_t n,
 		       predicate_index_t pi) {
-  assume(n < NABSNODES);
-  assume(pi < NPREDS);
+  Assume(n < NABSNODES);
+  Assume(pi < NPREDS);
   return heap->universal[n][pi];
 }
 
@@ -138,7 +146,7 @@ static bool_t get_univ(const abstract_heapt *heap,
  * What is the value of the i_th universal predicate for n ?
  */
 static _Bool eval_pred(predicate_index_t pi, data_t val) {
-  assume(pi < NPREDS);
+  Assume(pi < NPREDS);
   return predicates[pi](val);
 }
 
@@ -150,8 +158,8 @@ static _Bool eval_pred(predicate_index_t pi, data_t val) {
 static void assign_ptr(abstract_heapt *heap,
 		       ptr_t x,
 		       node_t n) {
-  assume(x < NPROG);
-  assume(n < NABSNODES);
+  Assume(x < NPROG);
+  Assume(n < NABSNODES);
   heap->ptr[x] = n;
 }
 
@@ -159,8 +167,8 @@ static void assign_univ(abstract_heapt *heap,
 			node_t nx,
 			predicate_index_t pi,
 			bool_t pred_val) {
-  assume(nx < NABSNODES);
-  assume(pi < NPREDS);
+  Assume(nx < NABSNODES);
+  Assume(pi < NPREDS);
   heap->universal[nx][pi] = pred_val;
 }
 
@@ -168,8 +176,8 @@ static void assign_sorted(abstract_heapt *heap,
 			node_t nx,
 			predicate_index_t pi,
 			bool_t sorted_val) {
-  assume(nx < NABSNODES);
-  assume(pi < NPREDS);
+  Assume(nx < NABSNODES);
+  Assume(pi < NPREDS);
   heap->sorted[nx] = sorted_val;
 }
 
@@ -178,8 +186,8 @@ static void assign_min_max(abstract_heapt *heap,
 			predicate_index_t pi,
 			data_t min_val,
 			data_t max_val) {
-  assume(nx < NABSNODES);
-  assume(pi < NPREDS);
+  Assume(nx < NABSNODES);
+  Assume(pi < NPREDS);
   heap->min[nx] = min_val;
   heap->max[nx] = max_val;
 }
@@ -190,8 +198,8 @@ static void assign_min_max(abstract_heapt *heap,
 /* 			  node_t nx, */
 /* 			  predicate_index_t pi, */
 /* 			  bool_t pred_val) { */
-/*   assume(nx < NABSNODES); */
-/*   assume(pi < NPREDS); */
+/*   Assume(nx < NABSNODES); */
+/*   Assume(pi < NPREDS); */
 /*   heap->existential[nx][pi] = pred_val; */
 /* } */
 
@@ -200,9 +208,8 @@ static void assign_succ(abstract_heapt *heap,
 			node_t x,
 			node_t y,
 			word_t dist) {
-  assume(x < NABSNODES);
-  assume(y < NABSNODES);
-  assert (dist);
+  Assume(x < NABSNODES);
+  Assume(y < NABSNODES);
   
   heap->succ[x] = y;
   heap->prev[y] = x;
@@ -210,13 +217,11 @@ static void assign_succ(abstract_heapt *heap,
   heap->dist[x] = dist;
   
   predicate_index_t pi = 0;
-  if (dist == 1) {
+  if (dist == 0) {
     for (pi = 0; pi < NPREDS; ++pi) {
-      // everything is true about elments in the empty set
       assign_univ(heap, x, pi, bool_true);
+      // Cris TODO: check this
       assign_sorted(heap, x, pi, bool_true);
-      // nothing exists in the empty set
-      // assign_exists(heap, x, pi, bool_false);
     }
   }
 }
@@ -224,8 +229,8 @@ static void assign_succ(abstract_heapt *heap,
 static void assign_data(abstract_heapt *heap,
 			node_t x,
 			data_t val) {
-  assume(x < NABSNODES);
-  assert (x != null_node);
+  Assume(x < NABSNODES);
+  Assert (x != null_node, "INV_ERROR");
   heap->data[x] = val;
 }
 
@@ -234,7 +239,7 @@ static void assign_data(abstract_heapt *heap,
  */
 static node_t alloc(abstract_heapt *heap) {
   node_t n;
-  assume(heap->nnodes < NABSNODES);
+  Assume(heap->nnodes < NABSNODES);
   return heap->nnodes++;
 }
 
@@ -244,8 +249,8 @@ static node_t alloc(abstract_heapt *heap) {
  */
 static void invalidate(abstract_heapt *heap,
 		       node_t nx) {
-  assert (nx != null_node);
-  assert (nx < heap->nnodes);
+  Assert (nx != null_node, "INV_ERROR");
+  Assert (nx < heap->nnodes, "INV_ERROR");
   word_t i;
   for (i = 0; i < NPROG; ++i) {
     if (is_iterator(heap, i) &&
@@ -258,8 +263,8 @@ static void invalidate(abstract_heapt *heap,
 static void update_ptr(abstract_heapt *heap,
 		       node_t nx,
 		       node_t nnew) {
-  assert (nx != null_node);
-  assert (nx < heap->nnodes);
+  Assert (nx != null_node, "INV_ERROR");
+  Assert (nx < heap->nnodes, "INV_ERROR");
   word_t i;
   for (i = 0; i < NPROG; ++i) {
     if (heap->ptr[i] == nx) {
@@ -277,8 +282,8 @@ static void update_ptr(abstract_heapt *heap,
 static void invalidate_and_update(abstract_heapt *heap,
 				  node_t nx,
 				  node_t nnew) {
-  assert (nx != null_node);
-  assert (nx < heap->nnodes);
+  Assert (nx != null_node, "INV_ERROR");
+  Assert (nx < heap->nnodes, "INV_ERROR");
   word_t i;
   for (i = 0; i < NPROG; ++i) {
     if (heap->ptr[i] == nx) {
@@ -299,11 +304,11 @@ static void invalidate_and_update(abstract_heapt *heap,
  */
 static void clear_node(abstract_heapt* heap,
 		       node_t nx) {
-  assert (nx != null_node);
-  assert (nx < heap->nnodes);
+  Assert (nx != null_node, "INV_ERROR");
+  Assert (nx < heap->nnodes, "INV_ERROR");
   word_t data;
   assign_data(heap, nx, data);
-  assign_succ(heap, nx, null_node, 1);
+  assign_succ(heap, nx, null_node, 0);
 }
 
 /*
@@ -311,11 +316,11 @@ static void clear_node(abstract_heapt* heap,
  */
 void abstract_new(abstract_heapt *heap,
                   ptr_t x) {
-  assume(x < NPROG);
+  Assume(x < NPROG);
 
   // Just allocate a new node and have x point to it.
   node_t nx = alloc(heap);
-  assign_succ(heap, nx, null_node, 1);
+  assign_succ(heap, nx, null_node, 0);
   assign_ptr(heap, x, nx);
 }
 
@@ -326,7 +331,7 @@ void abstract_new(abstract_heapt *heap,
 */
 node_t subdivide(abstract_heapt *heap,
 		 node_t nx) {
-  assert (nx < NABSNODES);
+  Assert (nx < NABSNODES, "INV_ERROR");
   node_t succ_nx = succ(heap, nx);
   word_t nx_dist = dist(heap, nx);
 
@@ -334,7 +339,7 @@ node_t subdivide(abstract_heapt *heap,
   //
   // (1): x has a direct successor, i.e. x -1> succ_nx
   // (2): x's successor is some distance > 1 away, i.e. x -k-> succ_nx
-  if (nx_dist == 1) {
+  if (nx_dist == 0) {
     // Case 1:
     //
     // x's successor is one step away, so return that
@@ -351,7 +356,7 @@ node_t subdivide(abstract_heapt *heap,
     //
     // Heap state:
     //
-    // nx -1-> nnew -(k-1)-> succ_nx
+    // nx -0-> nnew -(k-1)-> succ_nx
     //
     // Begin by allocating a new node between nx and succ_nx.
     node_t nnew = alloc(heap);
@@ -363,7 +368,7 @@ node_t subdivide(abstract_heapt *heap,
       // Assume the predicates for the values stored at nnew
       // Only true universals are still true on the data
       if (new_univ == bool_true) {
-	assume(eval_pred(pi, data(heap, nnew)));
+	Assume(eval_pred(pi, data(heap, nnew)));
 	assign_univ(heap, nnew, pi, bool_true);
       } else {
 	assign_univ(heap, nnew, pi, bool_unknown);
@@ -371,7 +376,7 @@ node_t subdivide(abstract_heapt *heap,
 
       // Only false existentials are still false on the data
       /* if (get_exists == bool_false) { */
-      /* 	assume(!eval_pred(pi, data(heap, nnew))); */
+      /* 	Assume(!eval_pred(pi, data(heap, nnew))); */
       /* 	assign_exists(heap, nnew, pi, bool_false); */
       /* } else { */
       /* 	assign_exists(heap, nnew, pi, bool_unknown); */
@@ -381,7 +386,7 @@ node_t subdivide(abstract_heapt *heap,
     // Reassign nnew's succ pointer to nx's successor succ_nx
     assign_succ(heap, nnew, succ_nx, new_dist);
     // Reassign nx's succ pointer to the newly allocated node.
-    assign_succ(heap, nx, nnew, 1);
+    assign_succ(heap, nx, nnew, 0);
     return nnew;
   }
 }
@@ -391,7 +396,7 @@ node_t subdivide(abstract_heapt *heap,
 */
 extern void invalidate_succ(abstract_heapt* heap,
 			    node_t nx) {
-  assert (nx != null_node);
+  Assert (nx != null_node, "INV_ERROR");
 
   node_t initial_nx = nx;
   
@@ -412,7 +417,7 @@ extern void invalidate_succ(abstract_heapt* heap,
 */
 extern void invalidate_prev(abstract_heapt* heap,
 			    node_t nx) {
-  assert (nx != null_node);
+  Assert (nx != null_node, "INV_ERROR");
 
   node_t initial_nx = nx;
   
@@ -492,19 +497,24 @@ static void assume_consistent_node(const abstract_heapt *heap,
   
   // we can only have as many witnesses as the length
   // we only need as many as predicates since each val is unconstrained 
-  word_t num_nodes = dist(heap, nx) - 1;
+  word_t num_nodes = dist(heap, nx);
 
   word_t pi, j;
-  _Bool neg = 0; 
+
+  // indicates that there are no negated predicates
+
   for (pi = 0; pi < NPREDS; ++pi) {
+    _Bool no_neg = 1;
+    _Bool neg = 0;
     if (get_univ(heap, nx, pi) == bool_true) {
-      // we assume the positive predicates hold on all the witness values
+      // we Assume the positive predicates hold on all the witness values
       for (j = 0; j < NPREDS; ++j) {
 	
 	if (j >= num_nodes)
 	  continue;
-
-	assume(eval_pred(pi, vals[j]));
+#ifdef __CPROVER
+	Assume(eval_pred(pi, vals[j]));
+#endif	
       }
     } else if (get_univ(heap, nx, pi) == bool_false) {
       // we check that each negative predicates (existentials) holds
@@ -513,10 +523,14 @@ static void assume_consistent_node(const abstract_heapt *heap,
 	if (j >= num_nodes)
 	  continue;
 	neg = neg || !eval_pred(pi, vals[j]);
+	no_neg = 0;
       }
     }
+#ifdef __CPROVER    
+    Assume(no_neg || neg);
+#endif    
   }
-  assume(neg);
+  
 }
 
 
@@ -571,7 +585,9 @@ _Bool is_minimal(const abstract_heapt *heap) {
       bool_t s = get_sorted(heap, n);
 
       // edges of length 1 have the predicates true and are sorted
-      if (dist(heap, n) == 1 && (u != bool_true || s != bool_true))
+      if (n!= null_node &&
+	  dist(heap, n) == 0 &&
+	  (u != bool_true || s != bool_true))
 	return 0;
       
       if (u > bool_unknown || s > bool_unknown)
@@ -584,9 +600,9 @@ _Bool is_minimal(const abstract_heapt *heap) {
 	return 0;
       }
 
-      // Cris TODO: change dist to 0 after pulling Liana's changes
+      // Cris TODO: change dist to 0 after pulling Liana's changes -- done
       // enforce min <= max for all edges
-      if (dist(heap, n) > 1 && get_min(heap, n) > get_max(heap, n)) {
+      if (dist(heap, n) > 0 && get_min(heap, n) > get_max(heap, n)) {
 	return 0;
       }
     }
@@ -596,9 +612,6 @@ _Bool is_minimal(const abstract_heapt *heap) {
   for (i = 0; i < NABSNODES-1; i++) {
     nreachable += is_named[i];
     if (is_named[i] && !is_named[succ(heap, i)]) {
-      return 0;
-    }
-    if (i != null_node && dist(heap, i) <= 0) {
       return 0;
     }
   }
@@ -661,7 +674,7 @@ _Bool valid_abstract_heap(const abstract_heapt *heap) {
     return 0;
   }
 
-  if (dist(heap, null_node) != 0) {
+  if (dist(heap, null_node) != 0) { 
     return 0;
   }
 
@@ -701,19 +714,18 @@ word_t path_len(const abstract_heapt *heap,
     if (n == null_node) {
       return INF;
     }
-
-    curr_dist = s_add(curr_dist, dist(heap, n));
+    // count current node as well
+    curr_dist = s_add(1, s_add(curr_dist, dist(heap, n)));
     n = succ(heap, n);
   }
   
-  assert (0);
+  Assert (0, "INV_ERROR");
   return INF;
 }
 
 _Bool is_path(const abstract_heapt *heap,
 	       ptr_t x,
 	       ptr_t y) {
-  word_t curr_dist = 0;
   node_t n = deref(heap, x);
   node_t yn = deref(heap, y);
   word_t i;
@@ -727,7 +739,7 @@ _Bool is_path(const abstract_heapt *heap,
 
     n = succ(heap, n);
   }
-  assert (0);
+  Assert (0, "INV_ERROR");
   return 0;
 }
 
@@ -751,7 +763,7 @@ _Bool is_null(const abstract_heapt *heap,
 /* 		    ptr_t x, */
 /* 		    ptr_t y, */
 /* 		    predicate_index_t pi) { */
-/*   assume(is_path(heap, x, y)); */
+/*   Assume(is_path(heap, x, y)); */
   
 /*   node_t nx = deref(heap, x); */
 /*   node_t ny = deref(heap, y); */
@@ -762,7 +774,7 @@ _Bool is_null(const abstract_heapt *heap,
 /* 	      ptr_t x, */
 /* 	      ptr_t y, */
 /* 	      predicate_index_t prop) { */
-/*   assume(is_path(heap, x, y)); */
+/*   Assume(is_path(heap, x, y)); */
   
 /*   node_t nx = deref(heap, x); */
 /*   node_t ny = deref(heap, y); */
@@ -789,7 +801,7 @@ _Bool forall_assume(const abstract_heapt *heap,
 		    ptr_t x,
 		    ptr_t y,
 		    predicate_index_t pi) {
-  assume(is_path(heap, x, y));
+  Assume(is_path(heap, x, y));
   node_t nx = deref(heap, x);
   node_t ny = deref(heap, y);
   return path_forall(heap, nx, ny, pi) == bool_true;
@@ -800,7 +812,7 @@ bool_t forall(const abstract_heapt *heap,
 	      ptr_t y,
 	      predicate_index_t prop) {
   // LSH think about it!
-  assume(is_path(heap, x, y));
+  Assume(is_path(heap, x, y));
   
   node_t nx = deref(heap, x);
   node_t ny = deref(heap, y);
@@ -840,7 +852,7 @@ bool_t sorted(const abstract_heapt *heap,
 	      ptr_t x,
 	      ptr_t y) {
 
-  assume(is_path(heap, x, y));
+  Assume(is_path(heap, x, y));
   
   node_t nx = deref(heap, x);
   node_t ny = deref(heap, y);
@@ -866,8 +878,8 @@ bool_t sorted(const abstract_heapt *heap,
     prev_max = data(heap, nx);
     res = and(res, get_sorted(heap, nx));
     // if len > 1 then we must also consider the min and max of the abstracted segment
-    // Cris TODO: change dist to 0
-    if(dist(heap, nx) > 1) {
+    // Cris TODO: change dist to 0 -- DONE
+    if(dist(heap, nx) > 0) {
       res = and(res, prev_max <= get_min(heap, nx));
       prev_max = get_max(heap, nx);
     }
@@ -878,6 +890,7 @@ bool_t sorted(const abstract_heapt *heap,
   // LSH FIXME: paper actually checks entailment
   return bool_unknown;
 
+  Assert(0, "INV_ERROR");
   return 0;
 }
 
@@ -892,17 +905,17 @@ bool_t sorted(const abstract_heapt *heap,
 data_t getP(const abstract_heapt *heap,
 	    ptr_t list,
 	    index_t i) {
-  assert (!is_iterator(heap, list));
-  assert(0);
+  Assert (!is_iterator(heap, list), "INV_ERROR");
+  Assert(0, "INV_ERROR");
   return 0;
 }
 
 /* Iterator get */
 data_t getI(const abstract_heapt *heap,
 	    ptr_t it) {
-  assert (is_iterator(heap, it));
+  Assert (is_iterator(heap, it), "INV_ERROR");
   node_t nit = deref(heap, it);
-  assert (nit != null_node);
+  Assert (nit != null_node, "INV_ERROR");
   return data(heap, nit);
 }
 
@@ -918,7 +931,7 @@ void add(abstract_heapt *heap,
 	 ptr_t list,
 	 data_t val) {
   
-  assert (!is_iterator(heap, list));
+  Assert (!is_iterator(heap, list), "INV_ERROR");
   node_t nlist = deref(heap, list);
   
   if ( nlist == null_node) {
@@ -928,13 +941,13 @@ void add(abstract_heapt *heap,
     return;
   }
 
-  invalidate_succ(heap, nlist);
+  //invalidate_succ(heap, nlist);
   
   word_t i;
   for (i = 0; i < NABSNODES; ++i) {
     if (succ(heap, nlist) == null_node) {
       node_t nnew = alloc(heap);
-      assign_succ(heap, nnew, null_node, 1);      
+      assign_succ(heap, nnew, null_node, 0);      
       assign_succ(heap, nlist, nnew, dist(heap, nlist));
       assign_data(heap, nnew, val);
       break;
@@ -948,10 +961,10 @@ void add(abstract_heapt *heap,
 void assign(abstract_heapt *heap,
 	    ptr_t x,
 	    ptr_t y) {
-  assume(x < NPROG);
-  assume(y < NPROG);
+  Assume(x < NPROG);
+  Assume(y < NPROG);
 
-  assert (is_iterator(heap, x) == is_iterator(heap, y));
+  Assert (is_iterator(heap, x) == is_iterator(heap, y), "INV_ERROR");
 
   node_t py = deref(heap, y);
   assign_ptr(heap, x, py);
@@ -960,7 +973,7 @@ void assign(abstract_heapt *heap,
 /* Removes all elements from list */
 void clear(abstract_heapt *heap,
 	   ptr_t x) {
-  assert(0);
+  Assert(0, "INV_ERROR");
 }
 
 /*************************
@@ -973,8 +986,8 @@ void setP(abstract_heapt *heap,
 	  ptr_t list,
 	  index_t i,
 	  data_t val) {
-  assert(!is_iterator(heap, list));
-  assert(0);
+  Assert(!is_iterator(heap, list), "INV_ERROR");
+  Assert(0, "INV_ERROR");
 }
 
 
@@ -983,16 +996,16 @@ void addP(abstract_heapt *heap,
 	  ptr_t list,
 	  index_t i,
 	  data_t val) {
-  assert(!is_iterator(heap, list));
-  assert(0);
+  Assert(!is_iterator(heap, list), "INV_ERROR");
+  Assert(0, "INV_ERROR");
 }
 
 /* Positional remove */
 void removeP(abstract_heapt *heap,
 	     ptr_t list,
 	     index_t i)  {
-  assert(!is_iterator(heap, list));
-  assert(0);
+  Assert(!is_iterator(heap, list), "INV_ERROR");
+  Assert(0, "INV_ERROR");
 }
 
 /*************************
@@ -1002,8 +1015,8 @@ void removeP(abstract_heapt *heap,
 void iterator(abstract_heapt* heap,
 	      ptr_t it,
 	      ptr_t list) {
-  assert (is_iterator(heap, it) &&
-	  !is_iterator(heap, list));
+  Assert (is_iterator(heap, it) &&
+	  !is_iterator(heap, list), "INV_ERROR");
 
   node_t nlist = deref(heap, list);
   assign_ptr(heap, it, nlist);
@@ -1015,10 +1028,10 @@ void addI(abstract_heapt *heap,
 	  ptr_t it,
 	  data_t val) {
 
-  assert (is_iterator(heap, it));
+  Assert (is_iterator(heap, it), "INV_ERROR");
 
   // LSH FIXME: this case not supported yet so use assume
-  assume (!is_null(heap, it));
+  Assume (!is_null(heap, it));
   node_t nit = deref(heap, it);
   
   // create new node and set data
@@ -1028,18 +1041,18 @@ void addI(abstract_heapt *heap,
   // if the list was empty create new node
   // LSH FIXME: what if it was an iterator that reached null?
   /* if ( nit == null_node) { */
-  /*   assign_succ(heap, nnew, null_node, 1); */
+  /*   assign_succ(heap, nnew, null_node, 0); */
   /*   assign_ptr(heap, it, nnew); */
   /*   return; */
   /* } */
 
   //  prev_nit -----d-------> nit ---> null
   // to
-  //  prev_nit -d-> nnew -1-> nit ---> null
+  //  prev_nit -d-> nnew -0-> nit ---> null
   
   node_t prev_nit = prev(heap, nit);
   // nnew points to nit
-  assign_succ(heap, nnew, nit, 1);
+  assign_succ(heap, nnew, nit, 0);
 
   // set the nprev that used to point to nit to point to nnew
   if (prev_nit != null_node) {
@@ -1058,16 +1071,16 @@ void setI(abstract_heapt *heap,
 	  ptr_t it,
 	  data_t val)  {
 
-  assume (it < NPROG);
-  assert (is_iterator(heap, it));
+  Assume (it < NPROG);
+  Assert (is_iterator(heap, it), "INV_ERROR");
   
   node_t nx = deref(heap, it);
   
   // LSH FIXME: cannot get prev of null_node
-  assume (nx != null_node);
+  Assume (nx != null_node);
 
   node_t nprev = prev(heap, nx);
-  assert (nprev != null_node);
+  Assert (nprev != null_node, "INV_ERROR");
   
   assign_data(heap, nprev, val);
 }
@@ -1076,18 +1089,18 @@ void setI(abstract_heapt *heap,
 /* Iterator remove - removes the last value returned by next */
 void removeI(abstract_heapt *heap,
 	     ptr_t it)  {
-  assume (it < NPROG);
-  assert (is_iterator(heap, it));
+  Assume (it < NPROG);
+  Assert (is_iterator(heap, it), "INV_ERROR");
   
   node_t nit = deref(heap, it);
   // FIXME: we cannot compute the prev of null currently 
-  assume(nit != null_node);
+  Assume(nit != null_node);
   // the node we will be removing
   node_t nrem = prev(heap, nit);
 
   // it cannot point to the beggining of the list
   // (no previous element to remove)
-  assert (nrem != null_node);
+  Assert (nrem != null_node, "INV_ERROR");
 
   // the node before the one we are removing
   node_t nprev = prev(heap, nrem);
@@ -1110,14 +1123,14 @@ void removeI(abstract_heapt *heap,
     for (pi = 0; pi < NPREDS; ++pi) {
       // true universals are maintained
       if (get_univ(heap, nrem, pi) == bool_true) {
-	assume(eval_pred(pi, data));
+	Assume(eval_pred(pi, data));
 	assign_univ(heap, nrem, pi, bool_true);
       } else {
 	assign_univ(heap, nrem, pi, bool_unknown);
       } 
       // false existentials are maintained
       /* if (get_exists(heap, nrem, pi) == bool_false) { */
-      /* 	assume(!eval_pred(pi, data)); */
+      /* 	Assume(!eval_pred(pi, data)); */
       /* 	assign_exists(heap, nrem, pi, bool_false); */
       /* } else { */
       /* 	assign_exists(heap, nrem, pi, bool_unknown); */
@@ -1145,12 +1158,12 @@ void removeI(abstract_heapt *heap,
 /* Iterator next */
 word_t next(abstract_heapt *heap,
 	    ptr_t it) {
-  assert (is_iterator(heap, it));
+  Assert (is_iterator(heap, it), "INV_ERROR");
   
-  assume(it < NPROG);
+  Assume(it < NPROG);
 
   node_t nit = deref(heap, it);
-  assert (nit != null_node);
+  Assert (nit != null_node, "INV_ERROR");
 
   word_t val = data(heap, nit);
   // subdivide creates new node at distance 1 and
@@ -1163,7 +1176,7 @@ word_t next(abstract_heapt *heap,
 /* Iterator has next */
 _Bool hasNext(abstract_heapt *heap,
 	      ptr_t it) {
-  assert (is_iterator(heap, it));
+  Assert (is_iterator(heap, it), "INV_ERROR");
   return !is_null(heap, it);
 }
 
@@ -1171,7 +1184,7 @@ _Bool hasNext(abstract_heapt *heap,
 /* Return the next index pointed to by iterator */
 index_t nextIndex(abstract_heapt *heap,
 		  ptr_t x) {
-  assert(0);
+  Assert(0, "INV_ERROR");
   return -1;
 }
 

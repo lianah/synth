@@ -23,12 +23,16 @@
 
 #define INF WORDMASK
 
+void debug_assert (_Bool x, char* tag);
+
 #ifdef __CPROVER
-  #define assume(x) __CPROVER_assume(x)
+  #define Assume(x) __CPROVER_assume(x)
+  #define Assert(x, tag) __CPROVER_assert(x, tag)
   typedef unsigned __CPROVER_bitvector[WIDTH] word_t;
   typedef unsigned __CPROVER_bitvector[2] bool_t; 
 #else
-  #define assume(x) assert(x)
+  #define Assume(x) assert(x)
+  #define Assert(x, tag) debug_assert(x, tag)
   typedef unsigned int word_t;
   typedef int bool_t; 
 #endif
@@ -95,8 +99,7 @@ typedef struct abstract_heap {
   // A map from nodes to the data stored in each node. 
   data_t data[NABSNODES];
 
-  // A map from nodes to distances, saying for each node n how far away its
-  // successor is.
+  // A map from nodes to the number of nodes abstracted by the node's outgoing edge.
   word_t dist[NABSNODES];
 
   // A map from nodes to the value of the universal predicates

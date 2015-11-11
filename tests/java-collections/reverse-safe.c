@@ -1,6 +1,6 @@
 #include "abstract_heap.h"
 
-// Run with -DNPROG=5 and -DNPRED=1
+// Run with -DNPROG=5 -DNPREDS=1
 
 /*
   

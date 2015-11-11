@@ -1,12 +1,12 @@
 #include "abstract_heap.h"
 
-// Run with -DNPROG=3 and -DNPRED=0
+// Run with -DNPROG=2 and -DNPRED=0 and -DNSLACK=1
 
 ptr_t list = 1;
 ptr_t it = 2;
 
 void pre(abstract_heapt *heap) {
-  assume (empty(heap, list));
+  Assume (empty(heap, list));
   add(heap, list, 10);
   add(heap, list, 11);
 }

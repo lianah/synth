@@ -1,14 +1,14 @@
 #include "abstract_heap.h"
 
-// Run with -DNPROG=3 and -DNPRED=0
+// Run with -DNPROG=2 and -DNPRED=0 and -DNSLACK=1
 
 ptr_t list = 1;
 ptr_t it = 2;
 
 
 void pre(abstract_heapt *heap) {
-  assume(sorted(heap, list, null_ptr) == bool_true);
-  add(heap, list, 10);
+  Assume(sorted(heap, list, null_ptr) == bool_true);
+  add(heap, list, 12);
 }
 
 void init_predicates() {}

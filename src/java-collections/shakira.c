@@ -18,28 +18,24 @@ void main(void) {
    
   init_predicates();
   init_heap(&h);
-  assume(valid_abstract_heap(&h));
+  Assume(valid_abstract_heap(&h));
 
   // Base.
   pre(&h);
-  assert(inv_check(&h));
+  Assert(inv_check(&h), "INV_FAIL: Base case.");
 
   h = nondet_heap();
   init_heap(&h);
-  assume (valid_abstract_heap(&h));
-
-  /* assume(inv(&h)); */
-  /* assume(cond(&h)); */
-  /* assert(0); */
+  Assume (valid_abstract_heap(&h));
 
   if (inv_assume(&h)) {
     if (cond(&h)) {
       // Induction.
       body(&h);
-      assert(inv_check(&h));
+      Assert(inv_check(&h), "INV_FAIL: Inductive step.");
      }  else {
       // Property.
-       assert(assertion(&h));
+       Assert(assertion(&h), "INV_FAIL: Property entailment.");
     }
   }
 }

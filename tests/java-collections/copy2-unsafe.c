@@ -1,6 +1,6 @@
 #include "abstract_heap.h"
 
-// Run with -DNPROG=4 -DNPRED=2
+// Run with -DNPROG=4 -DNPREDS=2
 
 ptr_t list = 1;
 ptr_t copy = 2;

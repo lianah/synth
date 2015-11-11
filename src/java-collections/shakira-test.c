@@ -22,25 +22,25 @@ void main(void) {
   init_predicates();
   
   init_counterexample(&h);
-  init_heap(&h);  
-  assert (valid_abstract_heap(&h));
+  init_heap(&h);
+  Assert (valid_abstract_heap(&h), "INV_FAIL: Base case.");
   
   // Base.
   pre(&h);
-  assert(inv_check(&h));
+  Assert(inv_check(&h), "INV_FAIL: Assumption");
 
   inductive_counterexample(&h);
   init_heap(&h);
-  assert (valid_abstract_heap(&h));
+  Assert (valid_abstract_heap(&h), "INV_FAIL: Assumption");
   
   if (inv_assume(&h)) {
     if (cond(&h)) {
       // Induction.
       body(&h);
-      assert(inv_check(&h));
+      Assert(inv_check(&h), "INV_FAIL: Inductive step.");
     }  else { 
        // Property.
-      assert(assertion(&h)); 
+      Assert(assertion(&h), "INV_FAIL: Inductive step."); 
      } 
   }
 }
