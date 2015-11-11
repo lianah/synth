@@ -174,10 +174,8 @@ static void assign_univ(abstract_heapt *heap,
 
 static void assign_sorted(abstract_heapt *heap,
 			node_t nx,
-			predicate_index_t pi,
 			bool_t sorted_val) {
   Assume(nx < NABSNODES);
-  Assume(pi < NPREDS);
   heap->sorted[nx] = sorted_val;
 }
 
@@ -230,9 +228,8 @@ static void assign_succ(abstract_heapt *heap,
   if (dist == 0) {
     for (pi = 0; pi < NPREDS; ++pi) {
       assign_univ(heap, x, pi, bool_true);
-      // Cris TODO: check this
-      assign_sorted(heap, x, pi, bool_true);
     }
+    assign_sorted(heap, x, bool_true);
   }
 }
 
@@ -400,6 +397,12 @@ node_t subdivide(abstract_heapt *heap,
     assign_succ(heap, nnew, succ_nx, new_dist);
     // Reassign nx's succ pointer to the newly allocated node.
     assign_succ(heap, nx, nnew, 0);
+
+    // Assume min <= val <= max
+    Assume(get_min(heap, nx) <= data(heap, nnew) <= get_max(heap, nx));
+    assign_sorted(heap, nx, bool_true);
+
+
     return nnew;
   }
 }

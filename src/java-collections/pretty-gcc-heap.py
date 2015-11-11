@@ -55,7 +55,7 @@ def processHeap(m,prefix):
     s = succs[n]
     d = dists[n]
     u = univs[n]
-    print r'node%d%d -> node%d%d [label="%d U=%s"];' % (i,n, i, s, d, u)
+    print r'node%d%d -> node%d%d [label="%d U=%s"];' % (prefix,n, prefix, s, d, u)
 
   print "}"
 

@@ -31,7 +31,7 @@ def preds_str(us):
     elif u == 0:
       string += "F "
     else:
-      assert(false)
+      string +="* "
   return string
       
   
@@ -47,6 +47,12 @@ def processHeap(m,prefix):
 
   [ptrs, iterators, succs, prevs, datas, dists, univs, nnodes, sort, mins, maxs] = [eval(g) for g in m]
 
+  for i in range(nnodes):
+    for u in univs[i]:
+      assert (u <= 2)
+
+  # print "pointers ", ptrs
+  # print "iterators ", iterators
 
   univs = [preds_str(u) for u in univs]
 
@@ -68,7 +74,7 @@ def processHeap(m,prefix):
     mi = mins[n]
     ma = maxs[n]
     
-    print r'node%d%d -> node%d%d [label="%d %s %d %d %d"];' % (i,n, i, s, d, u, so, mi, ma)
+    print r'node%d%d -> node%d%d [label="%d %s %d %d %d"];' % (prefix,n, prefix, s, d, u, so, mi, ma)
 
     #print r'node%d%d -> node%d%d [label="%d U=%s E=%s"];' % (i,p, i, n, d, u, e)
 
@@ -79,7 +85,6 @@ regex = 'h={[^.]*\.ptr={([\d, ]*)},[^.]*\.is_iterator={([FALSETRU, ]*)},[^.]*\.s
 cex = sys.stdin.read()
 
 heaps = re.findall(regex, cex)
-
 
 print "digraph {"
 
