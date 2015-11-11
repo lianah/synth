@@ -172,8 +172,11 @@ _Bool forall_assume(const abstract_heapt *heap,
 bool_t sorted(const abstract_heapt *heap,
 	      ptr_t x,
 	      ptr_t y);
-//	      data_t min,
-//	      data_t max);
+
+data_t min(const abstract_heapt *heap,
+	      ptr_t x,
+	      ptr_t y);
+
 
 
 /*************************

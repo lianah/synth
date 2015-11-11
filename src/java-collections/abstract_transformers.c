@@ -797,6 +797,7 @@ _Bool is_null(const abstract_heapt *heap,
 /*   return check ? bool_true : bool_unknown; */
 /* } */
 
+
 _Bool forall_assume(const abstract_heapt *heap,
 		    ptr_t x,
 		    ptr_t y,
@@ -868,17 +869,13 @@ bool_t sorted(const abstract_heapt *heap,
 
   for (i = 0; i < NABSNODES; ++i) {
     if (nx == ny) {
-      /* if (nx != null_node) { */
-      /* 	res = and(res, data(heap, nx) >= prev_max); */
-      /* } */
       return res;
     }
 
     res = and(res, prev_max <= data(heap, nx));
     prev_max = data(heap, nx);
     res = and(res, get_sorted(heap, nx));
-    // if len > 1 then we must also consider the min and max of the abstracted segment
-    // Cris TODO: change dist to 0 -- DONE
+    // if len > 0 then we must also consider the values of the abstracted segment
     if(dist(heap, nx) > 0) {
       res = and(res, prev_max <= get_min(heap, nx));
       prev_max = get_max(heap, nx);
@@ -893,6 +890,45 @@ bool_t sorted(const abstract_heapt *heap,
   Assert(0, "INV_ERROR");
   return 0;
 }
+
+data_t min(const abstract_heapt *heap,
+	      ptr_t x,
+	      ptr_t y) {
+
+  Assume(is_path(heap, x, y));
+    
+  node_t nx = deref(heap, x);
+  node_t ny = deref(heap, y);
+ 
+  Assert(nx != ny, "MIN_FOR_EMPTY_SEG_ERR");
+
+  word_t i;
+  data_t curr_min = data(heap, nx);
+
+  for (i = 0; i < NABSNODES; ++i) {
+    if (nx == ny) {
+      return curr_min;
+    }
+
+    if (data(heap, nx) < curr_min)
+      curr_min = data(heap, nx);
+    // if len > 0 then we must also consider the values of the abstracted segment
+    if(dist(heap, nx) > 0) {
+      if (get_min(heap, nx) < curr_min) {
+	curr_min = get_min(heap, nx);
+      }
+    }
+
+    nx = succ(heap, nx);
+  }
+
+  // LSH FIXME: paper actually checks entailment
+  return bool_unknown;
+
+  Assert(0, "INV_ERROR");
+  return 0;
+}
+
 
 
 /*************************
