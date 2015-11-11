@@ -93,6 +93,17 @@ args[17]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
 expected[17]="INV_FAIL: Inductive step."
 pretty_args[17]="list it"
 
+tests[18]="max-builtin-iterator-safe.c"
+args[18]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+expected[18]="VERIFICATION SUCCESSFUL"
+pretty_args[18]="list it"
+
+tests[19]="max-builtin-iterator-unsafe.c"
+args[19]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+expected[19]="INV_FAIL: Inductive step."
+pretty_args[19]="list it"
+
+
 # tests[0]="../../tests/java-collections/set-const2-safe.c"
 # tests[0]="../../tests/java-collections/set-const3-safe.c"
 # tests[0]="../../tests/java-collections/min-iterator-safe.c"
@@ -111,7 +122,7 @@ red_fail=${RED}[FAIL]${NC}
 green_success=${GREEN}[SUCCESS]${NC}
 
 
-for ((i=0;i<${#tests[@]};++i)); do
+for ((i=18;i<${#tests[@]};++i)); do
     LOG_FILE="$TEST_PATH${tests[i]}.log"
     HEAP_FILE="$TEST_PATH${tests[i]}.png"
     INPUT_FILE="$TEST_PATH${tests[i]}"
