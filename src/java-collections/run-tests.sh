@@ -73,6 +73,25 @@ args[13]="-DNPROG=5 -DNPREDS=1 -DNSLACK=3"
 expected[13]="INV_FAIL:"
 pretty_args[13]="list rev it it2"
 
+tests[14]="add_to_sorted_list_safe.c"
+args[14]="-DNPROG=2 -DNPREDS=1 -DNSLACK=1"
+expected[14]="VERIFICATION SUCCESSFUL"
+pretty_args[14]="list"
+
+tests[15]="add_to_sorted_list_unsafe.c"
+args[15]="-DNPROG=2 -DNPREDS=1 -DNSLACK=1"
+expected[15]="INV_FAIL: Base case."
+pretty_args[15]="list"
+
+tests[16]="min-builtin-iterator-safe.c"
+args[16]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+expected[16]="VERIFICATION SUCCESSFUL"
+pretty_args[16]="list it"
+
+tests[17]="min-builtin-iterator-unsafe.c"
+args[17]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+expected[17]="INV_FAIL: Inductive step."
+pretty_args[17]="list it"
 
 # tests[0]="../../tests/java-collections/set-const2-safe.c"
 # tests[0]="../../tests/java-collections/set-const3-safe.c"
