@@ -50,23 +50,30 @@ _Bool cond(abstract_heapt *heap) {
 
 void body(abstract_heapt *heap) {
   current = next(heap, it);
-  addI(heap, it2, 0);
   addI(heap, it2, current);
-
+  addI(heap, it2, current);
   iterator(heap, it2, reversed);
 }
 
 _Bool assertion(abstract_heapt *heap) {
    return path_len(heap, list, null_ptr) == path_len(heap, reversed, null_ptr) &&
-    forall(heap, list, null_ptr, 0) == forall(heap, reversed, null_ptr, 0) &&
-    exists(heap, list, null_ptr, 0) == exists(heap, reversed, null_ptr, 0);
+    forall(heap, list, null_ptr, 0) == forall(heap, reversed, null_ptr, 0);
 }
 
-_Bool inv(abstract_heapt *heap) {
+_Bool inv_assume(abstract_heapt *heap) {
    return path_len(heap, reversed, null_ptr) == path_len(heap, list, it) && 
-     forall(heap, list, it, 0) == forall(heap, reversed, null_ptr, 0) &&  
-     exists(heap, list, it, 0) == exists(heap, reversed, null_ptr, 0) &&
+     forall_assume(heap, list, it, 0) == forall_assume(heap, reversed, null_ptr, 0) &&  
      is_path(heap, list, it) &&
      alias(heap, it2, reversed) &&
      !alias(heap, list, reversed);
 }
+
+
+_Bool inv_check(abstract_heapt *heap) {
+   return path_len(heap, reversed, null_ptr) == path_len(heap, list, it) && 
+     forall(heap, list, it, 0) == forall(heap, reversed, null_ptr, 0) &&  
+     is_path(heap, list, it) &&
+     alias(heap, it2, reversed) &&
+     !alias(heap, list, reversed);
+}
+

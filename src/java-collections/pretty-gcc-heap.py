@@ -15,11 +15,20 @@ def ptrname(p):
   else:
     return "ptr_%d" % p
 
-def bool_t(x):
-  assert (x < 3)
-  if x == 2:
-    return "?"
-  return str(x)
+
+def preds_str(us):
+  string = ""
+  for u in us:
+    if u == 2:
+      string += "? "
+    elif u == 1:
+      string += "T "
+    elif u == 0:
+      string += "F "
+    else:
+      assert(false)
+  return string
+  
   
 def processHeap(m,prefix):
   print r'subgraph cluster_h%d {' % (prefix)
@@ -28,15 +37,14 @@ def processHeap(m,prefix):
   m = list(m)
   m[1] = m[1].replace("false", "0")
   m[1] = m[1].replace("true", "1")
+  m[6] = m[6].replace("{","[")
+  m[6] = m[6].replace("}","]")
 
   
-  [ptrs, iterators, succs, prevs, datas, dists, univs, exists, nnodes] = [eval(g) for g in m]
+  [ptrs, iterators, succs, prevs, datas, dists, univs, nnodes, sorts, mins, maxs] = [eval(g) for g in m]
 
-  for u in univs:
-    assert (len(u) == 1)
 
-  univs = [bool_t(u.pop()) for u in univs]
-  exists = [bool_t(e.pop()) for e in exists]
+  univs = [preds_str(u) for u in univs]
   
   for n in xrange(nnodes):
     data = datas[n]
@@ -47,14 +55,12 @@ def processHeap(m,prefix):
     s = succs[n]
     d = dists[n]
     u = univs[n]
-    e = exists[n]
-    print r'node%d%d -> node%d%d [label="%d U=%s E=%s"];' % (i,n, i, s, d, u, e)
+    print r'node%d%d -> node%d%d [label="%d U=%s"];' % (i,n, i, s, d, u)
 
   print "}"
 
 
-regex = 'ptr = {([\d, ]*)}, is_iterator = {([falsetru, ]*)}, succ = {([\d, ]*)}, prev = {([\d, ]*)}, data = {([\d, ]*)}, dist = {([\d, ]*)}, universal = {([\d,{} ]*)}, existential = {([\d,{} ]*)}, nnodes = (\d+)'
-
+regex = 'h={[^.]*\.ptr={([\d, ]*)},[^.]*\.is_iterator={([FALSETRU, ]*)},[^.]*\.succ={([\d, ]*)},[^.]*\.prev={([\d, ]*)},[^.]*\.data={([\d, ]*)},[^.]*\.dist={([\d, ]*)},[^.]*\.universal={([\d,{} ]*)},[^.]*\.nnodes=(\d+),[^.]*\.sorted={([\d, ]*)},[^.]*\.min={([\d, ]*)},[^.]*\.max={([\d, ]*)}'
 
 cex = sys.stdin.read()
 
