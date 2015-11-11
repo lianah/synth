@@ -181,11 +181,9 @@ static void assign_sorted(abstract_heapt *heap,
 
 static void assign_min_max(abstract_heapt *heap,
 			node_t nx,
-			predicate_index_t pi,
 			data_t min_val,
 			data_t max_val) {
   Assume(nx < NABSNODES);
-  Assume(pi < NPREDS);
   heap->min[nx] = min_val;
   heap->max[nx] = max_val;
 }
@@ -616,7 +614,6 @@ _Bool is_minimal(const abstract_heapt *heap) {
 	return 0;
       }
 
-      // Cris TODO: change dist to 0 after pulling Liana's changes -- done
       // enforce min <= max for all edges
       if (dist(heap, n) > 0 && get_min(heap, n) > get_max(heap, n)) {
 	return 0;
@@ -865,6 +862,10 @@ bool_t forall(const abstract_heapt *heap,
   return bool_unknown;
 }
 
+/*
+  Is the segment from x to y sorted?
+*/
+
 bool_t sorted(const abstract_heapt *heap,
 	      ptr_t x,
 	      ptr_t y) {
@@ -902,10 +903,11 @@ bool_t sorted(const abstract_heapt *heap,
 
   // LSH FIXME: paper actually checks entailment
   return bool_unknown;
-
-  Assert(0, "INV_ERROR");
-  return 0;
 }
+
+/*
+  What is the minimum value on the segment from x to y?
+*/
 
 data_t min(const abstract_heapt *heap,
 	      ptr_t x,
@@ -940,11 +942,46 @@ data_t min(const abstract_heapt *heap,
 
   // LSH FIXME: paper actually checks entailment
   return bool_unknown;
-
-  Assert(0, "INV_ERROR");
-  return 0;
 }
 
+/*
+  What is the maximum value on the segment from x to y?
+*/
+
+data_t max(const abstract_heapt *heap,
+	      ptr_t x,
+	      ptr_t y) {
+
+  Assume(is_path(heap, x, y));
+    
+  node_t nx = deref(heap, x);
+  node_t ny = deref(heap, y);
+ 
+  Assert(nx != ny, "MAX_FOR_EMPTY_SEG_ERR");
+
+  word_t i;
+  data_t curr_max = data(heap, nx);
+
+  for (i = 0; i < NABSNODES; ++i) {
+    if (nx == ny) {
+      return curr_max;
+    }
+
+    if (data(heap, nx) > curr_max)
+      curr_max = data(heap, nx);
+    // if len > 0 then we must also consider the values of the abstracted segment
+    if(dist(heap, nx) > 0) {
+      if (get_max(heap, nx) > curr_max) {
+	curr_max = get_max(heap, nx);
+      }
+    }
+
+    nx = succ(heap, nx);
+  }
+
+  // LSH FIXME: paper actually checks entailment
+  return bool_unknown;
+}
 
 
 /*************************

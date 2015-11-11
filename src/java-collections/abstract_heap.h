@@ -177,7 +177,9 @@ data_t min(const abstract_heapt *heap,
 	      ptr_t x,
 	      ptr_t y);
 
-
+data_t max(const abstract_heapt *heap,
+	      ptr_t x,
+	      ptr_t y);
 
 /*************************
  *
