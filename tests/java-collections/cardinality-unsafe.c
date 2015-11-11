@@ -5,10 +5,10 @@
 ptr_t list = 1;
 
 void pre(abstract_heapt *heap) {
-  assume (! empty(heap, list));
-  assume (forall_assume(heap, list, null_ptr, 0) == 0);
-  assume (forall_assume(heap, list, null_ptr, 1) == 0);
-  assume (forall_assume(heap, list, null_ptr, 2) == 0);
+  Assume (! empty(heap, list));
+  Assume (forall_assume(heap, list, null_ptr, 0) == 0);
+  Assume (forall_assume(heap, list, null_ptr, 1) == 0);
+  Assume (forall_assume(heap, list, null_ptr, 2) == 0);
 }
 
 _Bool isNot0(data_t val) {

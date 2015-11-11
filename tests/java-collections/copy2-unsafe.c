@@ -9,9 +9,9 @@ ptr_t it = 3;
 data_t current; 
 
 void pre(abstract_heapt *heap) {
-  assume (empty(heap, copy));
+  Assume (empty(heap, copy));
   // all elements of list are greater than 0
-  assume(forall_assume(heap, list, null_ptr, 1));
+  Assume(forall_assume(heap, list, null_ptr, 1));
   iterator(heap, it, list);
 }
 
@@ -53,11 +53,13 @@ _Bool assertion(abstract_heapt *heap) {
 _Bool inv_assume(abstract_heapt *heap) {
   return path_len(heap, copy, null_ptr) == path_len(heap, list, it) &&
     forall_assume(heap, copy, null_ptr, 1) &&
-    forall_assume(heap, list, null_ptr, 1);
+    forall_assume(heap, list, null_ptr, 1) &&
+    is_path(heap, list, it);
 }
 
 _Bool inv_check(abstract_heapt *heap) {
   return path_len(heap, copy, null_ptr) == path_len(heap, list, it) &&
     forall(heap, copy, null_ptr, 1) == bool_true &&
-    forall(heap, list, null_ptr, 1) == bool_true ;
+    forall(heap, list, null_ptr, 1) == bool_true &&
+    is_path(heap, list, it);
 }

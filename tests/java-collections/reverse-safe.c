@@ -21,8 +21,8 @@ ptr_t it2 = 4;
 data_t current; 
 
 void pre(abstract_heapt *heap) {
-  assume(!empty(heap, list));
-  assume(empty(heap, reversed));
+  Assume(!empty(heap, list));
+  Assume(empty(heap, reversed));
   iterator(heap, it, list);
   iterator(heap, it2, reversed);
 }

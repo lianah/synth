@@ -204,6 +204,16 @@ static void assign_min_max(abstract_heapt *heap,
 /* } */
 
 
+static void assign_prev(abstract_heapt *heap,
+			node_t x,
+			node_t y) {
+  Assume(x < NABSNODES);
+  Assume(y < NABSNODES);
+  
+  heap->prev[x] = y;
+}
+
+
 static void assign_succ(abstract_heapt *heap,
 			node_t x,
 			node_t y,
@@ -321,6 +331,7 @@ void abstract_new(abstract_heapt *heap,
   // Just allocate a new node and have x point to it.
   node_t nx = alloc(heap);
   assign_succ(heap, nx, null_node, 0);
+  assign_prev(heap, nx, null_node);
   assign_ptr(heap, x, nx);
 }
 
@@ -360,6 +371,8 @@ node_t subdivide(abstract_heapt *heap,
     //
     // Begin by allocating a new node between nx and succ_nx.
     node_t nnew = alloc(heap);
+    assign_prev(heap, nnew, null_node);
+    
     word_t new_dist = s_sub(nx_dist, 1);
     predicate_index_t pi;
     for (pi = 0; pi < NPREDS; ++pi) {
@@ -1072,6 +1085,8 @@ void addI(abstract_heapt *heap,
   
   // create new node and set data
   node_t nnew = alloc(heap);
+  //assign_succ(heap, nx, null_node, 0);
+  assign_prev(heap, nnew, null_node);
   assign_data(heap, nnew, val);
 
   // if the list was empty create new node
@@ -1144,7 +1159,7 @@ void removeI(abstract_heapt *heap,
   
   if (nprev == null_node) {
     // We are deleting the head of the list
-    if (dist(heap, nrem) == 1) {
+    if (dist(heap, nrem) == 0) {
       // clear the node to be removed
       clear_node(heap, nrem);
       // invalidate all iterators pointing to it and
@@ -1159,7 +1174,9 @@ void removeI(abstract_heapt *heap,
     for (pi = 0; pi < NPREDS; ++pi) {
       // true universals are maintained
       if (get_univ(heap, nrem, pi) == bool_true) {
+#ifdef __CPROVER	
 	Assume(eval_pred(pi, data));
+#endif	
 	assign_univ(heap, nrem, pi, bool_true);
       } else {
 	assign_univ(heap, nrem, pi, bool_unknown);
