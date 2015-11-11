@@ -9,7 +9,7 @@ index_t i;
 data_t current; 
 
 void pre(abstract_heapt *heap) {
-  assume(size(heap, reverse) == size(heap, list));
+  Assume(size(heap, reverse) == size(heap, list));
   i = 0;
 }
 
@@ -38,7 +38,13 @@ _Bool assertion(abstract_heapt *heap) {
     exists(heap, list, null_ptr, 0) == exists(heap, copy, null_ptr, 0);
 }
 
-_Bool inv(abstract_heapt *heap) {
+_Bool inv_assume(abstract_heapt *heap) {
+  return path_len(heap, copy, null_ptr) == path_len(heap, list, it) &&
+    forall_assume(heap, list, iterator, 0) == forall_assume(heap, copy, null_ptr, 0) &&
+    exists(heap, list, iterator, 0) == exists(heap, copy, null_ptr, 0);
+}
+
+_Bool inv_check(abstract_heapt *heap) {
   return path_len(heap, copy, null_ptr) == path_len(heap, list, it) &&
     forall(heap, list, iterator, 0) == forall(heap, copy, null_ptr, 0) &&
     exists(heap, list, iterator, 0) == exists(heap, copy, null_ptr, 0);

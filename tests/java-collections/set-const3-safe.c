@@ -39,6 +39,10 @@ _Bool assertion(abstract_heapt *heap) {
   return exists(heap, list, null_ptr, 1 /*isZero*/) == bool_true;
 }
 
-_Bool inv(abstract_heapt *heap) {
+_Bool inv_assume(abstract_heapt *heap) {
+  return exists(heap, list, iterator, 1 /*isZero*/) == bool_true;
+} 
+
+_Bool inv_check(abstract_heapt *heap) {
   return exists(heap, list, iterator, 1 /*isZero*/) == bool_true;
 } 

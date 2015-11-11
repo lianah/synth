@@ -40,7 +40,14 @@ _Bool assertion(abstract_heapt *heap) {
     && path_len(heap, less, null_ptr) + path_len(heap, greater, null_ptr) = path_len(heap, list, null_ptr);
 }
 
-_Bool inv(abstract_heapt *heap) {
+_Bool inv_assume(abstract_heapt *heap) {
+  return forall_assume(heap, less, null_ptr, 0) == bool_true
+    && forall_assume (heap, greater, null_ptr, 0) == bool_false
+    && path_len(heap, less, null_ptr) + path_len(heap, greater, null_ptr) = path_len(heap, list, iterator);
+}
+
+
+_Bool inv_check(abstract_heapt *heap) {
   return forall(heap, less, null_ptr, 0) == bool_true
     && forall (heap, greater, null_ptr, 0) == bool_false
     && path_len(heap, less, null_ptr) + path_len(heap, greater, null_ptr) = path_len(heap, list, iterator);

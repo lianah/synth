@@ -45,6 +45,10 @@ _Bool assertion(abstract_heapt *heap) {
   return size(heap, list) == 0;
 }
 
-_Bool inv(abstract_heapt *heap) {
+_Bool inv_assume(abstract_heapt *heap) {
+  return path_len(heap, list, it) == 0;
+}
+
+_Bool inv_check(abstract_heapt *heap) {
   return path_len(heap, list, it) == 0;
 }

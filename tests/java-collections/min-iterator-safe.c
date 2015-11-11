@@ -71,8 +71,8 @@ void body(abstract_heapt *heap) {
   _Bool post0 = smaller(val, min); // val <= min'
   _Bool post1 = equal(val, min); // val == min'
   // forall val. val <= min => val <= min'
-  assert (!pre0 || post0);
-  assert (!pre1 || post1);
+  Assert (!pre0 || post0);
+  Assert (!pre1 || post1);
 }
 
 _Bool assertion(abstract_heapt *heap) {
@@ -80,8 +80,11 @@ _Bool assertion(abstract_heapt *heap) {
          exists(heap, list,  null_ptr, 1);
 }
 
-_Bool inv(abstract_heapt *heap) {
+_Bool inv_assume(abstract_heapt *heap) {
   return is_path(heap, list, iterator) &&
-         forall(heap, list, iterator, 0) &&
-         exists(heap, list,  iterator, 1);
+         forall_assume(heap, list, iterator, 0);
+
+_Bool inv_check(abstract_heapt *heap) {
+  return is_path(heap, list, iterator) &&
+         forall(heap, list, iterator, 0);
 }
