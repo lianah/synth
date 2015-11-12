@@ -55,12 +55,15 @@ def processHeap(m,prefix):
     s = succs[n]
     d = dists[n]
     u = univs[n]
-    print r'node%d%d -> node%d%d [label="%d U=%s"];' % (prefix,n, prefix, s, d, u)
+    sort = "S" if sorts[n] == 1 else "N"
+    mi = mins[n]
+    ma = maxs[n]
+    print r'node%d%d -> node%d%d [label="%d %s %s (%d-%d)"];' % (prefix,n, prefix, s, d, u, sort, mi, ma)
 
   print "}"
 
 
-regex = 'h={[^.]*\.ptr={([\d, ]*)},[^.]*\.is_iterator={([FALSETRU, ]*)},[^.]*\.succ={([\d, ]*)},[^.]*\.prev={([\d, ]*)},[^.]*\.data={([\d, ]*)},[^.]*\.dist={([\d, ]*)},[^.]*\.universal={([\d,{} ]*)},[^.]*\.nnodes=(\d+),[^.]*\.sorted={([\d, ]*)},[^.]*\.min={([\d, ]*)},[^.]*\.max={([\d, ]*)}'
+regex = 'ptr = {([\d, ]*)}, is_iterator = {([falsetru, ]*)}, succ = {([\d, ]*)}, prev = {([\d, ]*)}, data = {([\d, ]*)}, dist = {([\d, ]*)}, universal = {([\d,{} -]*)}, nnodes = (\d*), sorted = {([\d, -]*)}, min = {([\d, -]*)}, max = {([\d, -]*)}'
 
 cex = sys.stdin.read()
 

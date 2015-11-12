@@ -32,7 +32,9 @@ _Bool cond(abstract_heapt *heap) {
 void body(abstract_heapt *heap) {
   _Bool first = alias(heap, it, list);
   // it.next();
+  dump_heap(heap, "pre-next", "list it");
   next(heap, it);
+  dump_heap(heap, "post-next", "list it");
   if (!first) {
     // it.set(4);
     setI(heap, it, 4);

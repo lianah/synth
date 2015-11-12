@@ -54,6 +54,7 @@ def processHeap(m,prefix):
   # print "pointers ", ptrs
   # print "iterators ", iterators
 
+  sort = ["S" if s==1 else "N" for s in sort]
   univs = [preds_str(u) for u in univs]
 
   # print univs
@@ -74,7 +75,7 @@ def processHeap(m,prefix):
     mi = mins[n]
     ma = maxs[n]
     
-    print r'node%d%d -> node%d%d [label="%d %s %d %d %d"];' % (prefix,n, prefix, s, d, u, so, mi, ma)
+    print r'node%d%d -> node%d%d [label="%d %s %s (%d-%d)"];' % (prefix,n, prefix, s, d, u, so, mi, ma)
 
     #print r'node%d%d -> node%d%d [label="%d U=%s E=%s"];' % (i,p, i, n, d, u, e)
 

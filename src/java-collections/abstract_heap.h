@@ -346,6 +346,16 @@ _Bool is_minimal(const abstract_heapt *heap);
 #define empty(h, x) is_null(h, x)
 #define size(h, x) path_len(h, x, null_ptr)
 
+#ifdef __CPROVER
+#define dump_heap(x, y, z) {}
+#else
+
+void dump_heap(abstract_heapt *heap,
+	       const char* heap_name,
+	       const char* pretty_args);
+#endif
+
+
 /* #define circular(h, x) (!is_path(h, x, null_ptr)) */
 
 

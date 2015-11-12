@@ -1,0 +1,17 @@
+Running example:
+
+./shakira.sh -DNPROG=3 -DNPREDS=1 ../../tests/java-collections/set-const-unsafe.c
+
+If the example is unsafe you can execute the counter-example. To generate .png files at various points during the execution of the program, add calls to:
+
+dump_heap(heap, <file-name>, <pretty-heap-args>);
+
+You can compile and execute the counterexample using the following command:
+
+./gcc-debug.sh -DNPROG=3 -DNPREDS=1 ../../tests/java-collections/set-const-unsafe.c
+
+It will create a file counterexample.c and then compile the input
+file, with shakira-test.c and with the counterexample.c file. It will
+also treat all Assume's as assert. It will create and run an
+executable file debug.out that executes the transformers on the
+counter-example.

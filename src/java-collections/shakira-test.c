@@ -23,8 +23,9 @@ void main(void) {
   
   init_counterexample(&h);
   init_heap(&h);
+
   Assert (valid_abstract_heap(&h), "INV_FAIL: Base case.");
-  
+
   // Base.
   pre(&h);
   Assert(inv_check(&h), "INV_FAIL: Assumption");
@@ -40,7 +41,7 @@ void main(void) {
       Assert(inv_check(&h), "INV_FAIL: Inductive step.");
     }  else { 
        // Property.
-      Assert(assertion(&h), "INV_FAIL: Inductive step."); 
+      Assert(assertion(&h), "INV_FAIL: Property entailment."); 
      } 
   }
 }
