@@ -391,14 +391,19 @@ node_t subdivide(abstract_heapt *heap,
       /* } */
     }
 
+
+    // Assume min <= val <= max
+    Assume(get_min(heap, nx) <= data(heap, nnew) <= get_max(heap, nx));
+    Assume(get_min(heap, nx) <= get_min(heap, nnew) <= get_max(heap, nx));
+    Assume(get_min(heap, nx) <= get_max(heap, nnew) <= get_max(heap, nx));
+    // Cris TODO: if sorted then data(nnew) >= data(nx)
+    assign_sorted(heap, nnew, get_sorted(heap, nx));
+    assign_sorted(heap, nx, bool_true);
+
     // Reassign nnew's succ pointer to nx's successor succ_nx
     assign_succ(heap, nnew, succ_nx, new_dist);
     // Reassign nx's succ pointer to the newly allocated node.
     assign_succ(heap, nx, nnew, 0);
-
-    // Assume min <= val <= max
-    Assume(get_min(heap, nx) <= data(heap, nnew) <= get_max(heap, nx));
-    assign_sorted(heap, nx, bool_true);
 
 
     return nnew;
@@ -595,6 +600,8 @@ _Bool is_minimal(const abstract_heapt *heap) {
     for (pi = 0; pi < NPREDS; ++pi) {
       bool_t u = get_univ(heap, n, pi);
       bool_t s = get_sorted(heap, n);
+      data_t mi = get_min(heap, n);
+      data_t ma = get_max(heap, n);
 
       // edges of length 1 have the predicates true and are sorted
       if (n!= null_node &&
@@ -612,8 +619,14 @@ _Bool is_minimal(const abstract_heapt *heap) {
 	return 0;
       }
 
+      // enforce min = max = data for edges of length 0 (corresponding to segments of length 1)
+      if (dist(heap, n) == 0 && n != null_node && 
+	  (mi != data(heap, n) || mi != ma)) {
+	return 0;
+      }
+
       // enforce min <= max for all edges
-      if (get_min(heap, n) > get_max(heap, n)) {
+      if (mi > ma) {
 	return 0;
       }
     }
@@ -875,60 +888,62 @@ bool_t forall(const abstract_heapt *heap,
 
   if (nx == ny)
     return bool_true;
-  
-  _Bool data_prop = 1;
 
-  bool_t pred_vals[NPREDS];
-
-  predicate_index_t pi;
-  for (pi = 0; pi < NPREDS; ++pi) {
-    pred_vals[pi] = bool_true;
-  }
+  return path_forall(heap, nx, ny, prop);
   
-  word_t i;
-  for (i = 0; i < NABSNODES; ++i) {
-    if (nx == ny) {
-      // universally quantify over val
-      data_t val = nondet_data_t();
-      //val = 8;
-      _Bool prop_true = 1;
-      _Bool prop_false = 0;
-      _Bool val_prop = eval_pred(prop, val);
+  /* _Bool data_prop = 1; */
+
+  /* bool_t pred_vals[NPREDS]; */
+
+  /* predicate_index_t pi; */
+  /* for (pi = 0; pi < NPREDS; ++pi) { */
+  /*   pred_vals[pi] = bool_true; */
+  /* } */
+  
+  /* word_t i; */
+  /* for (i = 0; i < NABSNODES; ++i) { */
+  /*   if (nx == ny) { */
+  /*     // universally quantify over val */
+  /*     data_t val = nondet_data_t(); */
+  /*     //val = 8; */
+  /*     _Bool prop_true = 1; */
+  /*     _Bool prop_false = 0; */
+  /*     _Bool val_prop = eval_pred(prop, val); */
       
-      for (pi = 0; pi < NPREDS; ++pi) {
-	if (pred_vals[pi] == bool_true) {
-	  // if predicate holds add to positive predicates
-	  // AND Pi(val)
-	  prop_true = prop_true && eval_pred(pi, val);
-	} else if (pred_vals[pi] == bool_false) {
-	  // if predicate is false check if it entails negation of property
-	  // OR (~Pi(val) => Prop(val))
-	  prop_false = prop_false || eval_pred(pi, val) || ! val_prop;
-	}
-      }
-      // The true predicates entail the property and the property holds on the data
-      //if (!((! prop_true || val_prop) && data_prop)) {
-      if (prop_true && !val_prop && data_prop) {
-      // The true predicates entail the negation of the property or 
-      // the property fails on the data or
-      // one of the negative predicates entails the negation of the property
-      if (! (!data_prop || !prop_true || !val_prop || prop_false))
-	  return bool_unknown;
-	else
-	  return bool_false;
-      }
-      else
-	return bool_true;
-    }
+  /*     for (pi = 0; pi < NPREDS; ++pi) { */
+  /* 	if (pred_vals[pi] == bool_true) { */
+  /* 	  // if predicate holds add to positive predicates */
+  /* 	  // AND Pi(val) */
+  /* 	  prop_true = prop_true && eval_pred(pi, val); */
+  /* 	} else if (pred_vals[pi] == bool_false) { */
+  /* 	  // if predicate is false check if it entails negation of property */
+  /* 	  // OR (~Pi(val) => Prop(val)) */
+  /* 	  prop_false = prop_false || eval_pred(pi, val) || ! val_prop; */
+  /* 	} */
+  /*     } */
+  /*     // The true predicates entail the property and the property holds on the data */
+  /*     //if (!((! prop_true || val_prop) && data_prop)) { */
+  /*     if (prop_true && !val_prop && data_prop) { */
+  /*     // The true predicates entail the negation of the property or  */
+  /*     // the property fails on the data or */
+  /*     // one of the negative predicates entails the negation of the property */
+  /*     if (! (!data_prop || !prop_true || !val_prop || prop_false)) */
+  /* 	  return bool_unknown; */
+  /* 	else */
+  /* 	  return bool_false; */
+  /*     } */
+  /*     else */
+  /* 	return bool_true; */
+  /*   } */
     
-    // evaluate the property no all data nodes
-    data_prop = data_prop && eval_pred(prop, data(heap, nx));
-    // collect valuation of the edge predicate
-    for (pi = 0; pi < NPREDS; ++pi) {
-      pred_vals[pi] = and(pred_vals[pi], get_univ(heap, nx, pi));
-    }
-    nx = succ(heap, nx);
-  }
+  /*   // evaluate the property no all data nodes */
+  /*   data_prop = data_prop && eval_pred(prop, data(heap, nx)); */
+  /*   // collect valuation of the edge predicate */
+  /*   for (pi = 0; pi < NPREDS; ++pi) { */
+  /*     pred_vals[pi] = and(pred_vals[pi], get_univ(heap, nx, pi)); */
+  /*   } */
+  /*   nx = succ(heap, nx); */
+  /* } */
 }
 
 

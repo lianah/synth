@@ -39,9 +39,12 @@ _Bool cond(abstract_heapt *heap) {
 }
 
 void body(abstract_heapt *heap) {
+  dump_heap(heap, "body", "list it");
   current = next(heap, it);
+  dump_heap(heap, "next", "list it");
   if (current > 2) {
     removeI(heap, it);
+    dump_heap(heap, "remove", "list it");
   }
 }
 

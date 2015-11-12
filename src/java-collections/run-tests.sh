@@ -123,6 +123,15 @@ args[23]="-DNPROG=5 -DNPREDS=2 -DNSLACK=2"
 expected[23]="INV_FAIL: Inductive step."
 pretty_args[23]="list less great it"
 
+tests[24]="selection-sort-safe.c"
+args[24]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+expected[24]="VERIFICATION SUCCESSFUL"
+pretty_args[24]="list it"
+
+tests[25]="selection-sort-unsafe.c"
+args[25]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+expected[25]="INV_FAIL: Inductive step."
+pretty_args[25]="list it"
 
 # tests[0]="../../tests/java-collections/set-const2-safe.c"
 # tests[0]="../../tests/java-collections/set-const3-safe.c"

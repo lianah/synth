@@ -23,7 +23,9 @@ ptr_t it = 2;
 
 word_t m, current; 
 
+_Bool nothing (data_t val) { return 1; }
 void init_predicates() {
+  predicates[0] = nothing;
 }
 
 
@@ -44,16 +46,22 @@ _Bool cond(abstract_heapt *heap) {
 }
 
 void body(abstract_heapt *heap) {
-
-    current = next(heap, it);
-    if (current < m) {
-      m = current; 
-    }
+  /* dump_heap(heap, "heap1", "list it"); */
+  /* printf("whole heap min = %d\n", min(heap, list, null_ptr)); */
+  /* printf("it heap min = %d\n", min(heap, list, it)); */
+  current = next(heap, it);
+  /* printf("current = %d\n", current); */
+  /* dump_heap(heap, "heap2", "list it");     */
+  /* printf("min = %d\n", m); */
+  if (current < m) {
+    m = current; 
+  }
+  /* printf("min after = %d\n", m); */
 }
 
 _Bool assertion(abstract_heapt *heap) {
   return is_path(heap, list, null_ptr) == bool_true &&
-    m == min(heap, list, null_ptr);
+    (alias(heap, list, null_ptr) || m == min(heap, list, null_ptr));
 }
 
 _Bool inv_check(abstract_heapt *heap) {
