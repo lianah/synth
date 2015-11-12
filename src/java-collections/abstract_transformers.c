@@ -890,7 +890,7 @@ bool_t forall(const abstract_heapt *heap,
     if (nx == ny) {
       // universally quantify over val
       data_t val = nondet_data_t();
-      val = 0;
+      //val = 8;
       _Bool prop_true = 1;
       _Bool prop_false = 0;
       _Bool val_prop = eval_pred(prop, val);
@@ -907,14 +907,18 @@ bool_t forall(const abstract_heapt *heap,
 	}
       }
       // The true predicates entail the property and the property holds on the data
-      if ((! prop_true || val_prop) && data_prop)
-	return bool_true;
+      //if (!((! prop_true || val_prop) && data_prop)) {
+      if (prop_true && !val_prop && data_prop) {
       // The true predicates entail the negation of the property or 
       // the property fails on the data or
       // one of the negative predicates entails the negation of the property
-      if (! prop_true || !val_prop || !data_prop || prop_false)
-	return bool_false;
-      return bool_unknown;
+      if (! (!data_prop || !prop_true || !val_prop || prop_false))
+	  return bool_unknown;
+	else
+	  return bool_false;
+      }
+      else
+	return bool_true;
     }
     
     // evaluate the property no all data nodes
