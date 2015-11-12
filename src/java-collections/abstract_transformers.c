@@ -398,8 +398,12 @@ node_t subdivide(abstract_heapt *heap,
 
     // Assume min <= val <= max
     Assume(get_min(heap, nx) <= data(heap, nnew) <= get_max(heap, nx));
+    Assume(get_min(heap, nx) <= get_min(heap, nnew) <= get_max(heap, nx));
+    Assume(get_min(heap, nx) <= get_max(heap, nnew) <= get_max(heap, nx));
+    // Cris TODO: if sorted then data(nnew) >= data(nx)
+    //Assume(data(heap, nx) <= get_min(heap, nx));
+    assign_sorted(heap, nnew, get_sorted(heap, nx));
     assign_sorted(heap, nx, bool_true);
-
 
     return nnew;
   }
