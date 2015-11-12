@@ -391,19 +391,20 @@ node_t subdivide(abstract_heapt *heap,
       /* } */
     }
 
-    // Reassign nnew's succ pointer to nx's successor succ_nx
-    assign_succ(heap, nnew, succ_nx, new_dist);
-    // Reassign nx's succ pointer to the newly allocated node.
-    assign_succ(heap, nx, nnew, 0);
 
     // Assume min <= val <= max
     Assume(get_min(heap, nx) <= data(heap, nnew) <= get_max(heap, nx));
     Assume(get_min(heap, nx) <= get_min(heap, nnew) <= get_max(heap, nx));
     Assume(get_min(heap, nx) <= get_max(heap, nnew) <= get_max(heap, nx));
     // Cris TODO: if sorted then data(nnew) >= data(nx)
-    //Assume(data(heap, nx) <= get_min(heap, nx));
     assign_sorted(heap, nnew, get_sorted(heap, nx));
     assign_sorted(heap, nx, bool_true);
+
+    // Reassign nnew's succ pointer to nx's successor succ_nx
+    assign_succ(heap, nnew, succ_nx, new_dist);
+    // Reassign nx's succ pointer to the newly allocated node.
+    assign_succ(heap, nx, nnew, 0);
+
 
     return nnew;
   }
@@ -601,6 +602,8 @@ _Bool is_minimal(const abstract_heapt *heap) {
     for (pi = 0; pi < NPREDS; ++pi) {
       bool_t u = get_univ(heap, n, pi);
       bool_t s = get_sorted(heap, n);
+      data_t mi = get_min(heap, n);
+      data_t ma = get_max(heap, n);
 
       // edges of length 1 have the predicates true and are sorted
       if (n!= null_node &&
@@ -618,8 +621,14 @@ _Bool is_minimal(const abstract_heapt *heap) {
 	return 0;
       }
 
+      // enforce min = max = data for edges of length 0 (corresponding to segments of length 1)
+      if (dist(heap, n) == 0 && n != null_node && 
+	  (mi != data(heap, n) || mi != ma)) {
+	return 0;
+      }
+
       // enforce min <= max for all edges
-      if (get_min(heap, n) > get_max(heap, n)) {
+      if (mi > ma) {
 	return 0;
       }
     }

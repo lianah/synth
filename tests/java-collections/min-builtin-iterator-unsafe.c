@@ -23,9 +23,10 @@ ptr_t it = 2;
 
 word_t m, current; 
 
+_Bool nothing (data_t val) { return 1; }
 void init_predicates() {
+  predicates[0] = nothing;
 }
-
 
 void init_heap(abstract_heapt *heap) {
   // distinguish between predicates and iterators

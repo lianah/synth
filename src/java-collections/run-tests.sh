@@ -103,6 +103,16 @@ args[19]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
 expected[19]="INV_FAIL: Inductive step."
 pretty_args[19]="list it"
 
+tests[20]="selection-sort-safe.c"
+args[20]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+expected[20]="VERIFICATION SUCCESSFUL"
+pretty_args[20]="list it"
+
+tests[21]="selection-sort-unsafe.c"
+args[21]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+expected[21]="INV_FAIL: Inductive step."
+pretty_args[21]="list it"
+
 
 # tests[0]="../../tests/java-collections/set-const2-safe.c"
 # tests[0]="../../tests/java-collections/set-const3-safe.c"
