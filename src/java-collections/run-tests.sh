@@ -122,7 +122,7 @@ red_fail=${RED}[FAIL]${NC}
 green_success=${GREEN}[SUCCESS]${NC}
 
 
-for ((i=18;i<${#tests[@]};++i)); do
+for ((i=0;i<${#tests[@]};++i)); do
     LOG_FILE="$TEST_PATH${tests[i]}.log"
     HEAP_FILE="$TEST_PATH${tests[i]}.png"
     INPUT_FILE="$TEST_PATH${tests[i]}"
@@ -153,18 +153,6 @@ for ((i=18;i<${#tests[@]};++i)); do
 	    `cat $LOG_FILE | ./pretty-heap.py $PRETTY_ARGS | dot -Tpng > $HEAP_FILE`
 	    printf " Counterexample heap in $HEAP_FILE\n"
 	fi
-	# elif  [ "${fail/$expected}" = "$fail" ]; then
-	#     # check that we fail due to the same reason
-	#     printf " ${RED}[FAIL]${NC} $fail doesn't match expected: $EXPECTED\n"
-	#     `cat $LOG_FILE | ./pretty-heap.py $PRETTY_ARGS | dot -Tpng > $HEAP_FILE`
-	#     printf " Output heap in $HEAP_FILE\n"
-	# else
-	#     printf " ${GREEN}[SUCCESS]${NC}"
-	#     `cat $LOG_FILE | ./pretty-heap.py $PRETTY_ARGS | dot -Tpng > $HEAP_FILE`
-	#     printf " Output heap in $HEAP_FILE\n"
-	#     # TODO Check that we can reproduce by compiling program
-	# fi
-	
     elif [ "$success" = "$EXPECTED" ]; then
 	printf " ${GREEN}[SUCCESS]${NC} SAFE - Invariant holds. \n"
     else

@@ -18,12 +18,15 @@ def processHeap(m):
   m[6] = m[6].replace("{","[")
   m[6] = m[6].replace("}","]")
 
-  [ptrs, iterators, succs, prevs, datas, dists, univs, nnodes] = [eval(g) for g in m]
+  [ptrs, iterators, succs, prevs, datas, dists, univs, nnodes, sorts, mins, maxs] = [eval(g) for g in m]
 
 
   assert (len(succs) == len(dists) and \
           len(dists) == len(univs) and \
-          len(univs) == len(datas))
+          len(univs) == len(datas) and \
+          len(mins) == len(maxs) and \
+          len(maxs) == len(sorts) and \
+          len(sorts) == len(univs))
   
   print "// set pointers"
   for i in range(len(ptrs)):
@@ -57,13 +60,26 @@ def processHeap(m):
     for j in range(len(u)):
       print r'heap->universal[%d][%d] = %d;' % (i, j, u[j])
 
+  print "// set sorted"
+  for i in range(len(sorts)):
+      print r'heap->sorted[%d] = %d;' % (i, sorts[i])
+
+  print "// set min"
+  for i in range(len(mins)):
+      print r'heap->min[%d] = %d;' % (i, mins[i])
+
+  print "// set max"
+  for i in range(len(sorts)):
+      print r'heap->max[%d] = %d;' % (i, maxs[i])
+      
+      
   # print "// set existantials"
   # for i in range(len(exists)):
   #     print r'heap->existential[%d][0] = %d;' % (i, exists[i])
 
   print "heap->nnodes =", nnodes, ";"
 
-regex = 'h={[^.]*\.ptr={([\d, ]*)},[^.]*\.is_iterator={([FALSETRU, ]*)},[^.]*\.succ={([\d, ]*)},[^.]*\.prev={([\d, ]*)},[^.]*\.data={([\d, ]*)},[^.]*\.dist={([\d, ]*)},[^.]*\.universal={([\d,{} ]*)},[^.]*\.nnodes=(\d+)'
+regex = 'h={[^.]*\.ptr={([\d, ]*)},[^.]*\.is_iterator={([FALSETRU, ]*)},[^.]*\.succ={([\d, ]*)},[^.]*\.prev={([\d, ]*)},[^.]*\.data={([\d, ]*)},[^.]*\.dist={([\d, ]*)},[^.]*\.universal={([\d,{} ]*)},[^.]*\.nnodes=(\d+),[^.]*\.sorted={([\d, ]*)},[^.]*\.min={([\d, ]*)},[^.]*\.max={([\d, ]*)}'
 
 cex = sys.stdin.read()
 

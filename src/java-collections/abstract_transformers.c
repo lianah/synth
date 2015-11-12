@@ -615,7 +615,7 @@ _Bool is_minimal(const abstract_heapt *heap) {
       }
 
       // enforce min <= max for all edges
-      if (dist(heap, n) > 0 && get_min(heap, n) > get_max(heap, n)) {
+      if (get_min(heap, n) > get_max(heap, n)) {
 	return 0;
       }
     }

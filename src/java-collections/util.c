@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -100,6 +101,96 @@ void print_abstract_heap(abstract_heapt *heap) {
 
   printf("\n");
 }
+
+#ifndef __CPROVER
+
+void dump_heap(abstract_heapt *heap,
+	       const char* heap_name,
+	       const char* pretty_args) {
+  FILE *fp;
+  fp = fopen("heap.txt", "w+");
+  int i;
+  fprintf(fp, "{ ptr = { %d", heap->ptr[0]);
+  for (i = 1; i < NPROG; ++i) {
+    fprintf(fp, ", %d", heap->ptr[i]);
+  }
+
+  fprintf(fp, "}, is_iterator = {%s", (heap->is_iterator[0] ? "true" : "false" ));
+
+  for (i = 1; i < NPROG; ++i) {
+    fprintf(fp, ", %s", (heap->is_iterator[i] ? "true" : "false" ));
+  }
+  
+  fprintf(fp, "}, succ = {%d", heap->succ[0]);
+  for (i = 1; i < NABSNODES; ++i) {
+    fprintf(fp, ", %d", heap->succ[i]);
+  }
+
+  fprintf(fp, "}, prev = {%d", heap->prev[0]);
+  for (i = 1; i < NABSNODES; ++i) {
+    fprintf(fp, ", %d", heap->prev[i]);
+  }
+
+  fprintf(fp, "}, data = {%d", heap->data[0]);
+  for (i = 1; i < NABSNODES; ++i) {
+    fprintf(fp, ", %d", heap->data[i]);
+  }
+
+  fprintf(fp, "}, dist = {%d", heap->dist[0]);
+  for (i = 1; i < NABSNODES; ++i) {
+    fprintf(fp, ", %d", heap->dist[i]);
+  }
+
+  fprintf(fp, "}, universal = {{");
+  int j;
+  fprintf(fp, "%d", heap->universal[0][0]);
+  for (j = 0; j < NPREDS; ++j) {
+    fprintf(fp, ", %d", heap->universal[0][j]);
+  }
+  fprintf(fp, "}");
+  for (i = 1; i < NABSNODES; ++i) {
+    fprintf(fp, ", {%d", heap->universal[i][0]);
+    for (j = 0; j < NPREDS; ++j) { 
+      fprintf(fp, ", %d", (int)(heap->universal[i][j]));
+    }
+    fprintf(fp, "}");
+  }
+
+  fprintf(fp, "}, nnodes = %d, sorted = {%d", heap->nnodes, heap->sorted[0]);
+    for (i = 1; i < NABSNODES; ++i) {
+    fprintf(fp, ", %d", heap->sorted[i]);
+  }
+    
+
+    fprintf(fp, "}, min = {%d", heap->min[0]);
+    for (i = 1; i < NABSNODES; ++i) {
+    fprintf(fp, ", %d", heap->min[i]);
+  }
+    
+
+    fprintf(fp, "}, max = {%d", heap->max[0]);
+    for (i = 1; i < NABSNODES; ++i) {
+    fprintf(fp, ", %d", heap->max[i]);
+  }
+
+  fprintf(fp, "}");
+  
+  // closing heap paren
+  fprintf(fp, "}");
+  fclose(fp);
+  char command[400];
+  strcpy(command, "cat heap.txt | ./pretty-gcc-heap.py ");
+  strcat(command, pretty_args);
+  strcat(command, "| dot -Tpng >");
+  strcat(command, heap_name);
+  strcat(command, ".png");
+  printf("Running %s\n", command);
+  
+  system(command);
+  
+}
+
+#endif
 
 /* void print_facts(heap_factst *facts) { */
 /*   ptr_t p, q; */

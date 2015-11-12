@@ -63,7 +63,7 @@ def processHeap(m,prefix):
   print "}"
 
 
-regex = 'ptr = {([\d, ]*)}, is_iterator = {([falsetru, ]*)}, succ = {([\d, ]*)}, prev = {([\d, ]*)}, data = {([\d, ]*)}, dist = {([\d, ]*)}, universal = {([\d,{} ]*)}, nnodes = (\d*), sorted = {([\d, -]*)}, min = {([\d, -]*)}, max = {([\d, -]*)}'
+regex = 'ptr = {([\d, ]*)}, is_iterator = {([falsetru, ]*)}, succ = {([\d, ]*)}, prev = {([\d, ]*)}, data = {([\d, ]*)}, dist = {([\d, ]*)}, universal = {([\d,{} -]*)}, nnodes = (\d*), sorted = {([\d, -]*)}, min = {([\d, -]*)}, max = {([\d, -]*)}'
 
 cex = sys.stdin.read()
 
