@@ -53,13 +53,13 @@ expected[9]="INV_FAIL:"
 pretty_args[9]="list copy it"
 
 tests[10]="copy-safe.c"
-args[10]="-DNPROG=4 -DNPREDS=2 -DNSLACK=2"
+args[10]="-DNPROG=4 -DNPREDS=1 -DNSLACK=2"
 expected[10]="VERIFICATION SUCCESSFUL"
 pretty_args[10]="list copy it"
 
 
 tests[11]="copy-unsafe.c"
-args[11]="-DNPROG=4 -DNPREDS=2 -DNSLACK=2"
+args[11]="-DNPROG=4 -DNPREDS=1 -DNSLACK=2"
 expected[11]="INV_FAIL:"
 pretty_args[11]="list copy it"
 
@@ -113,6 +113,16 @@ args[21]="-DNPROG=3 -DNPREDS=2 -DNSLACK=2"
 expected[21]="INV_FAIL: Inductive step."
 pretty_args[21]="list it"
 
+tests[22]="pivot-safe.c"
+args[22]="-DNPROG=5 -DNPREDS=2 -DNSLACK=2"
+expected[22]="VERIFICATION SUCCESSFUL"
+pretty_args[22]="list less great it"
+
+tests[23]="pivot-unsafe.c"
+args[23]="-DNPROG=5 -DNPREDS=2 -DNSLACK=2"
+expected[23]="INV_FAIL: Inductive step."
+pretty_args[23]="list less great it"
+
 
 # tests[0]="../../tests/java-collections/set-const2-safe.c"
 # tests[0]="../../tests/java-collections/set-const3-safe.c"
@@ -132,7 +142,7 @@ red_fail=${RED}[FAIL]${NC}
 green_success=${GREEN}[SUCCESS]${NC}
 
 
-for ((i=20;i<${#tests[@]};++i)); do
+for ((i=0;i<${#tests[@]};++i)); do
     LOG_FILE="$TEST_PATH${tests[i]}.log"
     HEAP_FILE="$TEST_PATH${tests[i]}.png"
     INPUT_FILE="$TEST_PATH${tests[i]}"

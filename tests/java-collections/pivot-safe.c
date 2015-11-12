@@ -44,29 +44,38 @@ _Bool cond(abstract_heapt *heap) {
 }
 
 void body(abstract_heapt *heap) {
+  dump_heap(heap, "body.png", "list less greater it");
   current = next(heap, it);
+  dump_heap(heap, "next.png", "list less greater it");
   if (isLess(current)) {
     add(heap, less, current);
+    dump_heap(heap, "less.png", "list less greater it");
   } else {
     add(heap, greater, current);
+    dump_heap(heap, "greater.png", "list less greater it");
   }
 }
 
 _Bool assertion(abstract_heapt *heap) {
   return forall(heap, less, null_ptr, 0) == bool_true
     && forall (heap, greater, null_ptr, 1) == bool_true
-    && path_len(heap, less, null_ptr) + path_len(heap, greater, null_ptr) == path_len(heap, list, null_ptr);
+    && s_add(path_len(heap, less, null_ptr),
+	     path_len(heap, greater, null_ptr)) == path_len(heap, list, null_ptr);
 }
 
 _Bool inv_assume(abstract_heapt *heap) {
   return forall_assume(heap, less, null_ptr, 0)
     && forall_assume (heap, greater, null_ptr, 1)
-    && path_len(heap, less, null_ptr) + path_len(heap, greater, null_ptr) == path_len(heap, list, it);
+    && is_path(heap, list, it)
+    && s_add(path_len(heap, less, null_ptr),
+	     path_len(heap, greater, null_ptr)) == path_len(heap, list, it);
 }
 
 
 _Bool inv_check(abstract_heapt *heap) {
   return forall(heap, less, null_ptr, 0) == bool_true
-    && forall (heap, greater, null_ptr, 1) == bool_true 
-    && path_len(heap, less, null_ptr) + path_len(heap, greater, null_ptr) == path_len(heap, list, it);
+    && forall (heap, greater, null_ptr, 1) == bool_true
+    && is_path(heap, list, it)
+    && s_add(path_len(heap, less, null_ptr),
+	     path_len(heap, greater, null_ptr)) == path_len(heap, list, it);
 }

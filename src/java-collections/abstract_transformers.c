@@ -890,6 +890,7 @@ bool_t forall(const abstract_heapt *heap,
     if (nx == ny) {
       // universally quantify over val
       data_t val = nondet_data_t();
+      val = 0;
       _Bool prop_true = 1;
       _Bool prop_false = 0;
       _Bool val_prop = eval_pred(prop, val);
