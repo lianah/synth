@@ -103,6 +103,16 @@ args[19]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
 expected[19]="INV_FAIL: Inductive step."
 pretty_args[19]="list it"
 
+tests[20]="filter-safe.c"
+args[20]="-DNPROG=3 -DNPREDS=2 -DNSLACK=2"
+expected[20]="VERIFICATION SUCCESSFUL"
+pretty_args[20]="list it"
+
+tests[21]="filter-unsafe.c"
+args[21]="-DNPROG=3 -DNPREDS=2 -DNSLACK=2"
+expected[21]="INV_FAIL: Inductive step."
+pretty_args[21]="list it"
+
 
 # tests[0]="../../tests/java-collections/set-const2-safe.c"
 # tests[0]="../../tests/java-collections/set-const3-safe.c"
@@ -122,7 +132,7 @@ red_fail=${RED}[FAIL]${NC}
 green_success=${GREEN}[SUCCESS]${NC}
 
 
-for ((i=0;i<${#tests[@]};++i)); do
+for ((i=20;i<${#tests[@]};++i)); do
     LOG_FILE="$TEST_PATH${tests[i]}.log"
     HEAP_FILE="$TEST_PATH${tests[i]}.png"
     INPUT_FILE="$TEST_PATH${tests[i]}"

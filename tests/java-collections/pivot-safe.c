@@ -8,13 +8,14 @@ ptr_t greater = 3;
 ptr_t it = 4;
 
 data_t current;
+data_t pivot;
 
 _Bool isLess(data_t val) {
-  return val < 0 ;
+  return val < pivot ;
 }
 
 _Bool isGreater(data_t val) {
-  return val >= 0 ;
+  return val >= pivot ;
 }
 
 
@@ -58,8 +59,8 @@ _Bool assertion(abstract_heapt *heap) {
 }
 
 _Bool inv_assume(abstract_heapt *heap) {
-  return forall_assume(heap, less, null_ptr, 0) == bool_true
-    && forall_assume (heap, greater, null_ptr, 1) == bool_true
+  return forall_assume(heap, less, null_ptr, 0)
+    && forall_assume (heap, greater, null_ptr, 1)
     && path_len(heap, less, null_ptr) + path_len(heap, greater, null_ptr) == path_len(heap, list, it);
 }
 

@@ -448,10 +448,8 @@ extern void invalidate_prev(abstract_heapt* heap,
   }
 }
 
-
 /*
- * Compute the value of forall pi on path (nx, ny)
- */
+ * Accumulate the values of pi over data and edges */
 static bool_t path_forall(const abstract_heapt *heap,
 			  node_t nx,
 			  node_t ny,
@@ -821,6 +819,50 @@ _Bool forall_assume(const abstract_heapt *heap,
   return path_forall(heap, nx, ny, pi) == bool_true;
 }
 
+/* bool_t forall(const abstract_heapt *heap, */
+/* 	      ptr_t x, */
+/* 	      ptr_t y, */
+/* 	      predicate_index_t prop) { */
+/*   // LSH think about it! */
+/*   Assume(is_path(heap, x, y)); */
+  
+/*   node_t nx = deref(heap, x); */
+/*   node_t ny = deref(heap, y); */
+
+/*   if (nx == ny) */
+/*     return bool_true; */
+  
+/*   predicate_index_t pi; */
+
+/*   data_t val = nondet_data_t(); */
+
+/*   _Bool prop_val = eval_pred(prop, val); */
+
+/*   _Bool assumps = 1; */
+  
+/*   for (pi = 0; pi < NPREDS; ++pi) { */
+/*     bool_t pred = path_forall(heap, nx, ny, pi); */
+/*     if (pred == bool_true) { */
+/*       assumps = assumps && eval_pred(pi, val); */
+/*     } else if (pred == bool_false) { */
+/*       // check if !pi => !prop */
+/*       // LSH FIXME: should check some entailment? */
+/*       if (pi == prop) */
+/* 	return bool_false; */
+/*     } */
+/*   } */
+
+/*   // LSH this returns true if we can find a value for val */
+/*   // that makes the assumptions false or the property true */
+/*   // (WRONG?) */
+/*   if (!assumps || prop_val) */
+/*     return bool_true; */
+/*   if (!assumps || !prop_val) */
+/*     return bool_false; */
+/*   return bool_unknown; */
+/* } */
+
+
 bool_t forall(const abstract_heapt *heap,
 	      ptr_t x,
 	      ptr_t y,
@@ -834,33 +876,56 @@ bool_t forall(const abstract_heapt *heap,
   if (nx == ny)
     return bool_true;
   
+  _Bool data_prop = 1;
+
+  bool_t pred_vals[NPREDS];
+
   predicate_index_t pi;
-
-  data_t val = nondet_data_t();
-
-  _Bool prop_val = eval_pred(prop, val);
-
-  _Bool assumps = 1;
-  
   for (pi = 0; pi < NPREDS; ++pi) {
-    bool_t pred = path_forall(heap, nx, ny, pi);
-    if (pred == bool_true) {
-      assumps = assumps && eval_pred(pi, val);
-    } else if (pred == bool_false) {
-      // check if !pi => !prop
-      // LSH FIXME: double check this is correct
-      if (eval_pred(pi, val) || eval_pred(prop, val))
-	return bool_false;
-    }
+    pred_vals[pi] = bool_true;
   }
-
-
-  if (!assumps || prop_val)
-    return bool_true;
-  if (!assumps || !prop_val)
-    return bool_false;
-  return bool_unknown;
+  
+  word_t i;
+  for (i = 0; i < NABSNODES; ++i) {
+    if (nx == ny) {
+      // universally quantify over val
+      data_t val = nondet_data_t();
+      _Bool prop_true = 1;
+      _Bool prop_false = 0;
+      _Bool val_prop = eval_pred(prop, val);
+      
+      for (pi = 0; pi < NPREDS; ++pi) {
+	if (pred_vals[pi] == bool_true) {
+	  // if predicate holds add to positive predicates
+	  // AND Pi(val)
+	  prop_true = prop_true && eval_pred(pi, val);
+	} else if (pred_vals[pi] == bool_false) {
+	  // if predicate is false check if it entails negation of property
+	  // OR (~Pi(val) => Prop(val))
+	  prop_false = prop_false || eval_pred(pi, val) || ! val_prop;
+	}
+      }
+      // The true predicates entail the property and the property holds on the data
+      if ((! prop_true || val_prop) && data_prop)
+	return bool_true;
+      // The true predicates entail the negation of the property or 
+      // the property fails on the data or
+      // one of the negative predicates entails the negation of the property
+      if (! prop_true || !val_prop || !data_prop || prop_false)
+	return bool_false;
+      return bool_unknown;
+    }
+    
+    // evaluate the property no all data nodes
+    data_prop = data_prop && eval_pred(prop, data(heap, nx));
+    // collect valuation of the edge predicate
+    for (pi = 0; pi < NPREDS; ++pi) {
+      pred_vals[pi] = and(pred_vals[pi], get_univ(heap, nx, pi));
+    }
+    nx = succ(heap, nx);
+  }
 }
+
 
 /*
   Is the segment from x to y sorted?

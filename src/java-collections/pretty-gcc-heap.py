@@ -26,7 +26,7 @@ def preds_str(us):
     elif u == 0:
       string += "F "
     else:
-      assert(false)
+      string +="* "
   return string
   
   
@@ -43,6 +43,10 @@ def processHeap(m,prefix):
   
   [ptrs, iterators, succs, prevs, datas, dists, univs, nnodes, sorts, mins, maxs] = [eval(g) for g in m]
 
+  for i in range(nnodes):
+    univ = univs[i]
+    for u in univ:
+      assert (u <= 2)
 
   univs = [preds_str(u) for u in univs]
   

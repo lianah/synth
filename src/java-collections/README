@@ -2,7 +2,9 @@ Running example:
 
 ./shakira.sh -DNPROG=3 -DNPREDS=1 ../../tests/java-collections/set-const-unsafe.c
 
-If the example is unsafe you can execute the counter-example. To generate .png files at various points during the execution of the program, add calls to:
+If the example is unsafe you can execute the counter-example. To
+generate .png files at various points during the execution of the
+program, add calls to dump_heap in the test program:
 
 dump_heap(heap, <file-name>, <pretty-heap-args>);
 

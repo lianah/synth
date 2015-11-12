@@ -144,13 +144,13 @@ void dump_heap(abstract_heapt *heap,
   fprintf(fp, "}, universal = {{");
   int j;
   fprintf(fp, "%d", heap->universal[0][0]);
-  for (j = 0; j < NPREDS; ++j) {
+  for (j = 1; j < NPREDS; ++j) {
     fprintf(fp, ", %d", heap->universal[0][j]);
   }
   fprintf(fp, "}");
   for (i = 1; i < NABSNODES; ++i) {
     fprintf(fp, ", {%d", heap->universal[i][0]);
-    for (j = 0; j < NPREDS; ++j) { 
+    for (j = 1; j < NPREDS; ++j) { 
       fprintf(fp, ", %d", (int)(heap->universal[i][j]));
     }
     fprintf(fp, "}");
