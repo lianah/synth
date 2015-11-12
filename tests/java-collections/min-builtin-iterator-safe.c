@@ -44,24 +44,25 @@ _Bool cond(abstract_heapt *heap) {
 }
 
 void body(abstract_heapt *heap) {
-
-    current = next(heap, it);
-    if (current < m) {
-      m = current; 
-    }
+  dump_heap(heap, "heap1", "list it");
+  current = next(heap, it);
+  dump_heap(heap, "heap2", "list it");    
+  if (current < m) {
+    m = current; 
+  }
 }
 
 _Bool assertion(abstract_heapt *heap) {
   return is_path(heap, list, null_ptr) == bool_true &&
-    m == min(heap, list, null_ptr);
+    (alias(heap, list, null_ptr) || m == min(heap, list, null_ptr));
 }
 
 _Bool inv_check(abstract_heapt *heap) {
   return is_path(heap, list, it) == bool_true &&
-    (!alias(heap, list, it) && m == min(heap, list, it));
+    (alias(heap, list, it) || m == min(heap, list, it));
 }
 
 _Bool inv_assume(abstract_heapt *heap) {
   return is_path(heap, list, it) == bool_true &&
-    (!alias(heap, list, it) && m == min(heap, list, it));
+    (alias(heap, list, it) || m == min(heap, list, it));
 }

@@ -29,7 +29,7 @@
 ptr_t list = 1;
 ptr_t it = 2;
 
-//word_t max1, min1; 
+word_t curr_min; 
 
 void init_predicates() {
 }
@@ -42,8 +42,6 @@ void init_heap(abstract_heapt *heap) {
 
 void pre(abstract_heapt *heap) {
   iterator(heap, it, list);
-  Assume(!is_null(heap, list));
-  m = next(heap, it);
 }
 
 _Bool cond(abstract_heapt *heap) {
@@ -51,24 +49,29 @@ _Bool cond(abstract_heapt *heap) {
 }
 
 void body(abstract_heapt *heap) {
-  //Assume(max(heap, list, it) <= curr_min);
-  addI(heap, it, min(heap, it, null_ptr));
+  // We must have alias(heap, list, it) || max(heap, list, it) <= curr_min;
+
+  // Inner loop invariant
+  Assume(alias(heap, it, null_ptr) || curr_min == min(heap, it, null_ptr));
+
+  addI(heap, it, curr_min);
 }
 
 _Bool assertion(abstract_heapt *heap) {
-  return is_path(heap, list, null_ptr) == bool_true;
+  return is_path(heap, list, null_ptr) == bool_true && 
+    sorted(heap, list, null_ptr) == bool_true;
 }
 
 _Bool inv_check(abstract_heapt *heap) {
   return is_path(heap, list, it) == bool_true &&
-    !alias(heap, list, it) &&
-    sorted(heap, list, it) == bool_true && 
-    max(heap, list, it) <= min(heap, it, null_ptr);
+    (alias(heap, list, it) ||
+     (sorted(heap, list, it) == bool_true && 
+      (alias(heap, it, null_ptr) || max(heap, list, it) <= min(heap, it, null_ptr))));
 }
 
 _Bool inv_assume(abstract_heapt *heap) {
   return is_path(heap, list, it) == bool_true &&
-    !alias(heap, list, it) &&
-    sorted(heap, list, it) == bool_true && 
-    max(heap, list, it) <= min(heap, it, null_ptr);
+    (alias(heap, list, it) ||
+     (sorted(heap, list, it) == bool_true && 
+      (alias(heap, it, null_ptr) || max(heap, list, it) <= min(heap, it, null_ptr))));
 }
