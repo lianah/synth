@@ -133,6 +133,18 @@ args[25]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
 expected[25]="INV_FAIL: Inductive step."
 pretty_args[25]="list it"
 
+
+tests[26]="implication-safe.c"
+args[26]="-DNPROG=4 -DNPREDS=3"
+expected[26]="VERIFICATION SUCCESSFUL"
+pretty_args[26]="list it1 it2"
+
+tests[27]="implication-unsafe.c"
+args[27]="-DNPROG=4 -DNPREDS=3"
+expected[27]="INV_FAIL: Property entailment."
+pretty_args[27]="list it1 it2"
+
+
 # tests[0]="../../tests/java-collections/set-const2-safe.c"
 # tests[0]="../../tests/java-collections/set-const3-safe.c"
 # tests[0]="../../tests/java-collections/min-iterator-safe.c"
@@ -151,7 +163,7 @@ red_fail=${RED}[FAIL]${NC}
 green_success=${GREEN}[SUCCESS]${NC}
 
 
-for ((i=0;i<${#tests[@]};++i)); do
+for ((i=26;i<${#tests[@]};++i)); do
     LOG_FILE="$TEST_PATH${tests[i]}.log"
     HEAP_FILE="$TEST_PATH${tests[i]}.png"
     INPUT_FILE="$TEST_PATH${tests[i]}"

@@ -188,7 +188,7 @@ data_t max(const abstract_heapt *heap,
  ************************/
 
 /* Positional get */
-data_t getP(const abstract_heapt *heap,
+data_t getP(abstract_heapt *heap,
 	    ptr_t x,
 	    index_t i);
 

@@ -410,6 +410,50 @@ node_t subdivide(abstract_heapt *heap,
   }
 }
 
+/* Returns the first node x such that path_len(node, x) >= index */
+extern node_t getSegment(abstract_heapt* heap,
+			 node_t node,
+			 index_t index) {
+  word_t i, len = 0;
+  for (i = 0; i < NABSNODES; ++i) {
+    Assert (node == null_node, "INV_FAIL: we should not reach null node");
+    // count the current element
+    len = s_add(len, 1);
+    // if still less than index
+    if (len < index) {
+      // add current length 
+      len = s_add(len, dist(heap, node));
+      // if still less then index go to next node
+      if (len < index) {
+	node = succ(heap, node);
+	continue;
+      }
+    }
+    return node;
+  }
+}
+
+extern node_t subdivideP(abstract_heapt* heap,
+			 node_t node,
+			 index_t index) {
+  Assert (node != null_node, "INV_ERROR: node cannot be null");
+  if (index == 0)
+    return node;
+
+  node_t succ = getSegment(heap, node, index);
+  word_t len = path_len(heap, node, succ);
+
+  word_t delta = s_sub(index, len);
+  
+  if (delta == 0)
+    return succ;
+  
+  return node;
+  
+    // TODO: continue computing distance and figure out what/if any
+    // fragment must be subdivided
+}
+
 /*
   Invalidate all the pointers from nx to null (excluding)
 */
@@ -1076,12 +1120,17 @@ data_t max(const abstract_heapt *heap,
  ************************/
 
 /* Positional get */
-data_t getP(const abstract_heapt *heap,
+data_t getP(abstract_heapt *heap,
 	    ptr_t list,
 	    index_t i) {
   Assert (!is_iterator(heap, list), "INV_ERROR");
-  Assert(0, "INV_ERROR");
-  return 0;
+
+  Assert (i >= 0, "INV_ERROR: index must be positive");
+  Assert (i < path_len(heap, list, null_ptr), "INV_ERROR: index out of range");
+
+  node_t node = deref(heap, list);
+  node_t pos_i = subdivideP(heap, node, i);
+  return data(heap, pos_i);
 }
 
 /* Iterator get */
