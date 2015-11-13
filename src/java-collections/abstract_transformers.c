@@ -881,7 +881,7 @@ bool_t forall(const abstract_heapt *heap,
 
   return path_forall(heap, nx, ny, prop);
 
-  // LSH: still having problems with remove-unsafe?
+  /* // LSH: still having problems with copy-safe and reverse-safe? */
   
   /* _Bool data_prop = 1; */
 
@@ -918,17 +918,17 @@ bool_t forall(const abstract_heapt *heap,
   /*     // which is not correct :( */
       
   /*     // The true predicates entail the property and the property holds on the data */
-  /*     if (prop_true && !val_prop && data_prop) { */
+  /*     if ((!prop_true || val_prop) && data_prop) { */
+  /* 	return bool_true; */
+  /*     } */
+      
   /*     // The true predicates entail the negation of the property or */
   /*     // the property fails on the data or */
   /*     // one of the negative predicates entails the negation of the property */
-  /*     if (! (!data_prop || !prop_true || !val_prop || prop_false)) */
-  /* 	  return bool_unknown; */
-  /* 	else */
-  /* 	  return bool_false; */
+  /*     if (!data_prop || (!prop_true || !val_prop) || prop_false) { */
+  /* 	return  bool_false; */
   /*     } */
-  /*     else */
-  /* 	return bool_true; */
+  /*     return bool_unknown; */
   /*   } */
     
   /*   // evaluate the property no all data nodes */
@@ -1185,8 +1185,11 @@ void addP(abstract_heapt *heap,
 
   node_t node = deref(heap, list);
   Assert (node != null_node, "INV_ERROR: cannot add null node");
+  // get the node right before the segment on which i falls
+  node_t seg_node = get_segment(heap, node, i);
+  node_t len = path_len(heap, node, seg_node);
 
-  node_t add_before = subdivide(heap, node, i);
+  node_t add_before = subdivide(heap, seg_node, s_sub(s_sub(len, i), 1));
   add_helper(heap, add_before, val);
 }
 
