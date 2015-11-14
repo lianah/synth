@@ -348,12 +348,18 @@ node_t subdivide(abstract_heapt *heap,
   node_t succ_nx = succ(heap, nx);
   word_t nx_dist = dist(heap, nx);
 
-  Assert (pos <= nx_dist, "INV_ERROR: edge too short cannot subdivide.");
-  
   // no need to create a new node just return nx
   if (pos == 0) {
     return nx;
+  } else if (pos == nx_dist + 1) {
+    return succ_nx;
   }
+
+  printf("XXXX pos = %d\n", pos);
+  printf("XXXX nx_dist = %d\n", nx_dist);
+  printf("XXXX Hi!\n");
+
+  Assert (pos <= nx_dist, "INV_ERROR: edge too short cannot subdivide.");
   
   node_t nnew = alloc(heap);
   assign_prev(heap, nnew, null_node);
@@ -378,10 +384,14 @@ node_t subdivide(abstract_heapt *heap,
     }
   }
 
+  // Reassign nnew's succ pointer to nx's successor succ_nx
+  assign_succ(heap, nnew, succ_nx, dist2);
+  // Reassign nx's succ pointer to the newly allocated node.
+  assign_succ(heap, nx, nnew, dist1);
+
+#if 0
+  // FOR SORTED:
   // Assume min <= val <= max
-  printf("[abstract_transformer] : min = %d\n", get_min(heap, nx));
-  printf("[abstract_transformer] : max = %d\n", get_max(heap, nx));
-  printf("[abstract_transformer] : data = %d\n", data(heap, nnew));
   Assume(get_min(heap, nx) <= get_min(heap, nnew));
   Assume(get_min(heap, nnew) <= data(heap, nnew));
   Assume(data(heap, nnew) <= get_max(heap, nnew));
@@ -398,11 +408,8 @@ node_t subdivide(abstract_heapt *heap,
   }
   assign_sorted(heap, nnew, get_sorted(heap, nx));
   assign_sorted(heap, nx, bool_true);
+#endif
 
-  // Reassign nnew's succ pointer to nx's successor succ_nx
-  assign_succ(heap, nnew, succ_nx, dist2);
-  // Reassign nx's succ pointer to the newly allocated node.
-  assign_succ(heap, nx, nnew, dist1);
   
   return nnew;
 }
@@ -451,19 +458,20 @@ extern void invalidate_prev(abstract_heapt* heap,
 }
 
 
-/* Returns the first node x such that path_len(node, x) >= index */
+/* Returns the last node x such that path_len(node, x) <= index */
+
 extern node_t get_segment(abstract_heapt* heap,
 			 node_t node,
 			 index_t index) {
   word_t i, len = 0;
 
   for (i = 0; i < NABSNODES; ++i) {
-    if (len >= index) {
-      return node;
-    }
-
     len = s_add(len, dist(heap, node));
     len = s_add(len, 1);
+
+    if (len > index) {
+      return node;
+    }
 
     node = succ(heap, node);
   }
@@ -806,12 +814,12 @@ _Bool valid_abstract_heap(const abstract_heapt *heap) {
  *  Abstract "predicates"
  * 
  ************************/
-word_t path_len(const abstract_heapt *heap,
-                ptr_t x,
-                ptr_t y) {
+
+
+word_t node_path_len(const abstract_heapt *heap,
+		     node_t n,
+		     node_t yn) {
   word_t curr_dist = 0;
-  node_t n = deref(heap, x);
-  node_t yn = deref(heap, y);
   word_t i;
 
   for (i = 0; i < NABSNODES+1; i++) {
@@ -828,6 +836,15 @@ word_t path_len(const abstract_heapt *heap,
   
   Assert (0, "INV_ERROR");
   return INF;
+}
+
+word_t path_len(const abstract_heapt *heap,
+                ptr_t x,
+                ptr_t y) {
+  node_t n = deref(heap, x);
+  node_t yn = deref(heap, y);
+
+  return node_path_len(heap, n, yn);
 }
 
 _Bool is_path(const abstract_heapt *heap,
@@ -1074,25 +1091,23 @@ data_t max(const abstract_heapt *heap,
 }
 
 node_t succP(abstract_heapt *heap,
-    ptr_t list,
+    node_t node,
     index_t i) {
-  Assert (!is_iterator(heap, list), "INV_ERROR");
-
   Assert (i >= 0, "INV_ERROR: index must be positive");
-  Assert (i <= path_len(heap, list, null_ptr), "INV_ERROR: index out of range");
 
-  node_t node = deref(heap, list);
-
-  // get the node right after the segment on which i falls
+  // get the node right before the segment on which i falls
   // or the node on which i falls if the node already exists
   node_t seg_node = get_segment(heap, node, i);
-  node_t len = path_len(heap, node, seg_node);
+  word_t len = node_path_len(heap, node, seg_node);
 
   // subdivide this segment if necessary to create new node
-  if (len == s_add(i, 1)) {
+  if (len == i) {
     return seg_node;
-  } else if (len > i) {
-    return subdivide(heap, seg_node, s_sub(s_sub(len, i), 1));
+  } else if (len < i) {
+    return subdivide(heap, seg_node, s_sub(s_sub(i, len), 1));
+  } else {
+    printf("XXX len: %d, i: %d", len, i);
+    Assert (0, "INV_ERROR: wtf");
   }
 }
 
@@ -1106,6 +1121,8 @@ node_t succP(abstract_heapt *heap,
 data_t getP(abstract_heapt *heap,
 	    ptr_t list,
 	    index_t i) {
+  Assert (!is_iterator(heap, list), "INV_ERROR");
+  Assert (i >= 0 && i <= path_len(heap, list, null_ptr), "INV_ERROR");
   node_t pos_i = succP(heap, list, i);
   return data(heap, pos_i);
 }
@@ -1253,7 +1270,8 @@ void iteratorP(abstract_heapt* heap,
   Assert (is_iterator(heap, it) &&
 	  !is_iterator(heap, list), "INV_ERROR");
 
-  node_t nlist = succP(heap, list, i);
+  node_t node = deref(heap, list);
+  node_t nlist = succP(heap, node, i);
   assign_ptr(heap, it, nlist);
 }
 
