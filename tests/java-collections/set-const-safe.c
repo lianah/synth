@@ -31,7 +31,9 @@ _Bool cond(abstract_heapt *heap) {
 
 void body(abstract_heapt *heap) {
   // it.next();
+  dump_heap(heap, "body", "list it");
   next(heap, it);
+  dump_heap(heap, "next", "list it");
   // it.set(4);
   setI(heap, it, 4);
 }
@@ -41,7 +43,7 @@ _Bool assertion(abstract_heapt *heap) {
 }
 
 _Bool inv_assume(abstract_heapt *heap) {
-  return forall_assume(heap, list, it, 0);
+  return forall(heap, list, it, 0) == bool_true;
 }
 
 _Bool inv_check(abstract_heapt *heap) {

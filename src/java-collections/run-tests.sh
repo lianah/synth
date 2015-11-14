@@ -83,55 +83,76 @@ args[15]="-DNPROG=2 -DNPREDS=1 -DNSLACK=1"
 expected[15]="INV_FAIL: Base case."
 pretty_args[15]="list"
 
-tests[16]="min-builtin-iterator-safe.c"
+tests[16]="max-builtin-iterator-safe.c"
 args[16]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
 expected[16]="VERIFICATION SUCCESSFUL"
 pretty_args[16]="list it"
 
-tests[17]="min-builtin-iterator-unsafe.c"
+tests[17]="max-builtin-iterator-unsafe.c"
 args[17]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
 expected[17]="INV_FAIL: Inductive step."
 pretty_args[17]="list it"
 
-tests[18]="max-builtin-iterator-safe.c"
-args[18]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+tests[18]="filter-safe.c"
+args[18]="-DNPROG=3 -DNPREDS=2 -DNSLACK=2"
 expected[18]="VERIFICATION SUCCESSFUL"
 pretty_args[18]="list it"
 
-tests[19]="max-builtin-iterator-unsafe.c"
-args[19]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+tests[19]="filter-unsafe.c"
+args[19]="-DNPROG=3 -DNPREDS=2 -DNSLACK=2"
 expected[19]="INV_FAIL: Inductive step."
 pretty_args[19]="list it"
 
-tests[20]="filter-safe.c"
-args[20]="-DNPROG=3 -DNPREDS=2 -DNSLACK=2"
+tests[20]="pivot-safe.c"
+args[20]="-DNPROG=5 -DNPREDS=2 -DNSLACK=2"
 expected[20]="VERIFICATION SUCCESSFUL"
-pretty_args[20]="list it"
+pretty_args[20]="list less great it"
 
-tests[21]="filter-unsafe.c"
-args[21]="-DNPROG=3 -DNPREDS=2 -DNSLACK=2"
+tests[21]="pivot-unsafe.c"
+args[21]="-DNPROG=5 -DNPREDS=2 -DNSLACK=2"
 expected[21]="INV_FAIL: Inductive step."
-pretty_args[21]="list it"
+pretty_args[21]="list less great it"
 
-tests[22]="pivot-safe.c"
-args[22]="-DNPROG=5 -DNPREDS=2 -DNSLACK=2"
+tests[22]="selection-sort-inner-loop-safe.c"
+args[22]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
 expected[22]="VERIFICATION SUCCESSFUL"
-pretty_args[22]="list less great it"
+pretty_args[22]="list it"
 
-tests[23]="pivot-unsafe.c"
-args[23]="-DNPROG=5 -DNPREDS=2 -DNSLACK=2"
+tests[23]="selection-sort-inner-loop-unsafe.c"
+args[23]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
 expected[23]="INV_FAIL: Inductive step."
-pretty_args[23]="list less great it"
+pretty_args[23]="list it"
 
-tests[24]="selection-sort-safe.c"
+tests[24]="selection-sort-outer-loop-safe.c"
 args[24]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
 expected[24]="VERIFICATION SUCCESSFUL"
 pretty_args[24]="list it"
 
-tests[25]="selection-sort-unsafe.c"
+tests[25]="selection-sort-outer-loop-unsafe.c"
 args[25]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
 expected[25]="INV_FAIL: Inductive step."
 pretty_args[25]="list it"
+
+tests[26]="quicksort-first-loop-safe.c"
+args[26]="-DNPROG=5 -DNPREDS=1 -DNSLACK=2"
+expected[26]="VERIFICATION SUCCESSFUL"
+pretty_args[26]="list less greater it"
+
+tests[27]="quicksort-first-loop-unsafe.c"
+args[27]="-DNPROG=5 -DNPREDS=1 -DNSLACK=2"
+expected[27]="INV_FAIL: Inductive step."
+pretty_args[27]="list less greater it"
+
+tests[28]="quicksort-second-loop-safe.c"
+args[28]="-DNPROG=5 -DNPREDS=1 -DNSLACK=2"
+expected[28]="VERIFICATION SUCCESSFUL"
+pretty_args[28]="list less greater it"
+
+tests[29]="quicksort-second-loop-unsafe.c"
+args[29]="-DNPROG=5 -DNPREDS=1 -DNSLACK=2"
+expected[29]="INV_FAIL: Inductive step."
+pretty_args[29]="list less greater it"
+
 
 # tests[0]="../../tests/java-collections/set-const2-safe.c"
 # tests[0]="../../tests/java-collections/set-const3-safe.c"
@@ -151,7 +172,7 @@ red_fail=${RED}[FAIL]${NC}
 green_success=${GREEN}[SUCCESS]${NC}
 
 
-for ((i=0;i<${#tests[@]};++i)); do
+for ((i=22;i<${#tests[@]};++i)); do
     LOG_FILE="$TEST_PATH${tests[i]}.log"
     HEAP_FILE="$TEST_PATH${tests[i]}.png"
     INPUT_FILE="$TEST_PATH${tests[i]}"

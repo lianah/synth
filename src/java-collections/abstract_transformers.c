@@ -393,10 +393,23 @@ node_t subdivide(abstract_heapt *heap,
 
 
     // Assume min <= val <= max
-    Assume(get_min(heap, nx) <= data(heap, nnew) <= get_max(heap, nx));
-    Assume(get_min(heap, nx) <= get_min(heap, nnew) <= get_max(heap, nx));
-    Assume(get_min(heap, nx) <= get_max(heap, nnew) <= get_max(heap, nx));
-    // Cris TODO: if sorted then data(nnew) >= data(nx)
+    printf("[abstract_transformer] : min = %d\n", get_min(heap, nx));
+    printf("[abstract_transformer] : max = %d\n", get_max(heap, nx));
+    printf("[abstract_transformer] : data = %d\n", data(heap, nnew));
+    Assume(get_min(heap, nx) <= get_min(heap, nnew));
+    Assume(get_min(heap, nnew) <= data(heap, nnew));
+    Assume(data(heap, nnew) <= get_max(heap, nnew));
+    Assume(get_max(heap, nnew) <= get_max(heap, nx));
+
+    if(dist(heap, nnew) == 0 && !is_null(heap, nnew)) {
+      Assume(get_min(heap, nnew) == data(heap, nnew));
+      Assume(get_max(heap, nnew) == data(heap, nnew));
+    }
+    // additional constraints if the edge is sorted
+    if(get_sorted(heap, nx) == bool_true) {
+      Assume(data(heap, nx) <= data(heap, nnew));
+      Assume(data(heap, nnew) <= get_min(heap, nnew));
+    }
     assign_sorted(heap, nnew, get_sorted(heap, nx));
     assign_sorted(heap, nx, bool_true);
 
@@ -404,7 +417,6 @@ node_t subdivide(abstract_heapt *heap,
     assign_succ(heap, nnew, succ_nx, new_dist);
     // Reassign nx's succ pointer to the newly allocated node.
     assign_succ(heap, nx, nnew, 0);
-
 
     return nnew;
   }
@@ -1148,6 +1160,8 @@ void assign(abstract_heapt *heap,
 void clear(abstract_heapt *heap,
 	   ptr_t x) {
   Assert(0, "INV_ERROR");
+
+
 }
 
 /*************************
