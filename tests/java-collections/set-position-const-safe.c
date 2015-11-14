@@ -20,22 +20,22 @@ void init_heap(abstract_heapt *heap) {
   // distinguish between predicates and iterators
   heap->is_iterator[list] = 0;
   heap->is_iterator[it] = 1;
-  //idx = rand();
+  idx = 30;
 }
 
 void pre(abstract_heapt *heap) {
   //ListIt<Int> it = list.listIterator()
-  iterator(heap, it, list);
+  //iterator(heap, it, list);
   idx = 0;
 }
 
 _Bool cond(abstract_heapt *heap) {
-  return idx < size(heap, list) - 1;
+  return 0 <= idx && idx < size(heap, list); 
 }
 
 void body(abstract_heapt *heap) {
   dump_heap(heap, "a", "list it");
-  printf("XXX idx=%d\n", idx);
+  printf("XXX idx=%d, size=%d\n", idx, size(heap, list));
   setP(heap, list, idx, 4);
   idx++;
   dump_heap(heap, "b", "list it");
@@ -46,12 +46,14 @@ _Bool assertion(abstract_heapt *heap) {
 }
 
 _Bool inv_assume(abstract_heapt *heap) {
-  iteratorP(heap, it, list, idx);
-  return forall_assume(heap, list, it, 0);
+  if (0 <= idx && idx <= size(heap, list)) {
+    iteratorP(heap, it, list, idx);
+    return forall_assume(heap, list, it, 0) == bool_true;
+  } else {
+    return 0;
+  }
 }
 
 _Bool inv_check(abstract_heapt *heap) {
-  iteratorP(heap, it, list, idx);
-  dump_heap(heap, "c", "list it");
-  return forall(heap, list, it, 0) == bool_true;
+  return inv_assume(heap);
 }
