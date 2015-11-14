@@ -1071,25 +1071,39 @@ data_t max(const abstract_heapt *heap,
  * 
  ************************/
 
-/* Positional get */
-data_t getP(abstract_heapt *heap,
+node_t succP(abstract_heapt *heap,
 	    ptr_t list,
 	    index_t i) {
   Assert (!is_iterator(heap, list), "INV_ERROR");
 
   Assert (i >= 0, "INV_ERROR: index must be positive");
-  Assert (i < path_len(heap, list, null_ptr), "INV_ERROR: index out of range");
+  Assert (i <= path_len(heap, list, null_ptr), "INV_ERROR: index out of range");
 
   node_t node = deref(heap, list);
 
-  Assert(node != null_node, "INV_ERROR: can't getP on null");
+  if (i == 0) {
+    // Special case: just return the first node.
+    return node;
+  } else {
+    Assert(node != null_node, "INV_ERROR: can't succP on null");
 
-  // get the node right before the segment on which i falls
-  // or the node on which i falls if the node already exists
-  node_t seg_node = get_segment(heap, node, i);
-  node_t len = path_len(heap, node, seg_node);
-  // subdivide this segment if necessary to create new node
-  node_t pos_i = subdivide(heap, seg_node, s_sub(s_sub(len, i), 1));
+    // get the node right before the segment on which i falls
+    // or the node on which i falls if the node already exists
+    node_t seg_node = get_segment(heap, node, i);
+    node_t len = path_len(heap, node, seg_node);
+    // subdivide this segment if necessary to create new node
+    node_t pos_i = subdivide(heap, seg_node, s_sub(s_sub(len, i), 1));
+
+    return pos_i;
+  }
+}
+
+/* Positional get */
+data_t getP(abstract_heapt *heap,
+    ptr_t list,
+    index_t i) {
+  node_t pos_i = succP(heap, list, i);
+
   return data(heap, pos_i);
 }
 
@@ -1102,7 +1116,6 @@ data_t getI(const abstract_heapt *heap,
   return data(heap, nit);
 }
 
-		 
 /*************************
  *
  *  Abstract transformers
@@ -1171,11 +1184,10 @@ void setP(abstract_heapt *heap,
 	  data_t val) {
   Assert(!is_iterator(heap, list), "INV_ERROR");
 
-  node_t node = deref(heap, list);
+  node_t node = succP(heap, list, i);
   Assert (node != null_node, "INV_ERROR: cannot set null node");
 
-  node_t to_set = subdivide(heap, node, i);
-  assign_data(heap, to_set, val);
+  assign_data(heap, node, val);
 }
 
 
@@ -1224,6 +1236,18 @@ void iterator(abstract_heapt* heap,
 
   node_t nlist = deref(heap, list);
   assign_ptr(heap, it, nlist);
+}
+
+void iteratorP(abstract_heapt *heap,
+    ptr_t it,
+    ptr_t list,
+    index_t i) {
+  Assert (is_iterator(heap, it) &&
+      !is_iterator(heap, list), "INV_ERROR");
+  Assert (i <= size(heap, list), "INV_ERROR");
+
+  node_t node = succP(heap, list, i);
+  assign_ptr(heap, it, node);
 }
 
 
