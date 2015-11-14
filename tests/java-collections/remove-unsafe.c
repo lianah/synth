@@ -42,14 +42,14 @@ void body(abstract_heapt *heap) {
   dump_heap(heap, "body", "list it");
   current = next(heap, it);
   dump_heap(heap, "next", "list it");
-  if (current > 2) {
+  if (current >= 2) {
     removeI(heap, it);
     dump_heap(heap, "remove", "list it");
   }
 }
 
 _Bool assertion(abstract_heapt *heap) {
-   return forall(heap, list, null_ptr, 0);
+   return forall(heap, list, null_ptr, 0) == bool_true;
 }
 
 _Bool inv_assume(abstract_heapt *heap) {
@@ -57,5 +57,5 @@ _Bool inv_assume(abstract_heapt *heap) {
 }
 
 _Bool inv_check(abstract_heapt *heap) {
-   return forall(heap, list, it, 0);
+   return forall(heap, list, it, 0) == bool_true;
 }

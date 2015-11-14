@@ -44,7 +44,10 @@ void body(abstract_heapt *heap) {
 _Bool assertion(abstract_heapt *heap) {
   dump_heap(heap, "assertion", "list copy it");
   return path_len(heap, list, null_ptr) == path_len(heap, copy, null_ptr) &&
-    forall(heap, list, null_ptr, 0) == forall(heap, copy, null_ptr, 0);
+    ((forall(heap, list, null_ptr, 0) == bool_true &&
+      forall(heap, copy, null_ptr, 0) == bool_true) ||
+     (forall(heap, list, null_ptr, 0) == bool_false &&
+      forall(heap, copy, null_ptr, 0) == bool_false));
 }
 
 _Bool inv_assume(abstract_heapt *heap) {
@@ -54,5 +57,8 @@ _Bool inv_assume(abstract_heapt *heap) {
 
 _Bool inv_check(abstract_heapt *heap) {
   return path_len(heap, copy, null_ptr) == path_len(heap, list, it) &&
-    forall(heap, list, it, 0) == forall(heap, copy, null_ptr, 0);
+    ((forall(heap, list, it, 0) == bool_true &&
+      forall(heap, copy, null_ptr, 0) == bool_true) ||
+     (forall(heap, list, it, 0) == bool_false &&
+      forall(heap, copy, null_ptr, 0) == bool_false));
 }
