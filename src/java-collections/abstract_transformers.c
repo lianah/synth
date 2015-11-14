@@ -438,7 +438,7 @@ extern void invalidate_prev(abstract_heapt* heap,
 }
 
 
-/* Returns the last node x such that path_len(node, x) < index */
+/* Returns the first node x such that path_len(node, x) >= index */
 extern node_t get_segment(abstract_heapt* heap,
 			 node_t node,
 			 index_t index) {
@@ -446,17 +446,13 @@ extern node_t get_segment(abstract_heapt* heap,
   ptr_t next;
 
   for (i = 0; i < NABSNODES; ++i) {
-    Assert (node != null_node, "INV_FAIL: we should not reach null node");
-
-    next = succ(heap, node);
-    len = s_add(len, dist(heap, node));
-    len = s_add(len, 1);
-
     if (len >= index) {
       return node;
-    } else {
-      node = next;
     }
+
+    len = s_add(len, dist(heap, node));
+    len = s_add(len, 1);
+    node = succ(heap, node);
   }
 
   return node;
