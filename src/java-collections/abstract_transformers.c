@@ -438,27 +438,28 @@ extern void invalidate_prev(abstract_heapt* heap,
 }
 
 
-/* Returns the first node x such that path_len(node, x) >= index */
+/* Returns the last node x such that path_len(node, x) < index */
 extern node_t get_segment(abstract_heapt* heap,
 			 node_t node,
 			 index_t index) {
   word_t i, len = 0;
+  ptr_t next;
+
   for (i = 0; i < NABSNODES; ++i) {
-    Assert (node == null_node, "INV_FAIL: we should not reach null node");
-    // count the current element
+    Assert (node != null_node, "INV_FAIL: we should not reach null node");
+
+    next = succ(heap, node);
+    len = s_add(len, dist(heap, node));
     len = s_add(len, 1);
-    // if still less than index
-    if (len < index) {
-      // add current length 
-      len = s_add(len, dist(heap, node));
-      // if still less then index go to next node
-      if (len < index) {
-	node = succ(heap, node);
-	continue;
-      }
+
+    if (len >= index) {
+      return node;
+    } else {
+      node = next;
     }
-    return node;
   }
+
+  return node;
 }
 
 /* Remove the node nrem and updates head of list if necessary */
@@ -1080,6 +1081,8 @@ data_t getP(abstract_heapt *heap,
   Assert (i < path_len(heap, list, null_ptr), "INV_ERROR: index out of range");
 
   node_t node = deref(heap, list);
+
+  Assert(node != null_node, "INV_ERROR: can't getP on null");
 
   // get the node right before the segment on which i falls
   // or the node on which i falls if the node already exists
