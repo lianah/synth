@@ -79,24 +79,24 @@ void body(abstract_heapt *heap) {
   currenta = getP(heap, a, ia);
   currentb = getP(heap, b, ib);
 
-  //printf("currenta = %d and currentb = %d\n", currenta, currentb);
-  //printf("maxa = %d and maxb = %d\n", max(heap, a, null_ptr), max(heap, b, null_ptr));
-  //printf("mina = %d and minb = %d\n", min(heap, a, null_ptr), min(heap, b, null_ptr));
+  printf("currenta = %d and currentb = %d\n", currenta, currentb);
+  printf("maxa = %d and maxb = %d\n", max(heap, a, null_ptr), max(heap, b, null_ptr));
+  printf("mina = %d and minb = %d\n", min(heap, a, null_ptr), min(heap, b, null_ptr));
 
-  /* if(path_len(heap, c, null_ptr) > 1) { */
-  /*   printf("maxc = %d\n", max(heap, c, null_ptr)); */
-  /* } */
-  /* else { */
-  /*   printf("there is no max value for c-->null\n"); */
-  /* } */
+  if(path_len(heap, c, null_ptr) > 1) {
+    printf("maxc = %d\n", max(heap, c, null_ptr));
+  }
+  else {
+    printf("there is no max value for c-->null\n");
+  }
 
   if (currenta < currentb) {
-    // printf("add from list a element %d\n", currenta);
+    printf("add from list a element %d\n", currenta);
     add(heap, c, currenta);
     ia++;
   }
   else {
-    // printf("add from list b element %d\n", currentb);
+    printf("add from list b element %d\n", currentb);
     add(heap, c, currentb);
     ib++;
   }
@@ -109,8 +109,8 @@ _Bool assertion(abstract_heapt *heap) {
 }
 
 _Bool inv_assume(abstract_heapt *heap) {
-  iteratorP(heap, ita, a, ia);
-  iteratorP(heap, itb, b, ib);
+  listIterator(heap, ita, a, ia);
+  listIterator(heap, itb, b, ib);
 
   // a is sorted and
   // b is sorted and
@@ -129,8 +129,8 @@ _Bool inv_assume(abstract_heapt *heap) {
 
 
 _Bool inv_check(abstract_heapt *heap) {
-  iteratorP(heap, ita, a, ia);
-  iteratorP(heap, itb, b, ib);
+  listIterator(heap, ita, a, ia);
+  listIterator(heap, itb, b, ib);
 
   return (alias(heap, a, null_ptr) || sorted(heap, a, null_ptr)) &&
     (alias(heap, b, null_ptr) || sorted(heap, b, null_ptr)) &&

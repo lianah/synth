@@ -69,7 +69,7 @@ _Bool assertion(abstract_heapt *heap) {
 }
 
 _Bool inv_assume(abstract_heapt *heap) {
-  iteratorP(heap, ita, a, ia);
+  listIterator(heap, ita, a, ia);
 
   // a is sorted and
   // c is sorted and 
@@ -83,7 +83,7 @@ _Bool inv_assume(abstract_heapt *heap) {
 
 
 _Bool inv_check(abstract_heapt *heap) {
-  iteratorP(heap, ita, a, ia);
+  listIterator(heap, ita, a, ia);
 
   // a is sorted and
   // c is sorted and 

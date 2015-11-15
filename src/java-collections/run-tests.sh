@@ -218,6 +218,27 @@ args[42]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
 expected[42]="INV_ERROR: Inductive step."
 pretty_args[42]="list less great"
 
+tests[43]="merge-sort-first-loop-safe.c"
+args[43]="-DNPROG=6 -DNPREDS=1 -DNSLACK=2"
+expected[43]="VERIFICATION SUCCESSFUL"
+pretty_args[43]="a b c ita itb"
+
+tests[44]="merge-sort-first-loop-unsafe.c"
+args[44]="-DNPROG=6 -DNPREDS=1 -DNSLACK=2"
+expected[44]="INV_FAIL: Inductive step."
+pretty_args[44]="a b c ita itb"
+
+tests[45]="merge-sort-second-loop-safe.c"
+args[45]="-DNPROG=4 -DNPREDS=1 -DNSLACK=1"
+expected[45]="VERIFICATION SUCCESSFUL"
+pretty_args[45]="a c ita"
+
+tests[46]="merge-sort-second-loop-unsafe.c"
+args[46]="-DNPROG=4 -DNPREDS=1 -DNSLACK=2"
+expected[46]="INV_FAIL: Inductive step."
+pretty_args[46]="a c ita"
+
+
 # tests[0]="../../tests/java-collections/set-const2-safe.c"
 # tests[0]="../../tests/java-collections/set-const3-safe.c"
 # tests[0]="../../tests/java-collections/min-iterator-safe.c"
