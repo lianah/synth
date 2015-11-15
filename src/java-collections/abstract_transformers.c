@@ -31,7 +31,7 @@ data_t nondet_data_t();
 /*
  * Dereference p -- which node does p point to?
  */
-static node_t deref(const abstract_heapt *heap,
+node_t deref(const abstract_heapt *heap,
                     ptr_t p) {
   // Ensure p is a real pointer.
   Assume(p < NPROG);
@@ -147,7 +147,11 @@ static bool_t get_univ(const abstract_heapt *heap,
  */
 static _Bool eval_pred(predicate_index_t pi, data_t val) {
   Assume(pi < NPREDS);
-  return predicates[pi](val);
+  _Bool res = predicates[pi](val);
+
+  printf("XXX eval_pred(%d) = %d\n", val, res);
+
+  return res;
 }
 
 /*
@@ -343,15 +347,17 @@ void abstract_new(abstract_heapt *heap,
 node_t subdivide(abstract_heapt *heap,
 		 node_t nx,
 		 word_t pos) {
+
+
   Assert (nx < NABSNODES, "INV_ERROR");
 
   node_t succ_nx = succ(heap, nx);
   word_t nx_dist = dist(heap, nx);
 
   // no need to create a new node just return nx
-  if (pos == 0) {
+  if (pos == -1) {
     return nx;
-  } else if (pos == nx_dist + 1) {
+  } else if (pos == nx_dist) {
     return succ_nx;
   }
 
@@ -363,8 +369,8 @@ node_t subdivide(abstract_heapt *heap,
   
   node_t nnew = alloc(heap);
   assign_prev(heap, nnew, null_node);
-  word_t dist1 = s_sub(pos, 1);
-  word_t dist2 = s_sub(nx_dist, pos);
+  word_t dist1 = pos;
+  word_t dist2 = s_sub(s_sub(nx_dist, pos), 1);
   
   predicate_index_t pi;
   for (pi = 0; pi < NPREDS; ++pi) {
@@ -595,8 +601,15 @@ static bool_t path_forall(const abstract_heapt *heap,
     if (nx == ny) {
       return res;
     }
-    res = and(res, (bool_t)eval_pred(pi, data(heap, nx)));
-    res = and(res, get_univ(heap, nx, pi));
+
+    bool_t node_res = eval_pred(pi, data(heap, nx));
+    bool_t edge_res = get_univ(heap, nx, pi);
+    printf("XXX doing to eval_pred on node %d: node=%d, edge=%d\n", nx, node_res, edge_res);
+    res = and(res, node_res);
+    res = and(res, edge_res);
+
+    printf("XXX next node=%d, dist=%d\n", succ(heap, nx), dist(heap, nx));
+
     nx = succ(heap, nx);
   }
   return bool_unknown;
@@ -822,7 +835,11 @@ word_t node_path_len(const abstract_heapt *heap,
   word_t curr_dist = 0;
   word_t i;
 
+  printf("XXX path_len(%d, %d)", n, yn);
+
   for (i = 0; i < NABSNODES+1; i++) {
+    printf("XXX node=%d, dist=%d, curr_dist=%d\n", n, dist(heap, n), curr_dist);
+
     if (n == yn) {
       return curr_dist;
     }
@@ -886,10 +903,13 @@ _Bool forall_assume(const abstract_heapt *heap,
 		    ptr_t x,
 		    ptr_t y,
 		    predicate_index_t pi) {
-  Assume(is_path(heap, x, y));
-  node_t nx = deref(heap, x);
-  node_t ny = deref(heap, y);
-  return path_forall(heap, nx, ny, pi) == bool_true;
+
+  /* Assume(is_path(heap, x, y)); */
+  /* node_t nx = deref(heap, x); */
+  /* node_t ny = deref(heap, y); */
+  /* return path_forall(heap, nx, ny, pi) == bool_true; */
+
+  return forall(heap, x, y, pi) == bool_true;
 }
 
 
@@ -1209,9 +1229,8 @@ void setP(abstract_heapt *heap,
   Assert(!is_iterator(heap, list), "INV_ERROR");
 
   node_t node = deref(heap, list);
+  node_t to_set = succP(heap, node, i);
   Assert (node != null_node, "INV_ERROR: cannot set null node");
-
-  node_t to_set = subdivide(heap, node, i);
   assign_data(heap, to_set, val);
 }
 

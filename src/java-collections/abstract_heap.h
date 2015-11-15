@@ -122,6 +122,9 @@ typedef struct abstract_heap {
 
 } abstract_heapt;
 
+node_t deref(const abstract_heapt *heap,
+	     ptr_t p);
+
 
 
 /*************************
