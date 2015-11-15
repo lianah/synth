@@ -228,6 +228,17 @@ args[44]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
 expected[44]="INV_FAIL: Inductive step."
 pretty_args[44]="list it"
 
+tests[45]="copy-position-safe.c"
+args[45]="-DNPROG=5 -DNPREDS=1 -DNSLACK=2"
+expected[45]="VERIFICATION SUCCESSFUL"
+pretty_args[45]="list copy it it2"
+
+tests[46]="copy-position-unsafe.c"
+args[46]="-DNPROG=5 -DNPREDS=1 -DNSLACK=2"
+expected[46]="INV_FAIL: Inductive step."
+pretty_args[46]="list copy it it2"
+
+
 # tests[0]="../../tests/java-collections/set-const2-safe.c"
 # tests[0]="../../tests/java-collections/set-const3-safe.c"
 # tests[0]="../../tests/java-collections/min-iterator-safe.c"
@@ -246,7 +257,7 @@ red_fail=${RED}[FAIL]${NC}
 green_success=${GREEN}[SUCCESS]${NC}
 
 
-for ((i=0;i<${#tests[@]};++i)); do
+for ((i=43;i<${#tests[@]};++i)); do
     LOG_FILE="$TEST_PATH${tests[i]}.log"
     HEAP_FILE="$TEST_PATH${tests[i]}.png"
     INPUT_FILE="$TEST_PATH${tests[i]}"

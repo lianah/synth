@@ -15,7 +15,7 @@
 ptr_t list = 1;
 ptr_t copy = 2;
 ptr_t it = 3;
-ptr_t it2 = 3;
+ptr_t it2 = 4;
 
 data_t current; 
 word_t i;
@@ -23,6 +23,7 @@ word_t i;
 void pre(abstract_heapt *heap) {
   Assume (! empty(heap, list));
   Assume (size(heap, copy) == size(heap, list));
+  Assume(!alias(heap, list, copy));
   i = 0;
 }
 
@@ -66,8 +67,9 @@ _Bool inv_assume(abstract_heapt *heap) {
   if (0 <= i && i <= size(heap, list)) {
     listIterator(heap, it, list, i);
     listIterator(heap, it2, copy, i);
-    return forall_assume(heap, list, it, 0) ==
-           forall_assume(heap, copy, it2, 0);
+    return
+      size(heap, copy) == size(heap, list) &&
+      forall_assume(heap, list, it, 0) == forall_assume(heap, copy, it2, 0);
   } else {
     return 0;
   }
@@ -77,10 +79,12 @@ _Bool inv_check(abstract_heapt *heap) {
   if (0 <= i && i <= size(heap, list)) {
     listIterator(heap, it, list, i);
     listIterator(heap, it2, copy, i);
-    return ((forall(heap, list, it, 0) == bool_true &&
-	     forall(heap, copy, it2, 0) == bool_true) ||
-	    (forall(heap, list, it, 0) == bool_false &&
-	     forall(heap, copy, it2, 0) == bool_false));
+    return
+      size(heap, copy) == size(heap, list) &&
+      ((forall(heap, list, it, 0) == bool_true &&
+	forall(heap, copy, it2, 0) == bool_true) ||
+       (forall(heap, list, it, 0) == bool_false &&
+	forall(heap, copy, it2, 0) == bool_false));
   } else {
     return 0;
   }
