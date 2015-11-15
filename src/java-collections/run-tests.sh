@@ -188,6 +188,15 @@ args[36]="-DNPROG=2 -DNPREDS=1 -DNSLACK=1"
 expected[36]="INV_FAIL: Property entailment."
 pretty_args[36]="list"
 
+tests[37]="remove-position-safe.c"
+args[37]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+expected[37]="VERIFICATION SUCCESSFUL"
+pretty_args[37]="list it"
+
+tests[38]="remove-position-unsafe.c"
+args[38]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+expected[38]="INV_FAIL: Inductive step."
+pretty_args[38]="list it"
 
 
 # tests[0]="../../tests/java-collections/set-const2-safe.c"
@@ -208,7 +217,7 @@ red_fail=${RED}[FAIL]${NC}
 green_success=${GREEN}[SUCCESS]${NC}
 
 
-for ((i=0;i<${#tests[@]};++i)); do
+for ((i=37;i<${#tests[@]};++i)); do
     LOG_FILE="$TEST_PATH${tests[i]}.log"
     HEAP_FILE="$TEST_PATH${tests[i]}.png"
     INPUT_FILE="$TEST_PATH${tests[i]}"
