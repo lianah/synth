@@ -7,12 +7,14 @@ ptr_t it = 2;
 
 data_t current;
 
+index_t idx;
+
 _Bool isLess(data_t val) {
-  return val < 10 ;
+  return val < 10;
 }
 
 _Bool isGreater(data_t val) {
-  return val > 10 ;
+  return val > 10;
 }
 
 
@@ -25,29 +27,27 @@ void init_heap(abstract_heapt *heap) {
   // distinguish between predicates and iterators
   heap->is_iterator[list] = 0;
   heap->is_iterator[it] = 1;
+  idx = nondet();
 }
 
 
 void pre(abstract_heapt *heap) {
-  iterator(heap, it, list);
+  idx = 0;
 }
 
 _Bool cond(abstract_heapt *heap) {
-  return hasNext(heap, it);
+  return idx < size(heap, list);
 }
 
 void body(abstract_heapt *heap) {
-  dump_heap(heap, "body.png", "list it");
-  current = next(heap, it);
+  //dump_heap(heap, "body.png", "list it");
+  current = getP(heap, list, idx);
   if (isLess(current)) {
-    removeI(heap, it);
-    dump_heap(heap, "remove.png", "list it");
+    removeP(heap, list, idx);
+    //dump_heap(heap, "remove.png", "list it");
+  }  else {
+    idx++;
   }
-  dump_heap(heap, "no-remove.png", "list it");
-  /*else {
-    add(heap, greater, current);
-    dump_heap(heap, "greater.png", "list less greater it");
-    }*/
 }
 
 _Bool assertion(abstract_heapt *heap) {
@@ -56,10 +56,15 @@ _Bool assertion(abstract_heapt *heap) {
 }
 
 _Bool inv_assume(abstract_heapt *heap) {
-  return forall_assume(heap, list, it, 1);
+  if (idx <= size(heap, list)) {
+    listIterator(heap, it, list, idx);
+    return forall_assume(heap, list, it, 1);
+  } else {
+    return 0;
+  }
 }
 
 
 _Bool inv_check(abstract_heapt *heap) {
-  return forall(heap, list, it, 1) == bool_true;
+  return inv_assume(heap);
 }

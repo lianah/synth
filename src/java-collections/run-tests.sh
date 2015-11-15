@@ -195,9 +195,18 @@ pretty_args[37]="list less great"
 
 tests[38]="pivot-position-safe.c"
 args[38]="-DNPROG=4 -DNPREDS=2 -DNSLACK=2"
-expected[38]="VERIFICATION SUCCESSFUL"
+expected[38]="INV_ERROR: Inductive step."
 pretty_args[38]="list less great"
 
+tests[39]="filter-position-safe.c"
+args[39]="-DNPROG=4 -DNPREDS=2 -DNSLACK=2"
+expected[39]="VERIFICATION SUCCESSFUL"
+pretty_args[39]="list less great"
+
+tests[40]="filter-position-unsafe.c"
+args[40]="-DNPROG=4 -DNPREDS=2 -DNSLACK=2"
+expected[40]="INV_ERROR: Inductive step."
+pretty_args[40]="list less great"
 
 
 # tests[0]="../../tests/java-collections/set-const2-safe.c"
