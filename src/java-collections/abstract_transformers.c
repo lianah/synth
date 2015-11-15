@@ -355,9 +355,9 @@ node_t subdivide(abstract_heapt *heap,
   word_t nx_dist = dist(heap, nx);
 
   // no need to create a new node just return nx
-  if (pos == -1) {
+  if (pos == 0) {
     return nx;
-  } else if (pos == nx_dist) {
+  } else if (pos == s_add(nx_dist, 1)) {
     return succ_nx;
   }
 
@@ -369,8 +369,8 @@ node_t subdivide(abstract_heapt *heap,
   
   node_t nnew = alloc(heap);
   assign_prev(heap, nnew, null_node);
-  word_t dist1 = pos;
-  word_t dist2 = s_sub(s_sub(nx_dist, pos), 1);
+  word_t dist1 = s_sub(pos, 1);
+  word_t dist2 = s_sub(nx_dist, pos);
   
   predicate_index_t pi;
   for (pi = 0; pi < NPREDS; ++pi) {
@@ -1124,7 +1124,7 @@ node_t succP(abstract_heapt *heap,
   if (len == i) {
     return seg_node;
   } else if (len < i) {
-    return subdivide(heap, seg_node, s_sub(s_sub(i, len), 1));
+    return subdivide(heap, seg_node, s_sub(i, len));
   } else {
     printf("XXX len: %d, i: %d", len, i);
     Assert (0, "INV_ERROR: wtf");
