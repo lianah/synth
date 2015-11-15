@@ -122,6 +122,9 @@ typedef struct abstract_heap {
 
 } abstract_heapt;
 
+node_t deref(const abstract_heapt *heap,
+	     ptr_t p);
+
 
 
 /*************************
@@ -252,7 +255,6 @@ void iterator(abstract_heapt* h,
 	      ptr_t it,
 	      ptr_t list);
 
-/* Assign to it a positional iterator into the list */
 void iteratorP(abstract_heapt* h,
 	      ptr_t it,
 	      ptr_t list,

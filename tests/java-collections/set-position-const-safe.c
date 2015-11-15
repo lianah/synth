@@ -6,6 +6,8 @@
 ptr_t list = 1;
 ptr_t it = 2;
 
+word_t idx;
+
 _Bool isFour(data_t val) {
   return val == 4;
 }
@@ -18,24 +20,22 @@ void init_heap(abstract_heapt *heap) {
   // distinguish between predicates and iterators
   heap->is_iterator[list] = 0;
   heap->is_iterator[it] = 1;
+  idx = nondet();
 }
 
 void pre(abstract_heapt *heap) {
-  //ListIt<Int> it = list.listIterator()
-  iterator(heap, it, list);
+  idx = 0;
 }
 
 _Bool cond(abstract_heapt *heap) {
-  return hasNext(heap, it);
+  return 0 <= idx && idx < size(heap, list);
 }
 
 void body(abstract_heapt *heap) {
-  // it.next();
-  dump_heap(heap, "body", "list it");
-  next(heap, it);
-  dump_heap(heap, "next", "list it");
-  // it.set(4);
-  setI(heap, it, 4);
+  //dump_heap(heap, "a", "list it");
+  setP(heap, list, idx, 4);
+  idx++;
+  //dump_heap(heap, "b", "list it");
 }
 
 _Bool assertion(abstract_heapt *heap) {
@@ -43,9 +43,15 @@ _Bool assertion(abstract_heapt *heap) {
 }
 
 _Bool inv_assume(abstract_heapt *heap) {
-  return forall(heap, list, it, 0) == bool_true;
+  
+  if (0 <= idx && idx <= size(heap, list)) {
+    iteratorP(heap, it, list, idx);
+    return forall_assume(heap, list, it, 0);
+  } else {
+    return 0;
+  }
 }
 
 _Bool inv_check(abstract_heapt *heap) {
-  return forall(heap, list, it, 0) == bool_true;
+  return inv_assume(heap);
 }

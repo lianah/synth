@@ -47,7 +47,12 @@ void pre(abstract_heapt *heap) {
 }
 
 _Bool cond(abstract_heapt *heap) {
-  return hasNext(heap, it);
+  if(hasNext(heap, it)) {
+    // BUG: moving the iterator forward
+    data_t el = next(heap, it);
+    return hasNext(heap, it);
+  }
+  return 0;
 }
 
 void body(abstract_heapt *heap) {
