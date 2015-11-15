@@ -228,15 +228,35 @@ args[44]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
 expected[44]="INV_FAIL: Inductive step."
 pretty_args[44]="list it"
 
-tests[45]="copy-position-safe.c"
-args[45]="-DNPROG=5 -DNPREDS=1 -DNSLACK=2"
+tests[45]="merge-sort-first-loop-safe.c"
+args[45]="-DNPROG=6 -DNPREDS=1 -DNSLACK=2"
 expected[45]="VERIFICATION SUCCESSFUL"
-pretty_args[45]="list copy it it2"
+pretty_args[45]="a b c ita itb"
 
-tests[46]="copy-position-unsafe.c"
-args[46]="-DNPROG=5 -DNPREDS=1 -DNSLACK=2"
+tests[46]="merge-sort-first-loop-unsafe.c"
+args[46]="-DNPROG=6 -DNPREDS=1 -DNSLACK=2"
 expected[46]="INV_FAIL: Inductive step."
-pretty_args[46]="list copy it it2"
+pretty_args[46]="a b c ita itb"
+
+tests[47]="merge-sort-second-loop-safe.c"
+args[47]="-DNPROG=4 -DNPREDS=1 -DNSLACK=1"
+expected[47]="VERIFICATION SUCCESSFUL"
+pretty_args[47]="a c ita"
+
+tests[48]="merge-sort-second-loop-unsafe.c"
+args[48]="-DNPROG=4 -DNPREDS=1 -DNSLACK=2"
+expected[48]="INV_FAIL: Inductive step."
+pretty_args[48]="a c ita"
+
+tests[49]="copy-position-safe.c"
+args[49]="-DNPROG=5 -DNPREDS=1 -DNSLACK=2"
+expected[49]="VERIFICATION SUCCESSFUL"
+pretty_args[49]="list copy it it2"
+
+tests[50]="copy-position-unsafe.c"
+args[50]="-DNPROG=5 -DNPREDS=1 -DNSLACK=2"
+expected[50]="INV_FAIL: Inductive step."
+pretty_args[50]="list copy it it2"
 
 
 # tests[0]="../../tests/java-collections/set-const2-safe.c"
@@ -257,7 +277,7 @@ red_fail=${RED}[FAIL]${NC}
 green_success=${GREEN}[SUCCESS]${NC}
 
 
-for ((i=43;i<${#tests[@]};++i)); do
+for ((i=0;i<${#tests[@]};++i)); do
     LOG_FILE="$TEST_PATH${tests[i]}.log"
     HEAP_FILE="$TEST_PATH${tests[i]}.png"
     INPUT_FILE="$TEST_PATH${tests[i]}"
