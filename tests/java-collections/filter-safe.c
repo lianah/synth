@@ -8,11 +8,11 @@ ptr_t it = 2;
 data_t current;
 
 _Bool isLess(data_t val) {
-  return val < 0 ;
+  return val < 10;
 }
 
 _Bool isGreater(data_t val) {
-  return val >= 0 ;
+  return val >= 10;
 }
 
 
