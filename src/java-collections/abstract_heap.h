@@ -255,10 +255,10 @@ void iterator(abstract_heapt* h,
 	      ptr_t it,
 	      ptr_t list);
 
-void iteratorP(abstract_heapt* h,
-	      ptr_t it,
-	      ptr_t list,
-        index_t i);
+void listIterator(abstract_heapt* h,
+		  ptr_t it,
+		  ptr_t list,
+		  index_t i);
 
 
 /* Iterator add */
@@ -351,6 +351,9 @@ bool_t or(bool_t x, bool_t y);
  */
 _Bool valid_abstract_heap(const abstract_heapt *heap);
 _Bool is_minimal(const abstract_heapt *heap);
+
+
+word_t nondet_word_t();
 
 #define empty(h, x) is_null(h, x)
 #define size(h, x) path_len(h, x, null_ptr)

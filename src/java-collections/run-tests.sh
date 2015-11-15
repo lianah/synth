@@ -178,6 +178,45 @@ args[34]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
 expected[34]="INV_FAIL: Property entailment."
 pretty_args[34]="list it"
 
+tests[35]="remove2-position-safe.c"
+args[35]="-DNPROG=2 -DNPREDS=1 -DNSLACK=1"
+expected[35]="VERIFICATION SUCCESSFUL"
+pretty_args[35]="list"
+
+tests[36]="remove2-position-unsafe.c"
+args[36]="-DNPROG=2 -DNPREDS=1 -DNSLACK=1"
+expected[36]="INV_FAIL: Property entailment."
+pretty_args[36]="list"
+
+tests[37]="pivot-position-safe.c"
+args[37]="-DNPROG=4 -DNPREDS=2 -DNSLACK=2"
+expected[37]="VERIFICATION SUCCESSFUL"
+pretty_args[37]="list less great"
+
+tests[38]="pivot-position-safe.c"
+args[38]="-DNPROG=4 -DNPREDS=2 -DNSLACK=2"
+expected[38]="INV_ERROR: Inductive step."
+pretty_args[38]="list less great"
+
+tests[39]="filter-position-safe.c"
+args[39]="-DNPROG=4 -DNPREDS=2 -DNSLACK=2"
+expected[39]="VERIFICATION SUCCESSFUL"
+pretty_args[39]="list less great"
+
+tests[40]="filter-position-unsafe.c"
+args[40]="-DNPROG=4 -DNPREDS=2 -DNSLACK=2"
+expected[40]="INV_ERROR: Inductive step."
+pretty_args[40]="list less great"
+
+tests[41]="max-position-builtin-iterator-safe.c"
+args[41]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+expected[41]="VERIFICATION SUCCESSFUL"
+pretty_args[41]="list less great"
+
+tests[42]="max-position-builtin-iterator-unsafe.c"
+args[42]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+expected[42]="INV_ERROR: Inductive step."
+pretty_args[42]="list less great"
 
 # tests[0]="../../tests/java-collections/set-const2-safe.c"
 # tests[0]="../../tests/java-collections/set-const3-safe.c"
