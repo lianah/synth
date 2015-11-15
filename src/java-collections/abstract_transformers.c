@@ -149,8 +149,6 @@ static _Bool eval_pred(predicate_index_t pi, data_t val) {
   Assume(pi < NPREDS);
   _Bool res = predicates[pi](val);
 
-  printf("XXX eval_pred(%d) = %d\n", val, res);
-
   return res;
 }
 
@@ -334,16 +332,18 @@ void abstract_new(abstract_heapt *heap,
   assign_ptr(heap, x, nx);
 }
 
-
 /*
-  Creates a new node nnew at distance pos from nx by subdividing the nx edge
-  and updates the predicates, succ and len for nx, and nnew
+  Subdivides an edge (a, c), creating two edges with appropriate predicate labels.
+  The subdivision is done by creating, and returning, a new node b between a and c:
 
-  From: nx ----------d-------------------------> succ_nx
-  To:   nx ---(pos-1)---> nnew ----(d-pos)-----> succ_nx
+     a ---> b ---> c
 
-  Assumes:  0 <= pos <= d
-*/
+  such that path_len(a, b) = pos, and path_len(b, c) = path_len(a, c) - pos.
+
+  If pos=0, no subdivision is done and we just return a.
+
+  If pos = path_len(a, c), no subdivision is done and we just return c.
+ */
 node_t subdivide(abstract_heapt *heap,
 		 node_t nx,
 		 word_t pos) {
@@ -360,10 +360,6 @@ node_t subdivide(abstract_heapt *heap,
   } else if (pos == s_add(nx_dist, 1)) {
     return succ_nx;
   }
-
-  printf("XXXX pos = %d\n", pos);
-  printf("XXXX nx_dist = %d\n", nx_dist);
-  printf("XXXX Hi!\n");
 
   Assert (pos <= nx_dist, "INV_ERROR: edge too short cannot subdivide.");
   
@@ -390,12 +386,6 @@ node_t subdivide(abstract_heapt *heap,
     }
   }
 
-  // Reassign nnew's succ pointer to nx's successor succ_nx
-  assign_succ(heap, nnew, succ_nx, dist2);
-  // Reassign nx's succ pointer to the newly allocated node.
-  assign_succ(heap, nx, nnew, dist1);
-
-#if 0
   // FOR SORTED:
   // Assume min <= val <= max
   Assume(get_min(heap, nx) <= get_min(heap, nnew));
@@ -414,7 +404,12 @@ node_t subdivide(abstract_heapt *heap,
   }
   assign_sorted(heap, nnew, get_sorted(heap, nx));
   assign_sorted(heap, nx, bool_true);
-#endif
+
+
+  // Reassign nnew's succ pointer to nx's successor succ_nx
+  assign_succ(heap, nnew, succ_nx, dist2);
+  // Reassign nx's succ pointer to the newly allocated node.
+  assign_succ(heap, nx, nnew, dist1);
 
   
   return nnew;
@@ -604,11 +599,9 @@ static bool_t path_forall(const abstract_heapt *heap,
 
     bool_t node_res = eval_pred(pi, data(heap, nx));
     bool_t edge_res = get_univ(heap, nx, pi);
-    printf("XXX doing to eval_pred on node %d: node=%d, edge=%d\n", nx, node_res, edge_res);
+
     res = and(res, node_res);
     res = and(res, edge_res);
-
-    printf("XXX next node=%d, dist=%d\n", succ(heap, nx), dist(heap, nx));
 
     nx = succ(heap, nx);
   }
@@ -835,11 +828,8 @@ word_t node_path_len(const abstract_heapt *heap,
   word_t curr_dist = 0;
   word_t i;
 
-  printf("XXX path_len(%d, %d)", n, yn);
 
   for (i = 0; i < NABSNODES+1; i++) {
-    printf("XXX node=%d, dist=%d, curr_dist=%d\n", n, dist(heap, n), curr_dist);
-
     if (n == yn) {
       return curr_dist;
     }
@@ -1126,7 +1116,7 @@ node_t succP(abstract_heapt *heap,
   } else if (len < i) {
     return subdivide(heap, seg_node, s_sub(i, len));
   } else {
-    printf("XXX len: %d, i: %d", len, i);
+
     Assert (0, "INV_ERROR: wtf");
   }
 }
@@ -1143,7 +1133,8 @@ data_t getP(abstract_heapt *heap,
 	    index_t i) {
   Assert (!is_iterator(heap, list), "INV_ERROR");
   Assert (i >= 0 && i <= path_len(heap, list, null_ptr), "INV_ERROR");
-  node_t pos_i = succP(heap, list, i);
+  node_t node = deref(heap, list);
+  node_t pos_i = succP(heap, node, i);
   return data(heap, pos_i);
 }
 
@@ -1230,7 +1221,7 @@ void setP(abstract_heapt *heap,
 
   node_t node = deref(heap, list);
   node_t to_set = succP(heap, node, i);
-  Assert (node != null_node, "INV_ERROR: cannot set null node");
+  Assert (to_set != null_node, "INV_ERROR: cannot set null node");
   assign_data(heap, to_set, val);
 }
 
@@ -1243,12 +1234,8 @@ void addP(abstract_heapt *heap,
   Assert(!is_iterator(heap, list), "INV_ERROR");
 
   node_t node = deref(heap, list);
-  Assert (node != null_node, "INV_ERROR: cannot add null node");
-  // get the node right before the segment on which i falls
-  node_t seg_node = get_segment(heap, node, i);
-  node_t len = path_len(heap, node, seg_node);
+  node_t add_before = succP(heap, node, i);
 
-  node_t add_before = subdivide(heap, seg_node, s_sub(s_sub(len, i), 1));
   add_helper(heap, add_before, val);
 }
 
@@ -1259,12 +1246,8 @@ void removeP(abstract_heapt *heap,
   Assert(!is_iterator(heap, list), "INV_ERROR");
 
   node_t node = deref(heap, list);
-  Assert (node != null_node, "INV_ERROR: cannot remove null node");
-  // get the node right before the segment on which i falls
-  node_t seg_node = get_segment(heap, node, i);
-  node_t len = path_len(heap, node, seg_node);
-  // we need to subdivide at len - i - 1 away from seg_node
-  node_t to_remove = subdivide(heap, seg_node, s_sub(s_sub(len, i), 1));
+  node_t to_remove = succP(heap, node, i);
+
   remove_helper(heap, to_remove);
 }
 

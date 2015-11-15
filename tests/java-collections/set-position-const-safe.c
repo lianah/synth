@@ -21,7 +21,6 @@ void init_heap(abstract_heapt *heap) {
   heap->is_iterator[list] = 0;
   heap->is_iterator[it] = 1;
   idx = nondet();
-  // dump_heap(heap, "e", "list it");
 }
 
 void pre(abstract_heapt *heap) {
@@ -33,11 +32,10 @@ _Bool cond(abstract_heapt *heap) {
 }
 
 void body(abstract_heapt *heap) {
-  dump_heap(heap, "a", "list it");
-  printf("XXX idx=%d, size=%d\n", idx, size(heap, list));
+  //dump_heap(heap, "a", "list it");
   setP(heap, list, idx, 4);
   idx++;
-  dump_heap(heap, "b", "list it");
+  //dump_heap(heap, "b", "list it");
 }
 
 _Bool assertion(abstract_heapt *heap) {
@@ -45,17 +43,11 @@ _Bool assertion(abstract_heapt *heap) {
 }
 
 _Bool inv_assume(abstract_heapt *heap) {
-  printf("XXX inv_assume: idx=%d, size=%d\n", idx, size(heap, list));
-
+  
   if (0 <= idx && idx <= size(heap, list)) {
     iteratorP(heap, it, list, idx);
-    printf("XXX dist list->it = %d\n", path_len(heap, list, it));
-    printf("XXX new size = %d\n", size(heap, list));
-    printf("XXX *list = %d, *it = %d\n", deref(heap, list), deref(heap, it));
-    //dump_heap(heap, "c", "list it");
     return forall_assume(heap, list, it, 0);
   } else {
-    printf("XXX idx out of bounds\n");
     return 0;
   }
 }
