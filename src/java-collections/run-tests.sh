@@ -163,6 +163,22 @@ args[31]="-DNPROG=4 -DNPREDS=3"
 expected[31]="INV_FAIL: Property entailment."
 pretty_args[31]="list it1 it2"
 
+tests[32]="set-position-const-safe.c"
+args[32]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+expected[32]="VERIFICATION SUCCESSFUL"
+pretty_args[32]="list it"
+
+tests[33]="set-position-const-unsafe1.c"
+args[33]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+expected[33]="INV_FAIL: Inductive step."
+pretty_args[33]="list it"
+
+tests[34]="set-position-const-unsafe2.c"
+args[34]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+expected[34]="INV_FAIL: Property entailment."
+pretty_args[34]="list it"
+
+
 # tests[0]="../../tests/java-collections/set-const2-safe.c"
 # tests[0]="../../tests/java-collections/set-const3-safe.c"
 # tests[0]="../../tests/java-collections/min-iterator-safe.c"

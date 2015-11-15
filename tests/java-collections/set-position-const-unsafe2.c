@@ -29,7 +29,7 @@ void pre(abstract_heapt *heap) {
 }
 
 _Bool cond(abstract_heapt *heap) {
-  return 0 <= idx && idx < size(heap, list);
+  return 0 <= idx && idx < size(heap, list) - 1;
 }
 
 void body(abstract_heapt *heap) {

@@ -35,7 +35,7 @@ _Bool cond(abstract_heapt *heap) {
 void body(abstract_heapt *heap) {
   dump_heap(heap, "a", "list it");
   printf("XXX idx=%d, size=%d\n", idx, size(heap, list));
-  setP(heap, list, idx, 4);
+  setP(heap, list, idx, 3);
   idx++;
   dump_heap(heap, "b", "list it");
 }
