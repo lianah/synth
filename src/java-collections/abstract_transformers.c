@@ -1123,12 +1123,12 @@ node_t succP(abstract_heapt *heap,
  * 
  ************************/
 
-node_t succP(abstract_heapt *heap,
+/* Positional get */
+data_t getP(abstract_heapt *heap,
 	    ptr_t list,
 	    index_t i) {
   Assert (!is_iterator(heap, list), "INV_ERROR");
   Assert (i >= 0 && i <= path_len(heap, list, null_ptr), "INV_ERROR");
-
   node_t node = deref(heap, list);
   node_t pos_i = succP(heap, node, i);
   return data(heap, pos_i);
@@ -1144,6 +1144,7 @@ data_t getI(const abstract_heapt *heap,
   return data(heap, nit);
 }
 
+		 
 /*************************
  *
  *  Abstract transformers

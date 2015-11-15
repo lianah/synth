@@ -260,6 +260,7 @@ void listIterator(abstract_heapt* h,
 		  ptr_t list,
 		  index_t i);
 
+
 /* Iterator add */
 void addI(abstract_heapt *heap,
 	  ptr_t x,

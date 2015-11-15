@@ -188,6 +188,16 @@ args[36]="-DNPROG=2 -DNPREDS=1 -DNSLACK=1"
 expected[36]="INV_FAIL: Property entailment."
 pretty_args[36]="list"
 
+tests[37]="pivot-position-safe.c"
+args[37]="-DNPROG=4 -DNPREDS=2 -DNSLACK=2"
+expected[37]="VERIFICATION SUCCESSFUL"
+pretty_args[37]="list less great"
+
+tests[38]="pivot-position-safe.c"
+args[38]="-DNPROG=4 -DNPREDS=2 -DNSLACK=2"
+expected[38]="VERIFICATION SUCCESSFUL"
+pretty_args[38]="list less great"
+
 
 
 # tests[0]="../../tests/java-collections/set-const2-safe.c"
