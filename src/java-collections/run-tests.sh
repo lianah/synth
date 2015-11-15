@@ -178,6 +178,17 @@ args[34]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
 expected[34]="INV_FAIL: Property entailment."
 pretty_args[34]="list it"
 
+tests[35]="remove2-position-safe.c"
+args[35]="-DNPROG=2 -DNPREDS=1 -DNSLACK=1"
+expected[35]="VERIFICATION SUCCESSFUL"
+pretty_args[35]="list"
+
+tests[36]="remove2-position-unsafe.c"
+args[36]="-DNPROG=2 -DNPREDS=1 -DNSLACK=1"
+expected[36]="INV_FAIL: Property entailment."
+pretty_args[36]="list"
+
+
 
 # tests[0]="../../tests/java-collections/set-const2-safe.c"
 # tests[0]="../../tests/java-collections/set-const3-safe.c"

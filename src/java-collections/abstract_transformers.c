@@ -14,6 +14,13 @@ data_t nondet_data_t() {
   return d;
 }
 
+
+word_t nondet_word_t() {
+  word_t d;
+  return d;
+}
+
+
 void debug_assert (_Bool x, char* tag) {
   if(!x) {
     printf("\n%s\n", tag);
@@ -24,6 +31,7 @@ void debug_assert (_Bool x, char* tag) {
 #else
 
 data_t nondet_data_t();
+word_t nondet_word_t();
 
 #endif
 
@@ -90,18 +98,6 @@ static word_t data(const abstract_heapt *heap,
   Assert(n != null_node, "INV_ERROR: data");
   return heap->data[n];
 }
-
-
-/*
- * What is the value of the i_th existential predicate for n ?
- */
-/* static bool_t get_exists(const abstract_heapt *heap, */
-/* 			 node_t n, */
-/* 			 predicate_index_t pi) { */
-/*   Assume(n < NABSNODES); */
-/*   Assume(pi < NPREDS); */
-/*   return heap->existential[n][pi]; */
-/* } */
 
 /*
  * What is the value of the sorted predicate for n ?
@@ -488,7 +484,7 @@ extern void remove_helper(abstract_heapt* heap,
   // the node after the one we are removing
   node_t nit = succ(heap, nrem);
 
-  Assert (nit!= null_node, "INV_ERROR");
+  // LSH: why did we use to assert nit != null_node?
   
   predicate_index_t pi;
 
@@ -1265,10 +1261,10 @@ void iterator(abstract_heapt* heap,
   assign_ptr(heap, it, nlist);
 }
 
-void iteratorP(abstract_heapt* heap,
-	      ptr_t it,
-	      ptr_t list,
-        index_t i) {
+void listIterator(abstract_heapt* heap,
+		  ptr_t it,
+		  ptr_t list,
+		  index_t i) {
   Assert (is_iterator(heap, it) &&
 	  !is_iterator(heap, list), "INV_ERROR");
 

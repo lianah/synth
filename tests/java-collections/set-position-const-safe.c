@@ -20,7 +20,7 @@ void init_heap(abstract_heapt *heap) {
   // distinguish between predicates and iterators
   heap->is_iterator[list] = 0;
   heap->is_iterator[it] = 1;
-  idx = nondet();
+  idx = nondet_word_t();
 }
 
 void pre(abstract_heapt *heap) {
@@ -45,7 +45,7 @@ _Bool assertion(abstract_heapt *heap) {
 _Bool inv_assume(abstract_heapt *heap) {
   
   if (0 <= idx && idx <= size(heap, list)) {
-    iteratorP(heap, it, list, idx);
+    listIterator(heap, it, list, idx);
     return forall_assume(heap, list, it, 0);
   } else {
     return 0;
