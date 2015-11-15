@@ -483,8 +483,6 @@ extern void remove_helper(abstract_heapt* heap,
   node_t nprev = prev(heap, nrem);
   // the node after the one we are removing
   node_t nit = succ(heap, nrem);
-
-  // LSH: why did we use to assert nit != null_node?
   
   predicate_index_t pi;
 

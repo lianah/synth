@@ -3,4 +3,5 @@
 *.png
 *.out
 *.dot
+*.log
 counterexample.c
