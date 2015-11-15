@@ -208,6 +208,15 @@ args[40]="-DNPROG=4 -DNPREDS=2 -DNSLACK=2"
 expected[40]="INV_ERROR: Inductive step."
 pretty_args[40]="list less great"
 
+tests[41]="max-position-builtin-iterator-safe.c"
+args[41]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+expected[41]="VERIFICATION SUCCESSFUL"
+pretty_args[41]="list less great"
+
+tests[42]="max-position-builtin-iterator-unsafe.c"
+args[42]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+expected[42]="INV_ERROR: Inductive step."
+pretty_args[42]="list less great"
 
 # tests[0]="../../tests/java-collections/set-const2-safe.c"
 # tests[0]="../../tests/java-collections/set-const3-safe.c"
