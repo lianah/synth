@@ -15,11 +15,6 @@ def ptrname(p):
   else:
     return "ptr_%d" % p
 
-def bool_t(x):
-  #assert (x < 3)
-  if x >= 2:
-    return "?"
-  return str(x)
 
 def preds_str(us):
   string = ""
@@ -33,54 +28,46 @@ def preds_str(us):
     else:
       string +="* "
   return string
-      
+  
   
 def processHeap(m,prefix):
   print r'subgraph cluster_h%d {' % (prefix)
   print r'label=h%d' % (prefix)
 
   m = list(m)
-  m[1] = m[1].replace("FALSE", "0")
-  m[1] = m[1].replace("TRUE", "1")
+  m[1] = m[1].replace("false", "0")
+  m[1] = m[1].replace("true", "1")
   m[6] = m[6].replace("{","[")
   m[6] = m[6].replace("}","]")
 
-  [ptrs, iterators, succs, datas, dists, univs, nnodes, sort, mins, maxs] = [eval(g) for g in m]
+  
+  [ptrs, iterators, succs, prevs, datas, dists, univs, nnodes, sorts, mins, maxs] = [eval(g) for g in m]
 
   for i in range(nnodes):
-    for u in univs[i]:
+    univ = univs[i]
+    for u in univ:
       assert (u <= 2)
 
-  # print "pointers ", ptrs
-  # print "iterators ", iterators
-
-  sort = ["S" if s==1 else "N" for s in sort]
   univs = [preds_str(u) for u in univs]
-
-  # print univs
-  # exists = [bool_t(e.pop()) for e in exists]
   
   for n in xrange(nnodes):
-    d = datas[n]
-    print r'node%d%d [label="%s [%d]"];' % (prefix, n, nodeptrs(n, ptrs), d)
+    data = datas[n]
+    print r'node%d%d [label="%s [%d]"];' % (prefix, n, nodeptrs(n, ptrs), data)
 
 
   for n in xrange(nnodes):
     s = succs[n]
     d = dists[n]
     u = univs[n]
-    # e = exists[n]
-    so = sort[n]
+    sort = "S" if sorts[n] == 1 else "N"
     mi = mins[n]
     ma = maxs[n]
-    
-    print r'node%d%d -> node%d%d [label="%d %s %s (%d-%d)"];' % (prefix,n, prefix, s, d, u, so, mi, ma)
-
-    #print r'node%d%d -> node%d%d [label="%d U=%s E=%s"];' % (i,p, i, n, d, u, e)
+    print r'node%d%d -> node%d%d [label="%d %s %s (%d-%d)"];' % (prefix,n, prefix, s, d, u, sort, mi, ma)
 
   print "}"
 
-regex = 'h={[^.]*\.ptr={([\d, ]*)},[^.]*\.is_iterator={([FALSETRU, ]*)},[^.]*\.succ={([\d, ]*)},[^.]*\.data={([\d, ]*)},[^.]*\.dist={([\d, ]*)},[^.]*\.universal={([\d,{} ]*)},[^.]*\.nnodes=(\d+),[^.]*\.sorted={([\d, ]*)},[^.]*\.min={([\d, ]*)},[^.]*\.max={([\d, ]*)}'
+
+regex = 'ptr = {([\d, ]*)}, is_iterator = {([falsetru, ]*)}, succ = {([\d, ]*)}, prev = {([\d, ]*)}, data = {([\d, ]*)}, dist = {([\d, ]*)}, universal = {([\d,{} -]*)}, nnodes = (\d*), sorted = {([\d, -]*)}, min = {([\d, -]*)}, max = {([\d, -]*)}'
 
 cex = sys.stdin.read()
 

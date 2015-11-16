@@ -11,31 +11,37 @@ extern _Bool inv_assume(const abstract_heapt *heap);
 extern void init_predicates();
 extern void init_heap(abstract_heapt *heap);
 
+extern void init_counterexample(abstract_heapt *heap);
+extern void inductive_counterexample(abstract_heapt *heap);
+
 abstract_heapt nondet_heap(); 
 
 void main(void) {
-  abstract_heapt h; 
-   
+   abstract_heapt h; 
+
   init_predicates();
+  
+  init_counterexample(&h);
   init_heap(&h);
-  Assume(valid_abstract_heap(&h));
+
+  Assert (valid_abstract_heap(&h), "INV_FAIL: Base case.");
 
   // Base.
   pre(&h);
-  Assert(inv_check(&h), "INV_FAIL: Base case.");
+  Assert(inv_check(&h), "INV_FAIL: Assumption");
 
-  h = nondet_heap();
+  inductive_counterexample(&h);
   init_heap(&h);
-  Assume (valid_abstract_heap(&h));
-
+  Assert (valid_abstract_heap(&h), "INV_FAIL: Assumption");
+  
   if (inv_assume(&h)) {
     if (cond(&h)) {
       // Induction.
       body(&h);
       Assert(inv_check(&h), "INV_FAIL: Inductive step.");
-     }  else {
-      // Property.
-       Assert(assertion(&h), "INV_FAIL: Property entailment.");
-    }
+    }  else { 
+       // Property.
+      Assert(assertion(&h), "INV_FAIL: Property entailment."); 
+     } 
   }
 }
