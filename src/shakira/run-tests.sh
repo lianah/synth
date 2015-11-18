@@ -287,7 +287,7 @@ for ((i=0;i<${#tests[@]};++i)); do
 	    
     CMD="$SHAKIRA $INPUT_FILE $ARGS  "
     printf "Running $CMD\n"
-    `$CMD &> $LOG_FILE`
+    `runlim -s 6000 -t 600 $CMD &> $LOG_FILE`
     exit_code=$?
     fail=`grep INV_FAIL $LOG_FILE`
     success=`grep "VERIFICATION SUCCESSFUL" $LOG_FILE`

@@ -663,8 +663,10 @@ static void assume_consistent_node(const abstract_heapt *heap,
 
 static void assume_consistent(const abstract_heapt *heap) {
   word_t i;
-  for (i = 0; i < heap->nnodes; ++i) {
-    assume_consistent_node(heap, i);
+  for (i = 0; i < NABSNODES; ++i) {
+    if (i < heap->nnodes) {
+      assume_consistent_node(heap, i);
+    }
   }
 }
 
@@ -770,6 +772,11 @@ _Bool is_minimal(const abstract_heapt *heap) {
     if (!is_named[n] && is_reachable[n] && indegree[n] <= 1) {
       return 0;
     }
+  }
+  // Check that list pointers have no incoming edges:
+  for (p = 1; p < NPROG; ++p) {
+    if (heap->is_iterator[p]==0 && indegree[heap->ptr[p]] != 0)
+      return 0;
   }
 
   // If we're a fully reduced graph, we don't have any unreachable nodes.
