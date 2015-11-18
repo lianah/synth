@@ -21,14 +21,14 @@ void main(void) {
 
   init_predicates();
   
-  init_counterexample(&h);
-  init_heap(&h);
+  /* init_counterexample(&h); */
+  /* init_heap(&h); */
 
-  Assert (valid_abstract_heap(&h), "INV_FAIL: Base case.");
+  /* Assert (valid_abstract_heap(&h), "INV_FAIL: Base case."); */
 
-  // Base.
-  pre(&h);
-  Assert(inv_check(&h), "INV_FAIL: Assumption");
+  /* // Base. */
+  /* pre(&h); */
+  /* Assert(inv_check(&h), "INV_FAIL: Assumption"); */
 
   inductive_counterexample(&h);
   init_heap(&h);

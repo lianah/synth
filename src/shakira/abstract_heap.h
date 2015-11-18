@@ -58,11 +58,10 @@ typedef word_t data_t;
 typedef word_t index_t;
 typedef word_t predicate_index_t;
 
-/* typedef struct sorted_edge { */
-/*   bool_t is_sorted; */
-/*   data_t min; */
-/*   data_t max; */
-/* } sorted_edget; */
+typedef struct pair {
+  word_t first;
+  word_t second;
+} pair_t; 
 
 #define null_ptr (ptr_t) 0
 #define null_node (node_t) 0
@@ -133,6 +132,8 @@ node_t deref(const abstract_heapt *heap,
  * 
  ************************/
 
+word_t size(const abstract_heapt *heap,
+	    ptr_t x);
 word_t path_len(const abstract_heapt *heap,
                 ptr_t x,
 		ptr_t y);
@@ -359,7 +360,7 @@ _Bool is_minimal(const abstract_heapt *heap);
 word_t nondet_word_t();
 
 #define empty(h, x) is_null(h, x)
-#define size(h, x) path_len(h, x, null_ptr)
+//#define size(h, x) path_len(h, x, null_ptr)
 
 #ifdef __CPROVER
 #define dump_heap(x, y, z) {}

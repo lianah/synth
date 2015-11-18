@@ -464,25 +464,32 @@ extern void invalidate_prev(abstract_heapt* heap,
 }
 
 
+
 /* Returns the last node x such that path_len(node, x) <= index */
 
-extern node_t get_segment(abstract_heapt* heap,
+extern pair_t get_segment(abstract_heapt* heap,
 			 node_t node,
 			 index_t index) {
-  word_t i, len = 0;
+  word_t i, len = 0, old_len;
+  pair_t res;
 
   for (i = 0; i < NABSNODES; ++i) {
+    old_len = len;
     len = s_add(len, dist(heap, node));
     len = s_add(len, 1);
 
     if (len > index) {
-      return node;
+      res.first = node;
+      res.second = old_len;
+      return res;
     }
 
     node = succ(heap, node);
   }
 
-  return node;
+  res.first = node;
+  res.second = len;
+  return res;
 }
 
 /* Remove the node nrem and updates head of list if necessary */
@@ -861,6 +868,39 @@ word_t node_path_len(const abstract_heapt *heap,
   return INF;
 }
 
+
+word_t size(const abstract_heapt *heap,
+	    ptr_t x) {
+  node_t n = deref(heap, x);
+
+  word_t curr_dist = 0;
+  word_t i;
+
+  _Bool seen[NABSNODES];
+  memset(seen, 0, sizeof(seen));
+
+  
+  for (i = 0; i < NABSNODES+1; i++) {
+    // when dealing with cycles just count all the nodes until
+    // we see repeating nodes
+    if (seen[n]) {
+      return curr_dist;
+    }
+    seen[n] = 1;
+
+    // we have reached the end of the list
+    if (n == null_node) {
+      return curr_dist;
+    }
+    // count current node as well
+    curr_dist = s_add(1, s_add(curr_dist, dist(heap, n)));
+    n = succ(heap, n);
+  }
+  
+  Assert (0, "INV_ERROR");
+  return INF;
+}
+
 word_t path_len(const abstract_heapt *heap,
                 ptr_t x,
                 ptr_t y) {
@@ -1123,8 +1163,9 @@ node_t succP(abstract_heapt *heap,
 
   // get the node right before the segment on which i falls
   // or the node on which i falls if the node already exists
-  node_t seg_node = get_segment(heap, node, i);
-  word_t len = node_path_len(heap, node, seg_node);
+  pair_t res = get_segment(heap, node, i);
+  node_t seg_node = res.first;
+  word_t len = res.second; //node_path_len(heap, node, seg_node);
 
   // subdivide this segment if necessary to create new node
   if (len == i) {
