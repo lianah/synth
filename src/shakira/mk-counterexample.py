@@ -15,10 +15,10 @@ def processHeap(m):
   m = list(m)
   m[1] = m[1].replace("FALSE", "0")
   m[1] = m[1].replace("TRUE", "1")
-  m[6] = m[6].replace("{","[")
-  m[6] = m[6].replace("}","]")
+  m[5] = m[5].replace("{","[")
+  m[5] = m[5].replace("}","]")
 
-  [ptrs, iterators, succs, prevs, datas, dists, univs, nnodes, sorts, mins, maxs] = [eval(g) for g in m]
+  [ptrs, iterators, succs, datas, dists, univs, nnodes, sorts, mins, maxs] = [eval(g) for g in m]
 
 
   assert (len(succs) == len(dists) and \
@@ -41,9 +41,9 @@ def processHeap(m):
   for i in range(len(succs)):
       print r'heap->succ[%d] = %d;' % (i, succs[i])
 
-  print "// set predecessors"
-  for i in range(len(prevs)):
-      print r'heap->prev[%d] = %d;' % (i, prevs[i])
+  # print "// set predecessors"
+  # for i in range(len(prevs)):
+  #     print r'heap->prev[%d] = %d;' % (i, prevs[i])
       
   print "// set data"
   for i in range(len(datas)):
@@ -55,6 +55,7 @@ def processHeap(m):
       print r'heap->dist[%d] = %d;' % (i, dists[i])
 
   print "// set universals"
+
   for i in range(len(univs)):
     u = univs[i]
     for j in range(len(u)):
@@ -79,7 +80,7 @@ def processHeap(m):
 
   print "heap->nnodes =", nnodes, ";"
 
-regex = 'h={[^.]*\.ptr={([\d, ]*)},[^.]*\.is_iterator={([FALSETRU, ]*)},[^.]*\.succ={([\d, ]*)},[^.]*\.prev={([\d, ]*)},[^.]*\.data={([\d, ]*)},[^.]*\.dist={([\d, ]*)},[^.]*\.universal={([\d,{} ]*)},[^.]*\.nnodes=(\d+),[^.]*\.sorted={([\d, ]*)},[^.]*\.min={([\d, ]*)},[^.]*\.max={([\d, ]*)}'
+regex = 'h={[^.]*\.ptr={([\d, ]*)},[^.]*\.is_iterator={([FALSETRU, ]*)},[^.]*\.succ={([\d, ]*)},[^.]*\.data={([\d, ]*)},[^.]*\.dist={([\d, ]*)},[^.]*\.universal={([\d,{} ]*)},[^.]*\.nnodes=(\d+),[^.]*\.sorted={([\d, ]*)},[^.]*\.min={([\d, ]*)},[^.]*\.max={([\d, ]*)}'
 
 cex = sys.stdin.read()
 

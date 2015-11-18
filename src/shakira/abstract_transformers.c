@@ -77,14 +77,14 @@ static node_t prev(const abstract_heapt *heap,
   // Ensure n is an allocated node.
   Assume(n < NABSNODES);
   if (nlist == n)
-    return null_nodel;
+    return null_node;
   
   //Assert(n != null_node, "INV_ERROR: prev");
   word_t i;
   for (i = 0; i < NABSNODES; ++i) {
     if (succ(heap, nlist) == n)
       return nlist;
-    nlist == succ(heap, nlist);
+    nlist = succ(heap, nlist);
   }
   assert(0);
   return null_node;
@@ -575,7 +575,7 @@ extern void add_helper(abstract_heapt* heap,
   // set the nprev that used to point to nit to point to nnew
   if (prev_nit != null_node) {
     assign_succ(heap, prev_nit, nnew, dist(heap, prev_nit));
-    invalidate_prev(heap, list, nnew);
+    invalidate_prev(heap, nlist, nnew);
   } else {
     // we are adding at the beginning of the list so
     // replace all lists pointing to nit to point to the new list head nnew
@@ -663,8 +663,8 @@ static void assume_consistent_node(const abstract_heapt *heap,
 
 static void assume_consistent(const abstract_heapt *heap) {
   word_t i;
-  for (i = 0; i < NPROG; ++i) {
-    assume_consistent_node(heap, deref(heap, i));
+  for (i = 0; i < heap->nnodes; ++i) {
+    assume_consistent_node(heap, i);
   }
 }
 
@@ -672,111 +672,115 @@ _Bool is_minimal(const abstract_heapt *heap) {
   word_t is_named[NABSNODES];
   memset(is_named, 0, sizeof(is_named));
 
- word_t has_in_edge[NABSNODES];
- memset(has_in_edge, 0, sizeof(is_named));
-
-  
+  // Count the reachable nodes and find the indegrees of each node in the
+  // reachable subheap.
+  word_t is_reachable[NABSNODES];
+  word_t indegree[NABSNODES];
   word_t nreachable = 0;
+
+  memset(is_reachable, 0, sizeof(is_reachable));
+  memset(indegree, 0, sizeof(indegree));
 
   ptr_t p;
   node_t n, m;
   word_t i;
-  predicate_index_t pi; 
+  word_t last_reachable = 0;
 
-  // the null node is named
-  //is_named[0] = 1;
+  predicate_index_t pi; 
   
   for (p = 0; p < NPROG; p++) {
-    n = heap->ptr[p];
+    Assume(heap->ptr[p] < heap->nnodes);
+    
+    n = deref(heap, p);
     is_named[n] = 1;
 
-    // only allocated nodes
     if (n >= heap->nnodes) {
       return 0;
     }
 
-    // check that named nodes have succ n + 1
-    if (succ(heap, n) != null_node) {
-      if (n + 1 != succ(heap, n)) 
-	return 0;
-      // make sure predecessors match
-      /* if(prev(heap, succ(heap, n))!= n) */
-      /* 	return 0; */
+    for (i = 0; i < NABSNODES-1; i++) {
+      if (!is_reachable[n]) {
+        if (n >= heap->nnodes) {
+          return 0;
+        }
 
-      // only iterators can have incoming edges
-      has_in_edge[succ(heap, n)] = 1;
-    }
+        if (dist(heap, n) >= INF) {
+          return 0;
+        }
 
-    for (pi = 0; pi < NPREDS; ++pi) {
-      bool_t u = get_univ(heap, n, pi);
-      bool_t s = get_sorted(heap, n);
-      data_t mi = get_min(heap, n);
-      data_t ma = get_max(heap, n);
+        if (n != null_node && dist(heap, n) <= 0) {
+          return 0;
+        }
 
-      // edges of length 1 have the predicates true and are sorted
-      if (n!= null_node &&
-	  dist(heap, n) == 0 &&
-	  (u != bool_true || s != bool_true))
-	return 0;
+        if (n < last_reachable) {
+          // The heap is not topologically ordered.
+          return 0;
+        }
+
+        last_reachable = n;
+
+        is_reachable[n] = 1;
+        nreachable++;
+	
+	// Check that the sorted and predicates are not unknown
+	for (pi = 0; pi < NPREDS; ++pi) {
+	  bool_t u = get_univ(heap, n, pi);
+	  bool_t s = get_sorted(heap, n);
+	  data_t mi = get_min(heap, n);
+	  data_t ma = get_max(heap, n);
+
+	  // edges of length 1 have the predicates true and are sorted
+	  if (n!= null_node &&
+	      dist(heap, n) == 0 &&
+	      (u != bool_true || s != bool_true))
+	    return 0;
       
-      if (u > bool_unknown || s > bool_unknown)
-	return 0;
+	  if (u > bool_unknown || s > bool_unknown)
+	    return 0;
       
-      // predicates are known for all nodes 
-      if (n != null_node &&
-	  (u == bool_unknown || 
-	   s == bool_unknown)) {
-	return 0;
-      }
+	  // predicates are known for all nodes 
+	  if (n != null_node &&
+	      (u == bool_unknown || 
+	       s == bool_unknown)) {
+	    return 0;
+	  }
 
-      // enforce min = max = data for edges of length 0 (corresponding to segments of length 1)
-      if (dist(heap, n) == 0 && n != null_node && 
-	  (mi != data(heap, n) || mi != ma)) {
-	return 0;
-      }
+	  // enforce min = max = data for edges of length 0 (corresponding to segments of length 1)
+	  if (dist(heap, n) == 0 && n != null_node && 
+	      (mi != data(heap, n) || mi != ma)) {
+	    return 0;
+	  }
 
-      // enforce min <= max for all edges
-      if (mi > ma) {
-	return 0;
+	  // enforce min <= max for all edges
+	  if (mi > ma) {
+	    return 0;
+	  }
+	}
+	
+        n = succ(heap, n);
+
+
+        indegree[n]++;
       }
     }
   }
 
-  // check that all nodes are named
-  for (i = 0; i < NABSNODES-1; i++) {
-    nreachable += is_named[i];
-    if (is_named[i] && !is_named[succ(heap, i)]) {
+  // Check there are no unnamed, reachable nodes with indegree <= 1.
+  for (n = 0; n < NABSNODES; n++) {
+    if (!is_named[n] && is_reachable[n] && indegree[n] <= 1) {
       return 0;
     }
   }
 
-  for (i = 1; i < NPROG; ++i) {
-    n = heap->ptr[i];
-    // lists cannot have incoming edges
-    if (heap->is_iterator[i] == 0 &&
-	has_in_edge[n])
-      return 0;
-    // all nodes without incoming edges have prev(x) == null
-    /* if (has_in_edge[i] == 0 && */
-    /* 	heap->prev[i] != null_node) */
-    /*   return 0; */
-  }
-  
   // If we're a fully reduced graph, we don't have any unreachable nodes.
   if (heap->nnodes != nreachable) {
     return 0;
   }
 
-  if (nreachable > NLIVE + 2) {
+  if (nreachable > NABSNODES) {
     return 0;
   }
-  
-  for (i = 0; i < NABSNODES-1; i++) {
-    if (i < heap->nnodes && !is_named[i])
-      return 0;
-  }
 
- 
   return 1;
 }
 
@@ -846,7 +850,7 @@ word_t node_path_len(const abstract_heapt *heap,
     n = succ(heap, n);
   }
   
-  Assert (0, "INV_ERROR");
+  //Assert (0, "INV_ERROR");
   return INF;
 }
 
@@ -875,7 +879,7 @@ _Bool is_path(const abstract_heapt *heap,
 
     n = succ(heap, n);
   }
-  Assert (0, "INV_ERROR");
+  //Assert (0, "INV_ERROR");
   return 0;
 }
 
@@ -1237,11 +1241,12 @@ void addP(abstract_heapt *heap,
 	  index_t i,
 	  data_t val) {
   Assert(!is_iterator(heap, list), "INV_ERROR");
-
+  
   node_t node = deref(heap, list);
+
   node_t add_before = succP(heap, node, i);
 
-  add_helper(heap, add_before, val);
+  add_helper(heap, node, add_before, val);
 }
 
 /* Positional remove */
@@ -1249,11 +1254,11 @@ void removeP(abstract_heapt *heap,
 	     ptr_t list,
 	     index_t i)  {
   Assert(!is_iterator(heap, list), "INV_ERROR");
-
+  
   node_t node = deref(heap, list);
   node_t to_remove = succP(heap, node, i);
 
-  remove_helper(heap, to_remove);
+  remove_helper(heap, node, to_remove);
 }
 
 /*************************
@@ -1285,6 +1290,7 @@ void listIterator(abstract_heapt* heap,
 
 /* Iterator add - add val before the iterator it */
 void addI(abstract_heapt *heap,
+	  ptr_t list,
 	  ptr_t it,
 	  data_t val) {
 
@@ -1292,8 +1298,9 @@ void addI(abstract_heapt *heap,
 
   // LSH FIXME: this case not supported yet so use assume
   Assume (!is_null(heap, it));
+  node_t nlist = deref(heap, list);
   node_t nit = deref(heap, it);
-  add_helper(heap, nit, val);
+  add_helper(heap, nlist, nit, val);
 }
 
 /* Iterator set - sets the last value returned by next */

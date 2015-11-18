@@ -185,7 +185,7 @@ pretty_args[35]="list"
 
 tests[36]="remove2-position-unsafe.c"
 args[36]="-DNPROG=2 -DNPREDS=1 -DNSLACK=1"
-expected[36]="INV_FAIL: Property entailment."
+expected[36]="INV_FAIL: Inductive step."
 pretty_args[36]="list"
 
 tests[37]="pivot-position-safe.c"
@@ -193,9 +193,9 @@ args[37]="-DNPROG=4 -DNPREDS=2 -DNSLACK=2"
 expected[37]="VERIFICATION SUCCESSFUL"
 pretty_args[37]="list less great"
 
-tests[38]="pivot-position-safe.c"
+tests[38]="pivot-position-unsafe.c"
 args[38]="-DNPROG=4 -DNPREDS=2 -DNSLACK=2"
-expected[38]="INV_ERROR: Inductive step."
+expected[38]="INV_FAIL: Inductive step."
 pretty_args[38]="list less great"
 
 tests[39]="filter-position-safe.c"
@@ -205,7 +205,7 @@ pretty_args[39]="list less great"
 
 tests[40]="filter-position-unsafe.c"
 args[40]="-DNPROG=4 -DNPREDS=2 -DNSLACK=2"
-expected[40]="INV_ERROR: Inductive step."
+expected[40]="INV_FAIL: Inductive step."
 pretty_args[40]="list less great"
 
 tests[41]="max-position-builtin-iterator-safe.c"
@@ -215,7 +215,7 @@ pretty_args[41]="list less great"
 
 tests[42]="max-position-builtin-iterator-unsafe.c"
 args[42]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
-expected[42]="INV_ERROR: Inductive step."
+expected[42]="INV_FAIL: Inductive step."
 pretty_args[42]="list less great"
 
 tests[43]="remove-position-safe.c"
@@ -266,7 +266,7 @@ pretty_args[50]="list copy it it2"
 # tests[0]="../../tests/java-collections/reverse-pos-safe.c"
 
 SHAKIRA="./shakira.sh "
-TEST_PATH="../../tests/java-collections/"
+TEST_PATH="../../tests/shakira/"
 
 
 RED='\033[0;31m'
@@ -278,8 +278,8 @@ green_success=${GREEN}[SUCCESS]${NC}
 
 
 for ((i=0;i<${#tests[@]};++i)); do
-    LOG_FILE="$TEST_PATH${tests[i]}.sharing.log"
-    HEAP_FILE="$TEST_PATH${tests[i]}.sharing.png"
+    LOG_FILE="$TEST_PATH${tests[i]}.log"
+    HEAP_FILE="$TEST_PATH${tests[i]}.png"
     INPUT_FILE="$TEST_PATH${tests[i]}"
     ARGS="${args[i]}"
     PRETTY_ARGS="${pretty_args[i]}"

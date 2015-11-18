@@ -42,8 +42,8 @@ def processHeap(m,prefix):
   m = list(m)
   m[1] = m[1].replace("FALSE", "0")
   m[1] = m[1].replace("TRUE", "1")
-  m[6] = m[6].replace("{","[")
-  m[6] = m[6].replace("}","]")
+  m[5] = m[5].replace("{","[")
+  m[5] = m[5].replace("}","]")
 
   [ptrs, iterators, succs, datas, dists, univs, nnodes, sort, mins, maxs] = [eval(g) for g in m]
 

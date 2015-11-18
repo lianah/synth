@@ -127,10 +127,10 @@ void dump_heap(abstract_heapt *heap,
     fprintf(fp, ", %d", heap->succ[i]);
   }
 
-  fprintf(fp, "}, prev = {%d", heap->prev[0]);
-  for (i = 1; i < NABSNODES; ++i) {
-    fprintf(fp, ", %d", heap->prev[i]);
-  }
+  /* fprintf(fp, "}, prev = {%d", heap->prev[0]); */
+  /* for (i = 1; i < NABSNODES; ++i) { */
+  /*   fprintf(fp, ", %d", heap->prev[i]); */
+  /* } */
 
   fprintf(fp, "}, data = {%d", heap->data[0]);
   for (i = 1; i < NABSNODES; ++i) {

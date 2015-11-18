@@ -37,11 +37,11 @@ def processHeap(m,prefix):
   m = list(m)
   m[1] = m[1].replace("false", "0")
   m[1] = m[1].replace("true", "1")
-  m[6] = m[6].replace("{","[")
-  m[6] = m[6].replace("}","]")
+  m[5] = m[5].replace("{","[")
+  m[5] = m[5].replace("}","]")
 
   
-  [ptrs, iterators, succs, prevs, datas, dists, univs, nnodes, sorts, mins, maxs] = [eval(g) for g in m]
+  [ptrs, iterators, succs, datas, dists, univs, nnodes, sorts, mins, maxs] = [eval(g) for g in m]
 
   for i in range(nnodes):
     univ = univs[i]
@@ -67,7 +67,7 @@ def processHeap(m,prefix):
   print "}"
 
 
-regex = 'ptr = {([\d, ]*)}, is_iterator = {([falsetru, ]*)}, succ = {([\d, ]*)}, prev = {([\d, ]*)}, data = {([\d, ]*)}, dist = {([\d, ]*)}, universal = {([\d,{} -]*)}, nnodes = (\d*), sorted = {([\d, -]*)}, min = {([\d, -]*)}, max = {([\d, -]*)}'
+regex = 'ptr = {([\d, ]*)}, is_iterator = {([falsetru, ]*)}, succ = {([\d, ]*)}, data = {([\d, ]*)}, dist = {([\d, ]*)}, universal = {([\d,{} -]*)}, nnodes = (\d*), sorted = {([\d, -]*)}, min = {([\d, -]*)}, max = {([\d, -]*)}'
 
 cex = sys.stdin.read()
 

@@ -49,7 +49,7 @@ void debug_assert (_Bool x, char* tag);
  #define NPREDS 1
 #endif
 
-#define NABSNODES (NPROG + 1 + NSLACK)
+#define NABSNODES (2*NPROG + 1 + NSLACK)
 
 
 typedef word_t ptr_t;
@@ -263,6 +263,7 @@ void listIterator(abstract_heapt* h,
 
 /* Iterator add */
 void addI(abstract_heapt *heap,
+	  ptr_t list,
 	  ptr_t x,
 	  data_t val);
 
@@ -270,11 +271,13 @@ void addI(abstract_heapt *heap,
 // last value returned!), same for remove
 /* Iterator set */
 void setI(abstract_heapt *heap,
+	  ptr_t list,
 	  ptr_t x,
 	  data_t val);
 
 /* Iterator remove: removes the last node returned by next */
 void removeI(abstract_heapt *heap,
+	     ptr_t list,
 	     ptr_t x);
 
 /* Iterator next */
