@@ -258,6 +258,16 @@ args[50]="-DNPROG=5 -DNPREDS=1 -DNSLACK=2"
 expected[50]="INV_FAIL: Inductive step."
 pretty_args[50]="list copy it it2"
 
+tests[51]="cycle-safe.c"
+args[51]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+expected[51]="VERIFICATION SUCCESSFUL"
+pretty_args[51]="list it"
+
+tests[52]="cycle-unsafe.c"
+args[52]="-DNPROG=3 -DNPREDS=1 -DNSLACK=1"
+expected[52]="INV_FAIL: Property entailment."
+pretty_args[52]="list it"
+
 
 # tests[0]="../../tests/java-collections/set-const2-safe.c"
 # tests[0]="../../tests/java-collections/set-const3-safe.c"
@@ -277,7 +287,7 @@ red_fail=${RED}[FAIL]${NC}
 green_success=${GREEN}[SUCCESS]${NC}
 
 
-for ((i=0;i<${#tests[@]};++i)); do
+for ((i=51;i<${#tests[@]};++i)); do
     LOG_FILE="$TEST_PATH${tests[i]}.log"
     HEAP_FILE="$TEST_PATH${tests[i]}.png"
     INPUT_FILE="$TEST_PATH${tests[i]}"
