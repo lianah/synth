@@ -71,13 +71,24 @@ static node_t succ(const abstract_heapt *heap,
 /*
  * Prev operator -- which node is in n's predecessor pointer?
  */
-/* static node_t prev(const abstract_heapt *heap, */
-/*                    node_t n) { */
-/*   // Ensure n is an allocated node. */
-/*   Assume(n < NABSNODES); */
-/*   Assert(n != null_node, "INV_ERROR: prev"); */
-/*   return heap->prev[n]; */
-/* } */
+static node_t prev(const abstract_heapt *heap,
+		   node_t nlist,
+                   node_t n) {
+  // Ensure n is an allocated node.
+  Assume(n < NABSNODES);
+  if (nlist == n)
+    return null_nodel;
+  
+  //Assert(n != null_node, "INV_ERROR: prev");
+  word_t i;
+  for (i = 0; i < NABSNODES; ++i) {
+    if (succ(heap, nlist) == n)
+      return nlist;
+    nlist == succ(heap, nlist);
+  }
+  assert(0);
+  return null_node;
+}
 
 
 /*
@@ -435,24 +446,22 @@ extern void invalidate_succ(abstract_heapt* heap,
 /*
   Invalidate all the pointers from beginning of list to nx (excluding)
 */
-/* extern void invalidate_prev(abstract_heapt* heap, */
-/* 			    node_t nx) { */
-/*   Assert (nx != null_node, "INV_ERROR"); */
+extern void invalidate_prev(abstract_heapt* heap,
+			    node_t nlist,
+			    node_t nx) {
+  //Assert (nx != null_node, "INV_ERROR");
 
-/*   node_t initial_nx = nx; */
-  
-/*   nx = prev(heap, nx); */
-
-/*   word_t i; */
-/*   for (i = 1; i < NABSNODES; ++i) { */
-/*     // we want to exclude the first pointer */
-/*     if (prev(heap, nx) == null_node) { */
-/*       return; */
-/*     } */
-/*     invalidate(heap, nx); */
-/*     nx = prev(heap, nx); */
-/*   } */
-/* } */
+  word_t i;
+  for (i = 1; i < NABSNODES; ++i) {
+    // we want to exclude the first pointer
+    if (succ(heap, nlist) == nx) {
+      return;
+    }
+    invalidate(heap, nlist);
+    nlist = succ(heap, nlist);
+  }
+  assert(0);
+}
 
 
 /* Returns the last node x such that path_len(node, x) <= index */
@@ -478,63 +487,64 @@ extern node_t get_segment(abstract_heapt* heap,
 
 /* Remove the node nrem and updates head of list if necessary */
 extern void remove_helper(abstract_heapt* heap,
+			  node_t nlist,
 			  node_t nrem) {
   // the node before the one we are removing
-  //node_t nprev = prev(heap, nrem);
+  node_t nprev = prev(heap, nlist, nrem);
   // the node after the one we are removing
   node_t nit = succ(heap, nrem);
   
   predicate_index_t pi;
 
-  assert(0);
-/*   // We are deleting the head of the list */
-/*   if (nprev == null_node) { */
+  // We are deleting the head of the list
+  if (nprev == null_node) {
     
-/*     // There is an node right after nrem so just make this one the head */
-/*     if (dist(heap, nrem) == 0) { */
-/*       // clear the node to be removed */
-/*       clear_node(heap, nrem); */
-/*       // invalidate all iterators pointing to it and */
-/*       // update lists to point to the new head */
-/*       invalidate_and_update(heap, nrem, nit); */
-/*       return; */
-/*     } */
+    // There is an node right after nrem so just make this one the head
+    if (dist(heap, nrem) == 0) {
+      // clear the node to be removed
+      clear_node(heap, nrem);
+      // invalidate all iterators pointing to it and
+      // update lists to point to the new head
+      invalidate_and_update(heap, nrem, nit);
+      return;
+    }
 
-/*     // There is no new node so create new head of the list  */
-/*     // update the predicates and assume constraints on the new value */
-/*     word_t data; */
-/*     for (pi = 0; pi < NPREDS; ++pi) { */
-/*       // true universals are maintained */
-/*       if (get_univ(heap, nrem, pi) == bool_true) { */
-/* #ifdef __CPROVER	 */
-/* 	Assume(eval_pred(pi, data)); */
-/* #endif	 */
-/* 	assign_univ(heap, nrem, pi, bool_true); */
-/*       } else { */
-/* 	assign_univ(heap, nrem, pi, bool_unknown); */
-/*       }  */
-/*     } */
-/*     assign_data(heap, nrem, data); */
-/*     assign_succ(heap, nrem, nit, dist(heap, nrem) - 1); */
-/*     invalidate(heap, nrem); */
-/*     // LSH: do we need to update any sorted info? */
-/*     return; */
-/*   } */
+    // There is no new node so create new head of the list 
+    // update the predicates and assume constraints on the new value
+    word_t data;
+    for (pi = 0; pi < NPREDS; ++pi) {
+      // true universals are maintained
+      if (get_univ(heap, nrem, pi) == bool_true) {
+#ifdef __CPROVER	
+	Assume(eval_pred(pi, data));
+#endif	
+	assign_univ(heap, nrem, pi, bool_true);
+      } else {
+	assign_univ(heap, nrem, pi, bool_unknown);
+      } 
+    }
+    assign_data(heap, nrem, data);
+    assign_succ(heap, nrem, nit, dist(heap, nrem) - 1);
+    invalidate(heap, nrem);
+    // LSH: do we need to update any sorted info?
+    return;
+  }
   
-/*   // We are deleting a node in the middle */
-/*   for (pi = 0; pi < NPREDS; ++pi) { */
-/*     bool_t new_univ = and (get_univ(heap, nprev, pi), */
-/* 			   get_univ(heap, nrem, pi)); */
+  // We are deleting a node in the middle
+  for (pi = 0; pi < NPREDS; ++pi) {
+    bool_t new_univ = and (get_univ(heap, nprev, pi),
+			   get_univ(heap, nrem, pi));
 
-/*     assign_univ(heap, nprev, pi, new_univ); */
-/*     assign_succ(heap, nprev, nit, s_add(dist(heap, nprev), dist(heap, nrem))); */
-/*     clear_node(heap, nrem); */
-/*     // LSH: do we need to update any sorted info? */
-/*   } */
+    assign_univ(heap, nprev, pi, new_univ);
+    assign_succ(heap, nprev, nit, s_add(dist(heap, nprev), dist(heap, nrem)));
+    clear_node(heap, nrem);
+    // LSH: do we need to update any sorted info?
+  }
 }
 
 /* Add a node storing val right before the nx node */
 extern void add_helper(abstract_heapt* heap,
+		       node_t nlist,
 		       node_t nit,
 		       data_t val) {
 
@@ -557,21 +567,21 @@ extern void add_helper(abstract_heapt* heap,
   //  prev_nit -----d-------> nit ---> null
   // to
   //  prev_nit -d-> nnew -0-> nit ---> null
-  assert (0);
-  /* node_t prev_nit = prev(heap, nit); */
-  /* // nnew points to nit */
-  /* assign_succ(heap, nnew, nit, 0); */
+  
+  node_t prev_nit = prev(heap, nlist, nit);
+  // nnew points to nit
+  assign_succ(heap, nnew, nit, 0);
 
-  /* // set the nprev that used to point to nit to point to nnew */
-  /* if (prev_nit != null_node) { */
-  /*   assign_succ(heap, prev_nit, nnew, dist(heap, prev_nit)); */
-  /*   invalidate_prev(heap, nnew); */
-  /* } else { */
-  /*   // we are adding at the beginning of the list so */
-  /*   // replace all lists pointing to nit to point to the new list head nnew */
-  /*   update_ptr(heap, nit, nnew); */
-  /* } */
-  /* invalidate_succ(heap, nit); */
+  // set the nprev that used to point to nit to point to nnew
+  if (prev_nit != null_node) {
+    assign_succ(heap, prev_nit, nnew, dist(heap, prev_nit));
+    invalidate_prev(heap, list, nnew);
+  } else {
+    // we are adding at the beginning of the list so
+    // replace all lists pointing to nit to point to the new list head nnew
+    update_ptr(heap, nit, nnew);
+  }
+  invalidate_succ(heap, nit);
 }
 
 /*
@@ -662,114 +672,112 @@ _Bool is_minimal(const abstract_heapt *heap) {
   word_t is_named[NABSNODES];
   memset(is_named, 0, sizeof(is_named));
 
-  // Count the reachable nodes and find the indegrees of each node in the
-  // reachable subheap.
-  word_t is_reachable[NABSNODES];
-  word_t indegree[NABSNODES];
-  word_t nreachable = 0;
+ word_t has_in_edge[NABSNODES];
+ memset(has_in_edge, 0, sizeof(is_named));
 
-  memset(is_reachable, 0, sizeof(is_reachable));
-  memset(indegree, 0, sizeof(indegree));
+  
+  word_t nreachable = 0;
 
   ptr_t p;
   node_t n, m;
   word_t i;
-  word_t last_reachable = 0;
-  predicate_index_t pi;
+  predicate_index_t pi; 
+
+  // the null node is named
+  //is_named[0] = 1;
   
   for (p = 0; p < NPROG; p++) {
-    // Assume all pointers are valid to begin with
-    Assume(heap->ptr[p] != INVALID);
-    n = deref(heap, p);
+    n = heap->ptr[p];
     is_named[n] = 1;
 
+    // only allocated nodes
     if (n >= heap->nnodes) {
       return 0;
     }
 
-    for (i = 0; i < NABSNODES-1; i++) {
-      if (!is_reachable[n]) {
-        if (n >= heap->nnodes) {
-          return 0;
-        }
+    // check that named nodes have succ n + 1
+    if (succ(heap, n) != null_node) {
+      if (n + 1 != succ(heap, n)) 
+	return 0;
+      // make sure predecessors match
+      /* if(prev(heap, succ(heap, n))!= n) */
+      /* 	return 0; */
 
-        if (dist(heap, n) >= INF) {
-          return 0;
-        }
+      // only iterators can have incoming edges
+      has_in_edge[succ(heap, n)] = 1;
+    }
 
-        if (n != null_node && dist(heap, n) <= 0) {
-          return 0;
-        }
+    for (pi = 0; pi < NPREDS; ++pi) {
+      bool_t u = get_univ(heap, n, pi);
+      bool_t s = get_sorted(heap, n);
+      data_t mi = get_min(heap, n);
+      data_t ma = get_max(heap, n);
 
-        if (n < last_reachable) {
-          // The heap is not topologically ordered.
-          return 0;
-        }
-
-        last_reachable = n;
-
-        is_reachable[n] = 1;
-        nreachable++;
-
-        n = succ(heap, n);
-
-
-        indegree[n]++;
-	for (pi = 0; pi < NPREDS; ++pi) {
-	  bool_t u = get_univ(heap, n, pi);
-	  bool_t s = get_sorted(heap, n);
-	  data_t mi = get_min(heap, n);
-	  data_t ma = get_max(heap, n);
-
-	  // edges of length 1 have the predicates true and are sorted
-	  if (n!= null_node &&
-	      dist(heap, n) == 0 &&
-	      (u != bool_true || s != bool_true))
-	    return 0;
+      // edges of length 1 have the predicates true and are sorted
+      if (n!= null_node &&
+	  dist(heap, n) == 0 &&
+	  (u != bool_true || s != bool_true))
+	return 0;
       
-	  if (u > bool_unknown || s > bool_unknown)
-	    return 0;
+      if (u > bool_unknown || s > bool_unknown)
+	return 0;
       
-	  // predicates are known for all nodes 
-	  if (n != null_node &&
-	      (u == bool_unknown || 
-	       s == bool_unknown)) {
-	    return 0;
-	  }
+      // predicates are known for all nodes 
+      if (n != null_node &&
+	  (u == bool_unknown || 
+	   s == bool_unknown)) {
+	return 0;
+      }
 
-	  // enforce min = max = data for edges of length 0 (corresponding to segments of length 1)
-	  if (dist(heap, n) == 0 && n != null_node && 
-	      (mi != data(heap, n) || mi != ma)) {
-	    return 0;
-	  }
+      // enforce min = max = data for edges of length 0 (corresponding to segments of length 1)
+      if (dist(heap, n) == 0 && n != null_node && 
+	  (mi != data(heap, n) || mi != ma)) {
+	return 0;
+      }
 
-	  // enforce min <= max for all edges
-	  if (mi > ma) {
-	    return 0;
-	  }
-	}
+      // enforce min <= max for all edges
+      if (mi > ma) {
+	return 0;
       }
     }
   }
 
-  // Check there are no unnamed, reachable nodes with indegree <= 1.
-  for (n = 0; n < NABSNODES; n++) {
-    if (!is_named[n] && is_reachable[n] && indegree[n] <= 1) {
+  // check that all nodes are named
+  for (i = 0; i < NABSNODES-1; i++) {
+    nreachable += is_named[i];
+    if (is_named[i] && !is_named[succ(heap, i)]) {
       return 0;
     }
   }
 
+  for (i = 1; i < NPROG; ++i) {
+    n = heap->ptr[i];
+    // lists cannot have incoming edges
+    if (heap->is_iterator[i] == 0 &&
+	has_in_edge[n])
+      return 0;
+    // all nodes without incoming edges have prev(x) == null
+    /* if (has_in_edge[i] == 0 && */
+    /* 	heap->prev[i] != null_node) */
+    /*   return 0; */
+  }
+  
   // If we're a fully reduced graph, we don't have any unreachable nodes.
   if (heap->nnodes != nreachable) {
     return 0;
   }
 
-  if (nreachable > NLIVE*2 + 1) {
+  if (nreachable > NLIVE + 2) {
     return 0;
   }
+  
+  for (i = 0; i < NABSNODES-1; i++) {
+    if (i < heap->nnodes && !is_named[i])
+      return 0;
+  }
 
+ 
   return 1;
-
 }
 
 /*
@@ -787,7 +795,7 @@ _Bool valid_abstract_heap(const abstract_heapt *heap) {
 
   // The null node doesn't point anywhere and
   // by convention has no predecessor.
-  if (heap->succ[null_node] != null_node /*||
+  if (heap->succ[null_node] != null_node/* ||
 					   heap->prev[null_node] != null_node*/) {
     return 0;
   }
@@ -994,7 +1002,7 @@ bool_t sorted(const abstract_heapt *heap,
     return bool_true;
   }
 
-  data_t prev_max = data(heap, nx);
+  data_t old_max = data(heap, nx);
   bool_t res = bool_true;
   word_t i;
 
@@ -1003,13 +1011,13 @@ bool_t sorted(const abstract_heapt *heap,
       return res;
     }
 
-    res = and(res, prev_max <= data(heap, nx));
-    prev_max = data(heap, nx);
+    res = and(res, old_max <= data(heap, nx));
+    old_max = data(heap, nx);
     res = and(res, get_sorted(heap, nx));
     // if len > 0 then we must also consider the values of the abstracted segment
     if(dist(heap, nx) > 0) {
-      res = and(res, prev_max <= get_min(heap, nx));
-      prev_max = get_max(heap, nx);
+      res = and(res, old_max <= get_min(heap, nx));
+      old_max = get_max(heap, nx);
     }
 
     nx = succ(heap, nx);
@@ -1290,6 +1298,7 @@ void addI(abstract_heapt *heap,
 
 /* Iterator set - sets the last value returned by next */
 void setI(abstract_heapt *heap,
+	  ptr_t list,
 	  ptr_t it,
 	  data_t val)  {
 
@@ -1297,47 +1306,48 @@ void setI(abstract_heapt *heap,
   Assert (is_iterator(heap, it), "INV_ERROR");
   
   node_t nx = deref(heap, it);
-  
+  node_t nlist = deref(heap, list);
   // LSH FIXME: cannot get prev of null_node
   Assume (nx != null_node);
 
-  assert(0);
-  /* node_t nprev = prev(heap, nx); */
-  /* Assert (nprev != null_node, "INV_ERROR"); */
+  node_t nprev = prev(heap, nlist, nx);
+  Assert (nprev != null_node, "INV_ERROR");
   
-  /* assign_data(heap, nprev, val); */
+  assign_data(heap, nprev, val);
 }
 
 
 /* Iterator remove - removes the last value returned by next */
 void removeI(abstract_heapt *heap,
+	     ptr_t list,
 	     ptr_t it)  {
   Assume (it < NPROG);
   Assert (is_iterator(heap, it), "INV_ERROR");
   
   node_t nit = deref(heap, it);
+  node_t nlist = deref(heap, list);
   // FIXME: we cannot compute the prev of null currently 
   Assume(nit != null_node);
-  assert (0);
-  /* // We want to remove the node before nit */
-  /* node_t nprev = prev(heap, nit); */
+
+  // We want to remove the node before nit
+  node_t nprev = prev(heap, nlist, nit);
   
-  /* // it could not have been the head of the list (no next) */
-  /* Assert (nprev != null_node, "INV_ERROR"); */
+  // it could not have been the head of the list (no next)
+  Assert (nprev != null_node, "INV_ERROR");
 
-  /* // node to be removed */
-  /* node_t nrem;  */
-  /* if (dist(heap, nprev) == 0) { */
-  /*   // we are removing nprev since is the one right before nit */
-  /*   nrem = nprev; */
-  /* } else { */
-  /*   // we need to subdivide the incoming edge as follows: */
-  /*   // nprev ---------d-----------------> nit */
-  /*   // nprev ------(d-1)-------nrem--0--> nit */
-  /*   nrem = subdivide(heap, nprev, s_sub(dist(heap, nprev), 1));  */
-  /* } */
+  // node to be removed
+  node_t nrem; 
+  if (dist(heap, nprev) == 0) {
+    // we are removing nprev since is the one right before nit
+    nrem = nprev;
+  } else {
+    // we need to subdivide the incoming edge as follows:
+    // nprev ---------d-----------------> nit
+    // nprev ------(d-1)-------nrem--0--> nit
+    nrem = subdivide(heap, nprev, s_sub(dist(heap, nprev), 1)); 
+  }
 
-  /* remove_helper(heap, nrem); */
+  remove_helper(heap, nlist, nrem);
 }
 
 /* Iterator next */

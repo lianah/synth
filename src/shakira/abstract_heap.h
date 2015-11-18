@@ -49,7 +49,7 @@ void debug_assert (_Bool x, char* tag);
  #define NPREDS 1
 #endif
 
-#define NABSNODES (2*NPROG + NSLACK + 1)
+#define NABSNODES (NPROG + 1 + NSLACK)
 
 
 typedef word_t ptr_t;
