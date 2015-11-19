@@ -297,11 +297,15 @@ for ((i=0;i<${#tests[@]};++i)); do
 	    
     CMD="$SHAKIRA $INPUT_FILE $ARGS  "
     printf "Running $CMD\n"
-    `$CMD &> $LOG_FILE`
+    `runlim -s 6000 -t 600 $CMD &> $LOG_FILE`
     exit_code=$?
     fail=`grep INV_FAIL $LOG_FILE`
     success=`grep "VERIFICATION SUCCESSFUL" $LOG_FILE`
-    time=`grep "Runtime decision procedure:" $LOG_FILE`
+    sat_time=`grep "Runtime decision procedure:" $LOG_FILE`
+    symex_time=`grep "\[runlim\] time:" $LOG_FILE`
+    memory=`grep "\[runlim\] space:" $LOG_FILE`
+
+    # echo "grep \"[runlim] time:\" $LOG_FILE"
     
     if [ -z "$success" ]; then
 	if [ -z "$fail" ]; then
@@ -324,5 +328,5 @@ for ((i=0;i<${#tests[@]};++i)); do
 	printf " ${RED}[FAIL]${NC} $success doesn't match expected: $EXPECTED\n"
     fi
 	
-    printf "$fail $success $time exit code $exit_code\n"
+    printf "$fail $success $sat_time $symex_time $memory exit code $exit_code\n"
 done
