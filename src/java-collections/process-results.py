@@ -188,6 +188,6 @@ def readFromFile(fname, name, results):
 
 table = ResultsTable()    
 readFromFile(file1, "SLDH", table)
-readFromFile(file1, "SLDH2", table)
+readFromFile(file2, "SLDH2", table)
 table.printLatex("SLDH", "SLDH2")
 # readFromFile(file2, "SLDH+sh")
