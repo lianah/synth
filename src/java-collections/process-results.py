@@ -17,6 +17,13 @@ class Result:
               " symex_time: "+str(self.symex_time) +")"
         return res
 
+def prettyRes(res):
+    if res.status == "[SUCCESS]":
+        return "solved"
+    assert (res.status == "[FAIL]")
+    if (res.symex_time + res.sat_time >= 595):
+        return "TO"
+        
 class SolverToResult:
     def __init__(self):
         self.table = {} # Solver => (safe_result, unsafe_result)
@@ -83,7 +90,46 @@ class ResultsTable:
             (res1_safe, res1_unsafe) = ress.getResult(name1)
             (res2_safe, res2_unsafe) = ress.getResult(name2)
             print pb, " ", res1_safe.status, " ", res1_safe.sat_time, " ", res1_safe.symex_time, " ", res1_unsafe.status, " ", res1_unsafe.sat_time, " ", res1_unsafe.symex_time, " ", res2_safe.status, " ", res2_safe.sat_time, " ", res2_safe.symex_time," ", res2_unsafe.status, " ", res2_unsafe.sat_time, " ", res2_unsafe.symex_time  
-        
+
+    def printLatex(self, name1, name2):
+        print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        print "% Printing table for  "
+        print "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        print "\\setlength{\\tabcolsep}{.15cm}"
+        print "\\begin{tabular}{ l | r r r | r  r  r | r  r  r | r  r  r |}"
+        print "\\cline{2-13}"
+        print "\\multicolumn{1}{c}{}"
+        print "& \\multicolumn{6}{|c|}{\\textsf{\\logic}}"
+        print "& \\multicolumn{6}{c|}{\\textsf{\\badlogic}}"
+        print "\\\\"
+        print "\\cline{2-13}"
+        print "& \\multicolumn{3}{c|}{\\textsf{safe}}"
+        print "& \\multicolumn{3}{c|}{\\textsf{unsafe}}"
+        print "& \\multicolumn{3}{c|}{\\textsf{safe}}"
+        print "& \\multicolumn{3}{c|}{\\textsf{unsafe}}"
+        print "\\\\"
+        print ""
+        print "\\cline{2-13}"
+        print ""
+        print "\\multicolumn{1}{l}{\\tiny\\textsf{problem}} &"
+        print "\\multicolumn{1}{l}{\\tiny\\textsf{result}} & \\multicolumn{1}{l}{\\tiny\\textsf{Symex(s)}} & \\multicolumn{1}{l}{\\tiny\\textsf{SAT(s)}} &"
+        print "\\multicolumn{1}{l}{\\tiny\\textsf{result}} & \\multicolumn{1}{l}{\\tiny\\textsf{Symex(s)}} & \\multicolumn{1}{l}{\\tiny\\textsf{SAT(s)}} &"
+        print "\\multicolumn{1}{l}{\\tiny\\textsf{result}} & \\multicolumn{1}{l}{\\tiny\\textsf{Symex(s)}} & \\multicolumn{1}{l}{\\tiny\\textsf{SAT(s)}} &"
+        print "\\multicolumn{1}{l}{\\tiny\\textsf{result}} & \\multicolumn{1}{l}{\\tiny\\textsf{Symex(s)}} & \\multicolumn{1}{l}{\\tiny\\textsf{SAT(s)}} "
+        print "\\\\"
+
+        for pb in self.table:
+            ress = self.table[pb]
+            (res1_safe, res1_unsafe) = ress.getResult(name1)
+            (res2_safe, res2_unsafe) = ress.getResult(name2)
+            print "\\hline"
+            print "\\multicolumn{1}{|l|}{\\textsf{", pb, "}} & " , prettyRes(res1_safe) ,  " & ", res1_safe.symex_time, " & " , res1_safe.sat_time,  " & ", prettyRes(res1_unsafe) ,  " & ", res1_unsafe.symex_time, " & " , res1_unsafe.sat_time,  " & ", prettyRes(res2_safe) ,  " & ", res2_safe.symex_time, " & " , res2_safe.sat_time,  " & ", prettyRes(res2_unsafe) ,  " & ", res2_unsafe.symex_time, " & " , res2_unsafe.sat_time
+            print "\\\\"
+
+        print "\\hline"
+        print "\\end{tabular}"
+
+
 
 parser = argparse.ArgumentParser(description='Results file1 file2.')
 parser.add_argument('-f','--first',type=str,
@@ -143,5 +189,5 @@ def readFromFile(fname, name, results):
 table = ResultsTable()    
 readFromFile(file1, "SLDH", table)
 readFromFile(file1, "SLDH2", table)
-table.printTable("SLDH", "SLDH2")
+table.printLatex("SLDH", "SLDH2")
 # readFromFile(file2, "SLDH+sh")
