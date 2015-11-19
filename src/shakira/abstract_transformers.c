@@ -708,6 +708,7 @@ _Bool is_minimal(const abstract_heapt *heap) {
     }
 
     for (i = 0; i < NABSNODES-1; i++) {
+      Assume( n < NABSNODES);
       if (!is_reachable[n]) {
         if (n >= heap->nnodes) {
           return 0;
@@ -782,7 +783,8 @@ _Bool is_minimal(const abstract_heapt *heap) {
   }
   // Check that list pointers have no incoming edges:
   for (p = 1; p < NPROG; ++p) {
-    if (heap->is_iterator[p]==0 && indegree[heap->ptr[p]] != 0)
+    n = heap->ptr[p];
+    if (heap->is_iterator[p]==0 && indegree[n] != 0 && n != null_node)
       return 0;
   }
 
@@ -791,9 +793,10 @@ _Bool is_minimal(const abstract_heapt *heap) {
     return 0;
   }
 
-  if (nreachable > NABSNODES) {
+  if (nreachable > (NPROG- 1)*2 + 1) {
     return 0;
   }
+
 
   return 1;
 }
