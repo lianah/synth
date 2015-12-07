@@ -8,8 +8,8 @@ import string
 class Result:
     def __init__(self, status, sat_time, symex_time):
         self.status = status
-        self.sat_time = sat_time
-        self.symex_time = symex_time
+        self.sat_time = round(float(sat_time), 2)
+        self.symex_time = round(float(symex_time) - float(sat_time), 2)
 
     def __str__(self):
         res = "(status: "+self.status + ", " \
@@ -19,10 +19,19 @@ class Result:
 
 def prettyRes(res):
     if res.status == "[SUCCESS]":
-        return "solved"
+        return "\\cmark"
     assert (res.status == "[FAIL]")
-    if (res.symex_time + res.sat_time >= 595):
+    if (res.symex_time + res.sat_time >= 599.0):
         return "TO"
+    else:
+        return "\\xmark"
+        
+def prettyTime(time):
+    if (time == 0.0):
+        return "-"
+    if (time >= 600):
+        return "-"
+    return str(time)
         
 class SolverToResult:
     def __init__(self):
@@ -85,7 +94,7 @@ class ResultsTable:
         return res
 
     def printTable(self, name1, name2):
-        for pb in self.table:
+        for pb in self.table.items():
             ress = self.table[pb]
             (res1_safe, res1_unsafe) = ress.getResult(name1)
             (res2_safe, res2_unsafe) = ress.getResult(name2)
@@ -117,13 +126,15 @@ class ResultsTable:
         print "\\multicolumn{1}{l}{\\tiny\\textsf{result}} & \\multicolumn{1}{l}{\\tiny\\textsf{Symex(s)}} & \\multicolumn{1}{l}{\\tiny\\textsf{SAT(s)}} &"
         print "\\multicolumn{1}{l}{\\tiny\\textsf{result}} & \\multicolumn{1}{l}{\\tiny\\textsf{Symex(s)}} & \\multicolumn{1}{l}{\\tiny\\textsf{SAT(s)}} "
         print "\\\\"
-
-        for pb in self.table:
+        sorted_pbs = self.table.keys()
+        sorted_pbs.sort()
+        
+        for pb in sorted_pbs:
             ress = self.table[pb]
             (res1_safe, res1_unsafe) = ress.getResult(name1)
             (res2_safe, res2_unsafe) = ress.getResult(name2)
             print "\\hline"
-            print "\\multicolumn{1}{|l|}{\\textsf{", pb, "}} & " , prettyRes(res1_safe) ,  " & ", res1_safe.symex_time, " & " , res1_safe.sat_time,  " & ", prettyRes(res1_unsafe) ,  " & ", res1_unsafe.symex_time, " & " , res1_unsafe.sat_time,  " & ", prettyRes(res2_safe) ,  " & ", res2_safe.symex_time, " & " , res2_safe.sat_time,  " & ", prettyRes(res2_unsafe) ,  " & ", res2_unsafe.symex_time, " & " , res2_unsafe.sat_time
+            print "\\multicolumn{1}{|l|}{\\textsf{", pb, "}} & " , prettyRes(res1_safe) ,  " & ", prettyTime(res1_safe.symex_time), " & " ,  prettyTime(res1_safe.sat_time),  " & ", prettyRes(res1_unsafe) ,  " & ",  prettyTime(res1_unsafe.symex_time), " & " ,  prettyTime(res1_unsafe.sat_time),  " & ", prettyRes(res2_safe) ,  " & ",  prettyTime(res2_safe.symex_time), " & " ,  prettyTime(res2_safe.sat_time),  " & ", prettyRes(res2_unsafe) ,  " & ",  prettyTime(res2_unsafe.symex_time), " & " ,  prettyTime(res2_unsafe.sat_time)
             print "\\\\"
 
         print "\\hline"
@@ -145,12 +156,17 @@ file2= args.second
 
 def processName(filename):
     index = string.find(filename, "unsafe")
+    
     if index > 0:
         name = filename[0:index-1]
+        name += filename[index+6:]
         return (name, False)
+
     index = string.find(filename, "safe")
+
     assert (index > 0)
     name = filename[0:index-1]
+    name += filename[index+4:]
     return (name, True)
 
 def readFromFile(fname, name, results):
@@ -161,8 +177,10 @@ def readFromFile(fname, name, results):
         if not line:
             return
         # line has file name
-        file_name = re.findall("tests/java-collections/(.*\.c)", line)
+        file_name = re.findall("tests/"+name+"/(.*)\.c", line)
+        # print line
         (problem, safe) = processName(file_name[0])
+        problem = problem.replace("_", "-")
         # print problem, " ", safe
 
         line = f.readline()
@@ -170,12 +188,20 @@ def readFromFile(fname, name, results):
         # print status
 
         line = f.readline()
+        # ignore the path to the counter-example
+        if line.find("Counterexample heap in") > 0:
+            line = f.readline()
         line = line.replace('\t',"")
         times = re.findall("Runtime decision procedure: ([\d\.]*)s.*\[runlim] time:([\d\.]*) seconds \[runlim\] space:([\d\.]*)", line)
+        # this is a time-out since we did not print the dec proc run-time
+        if len(times) == 0:
+            times = re.findall(".*\[runlim] time:([\d\.]*) seconds \[runlim\] space:([\d\.]*)", line)
+            res = Result(status[0], times[0][0], times[0][0])
+        else:
+            res = Result(status[0], times[0][0], times[0][1])
+
         # print times
 
-        res = Result(status[0], times[0][0], times[0][1])
-        
         if (safe):
             results.addSafeResult(problem, name, res)
         else:
@@ -187,7 +213,7 @@ def readFromFile(fname, name, results):
 
 
 table = ResultsTable()    
-readFromFile(file1, "SLDH", table)
-readFromFile(file2, "SLDH2", table)
-table.printLatex("SLDH", "SLDH2")
+readFromFile(file1, "java-collections", table)
+readFromFile(file2, "shakira", table)
+table.printLatex("java-collections", "shakira")
 # readFromFile(file2, "SLDH+sh")
