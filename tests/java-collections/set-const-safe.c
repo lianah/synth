@@ -2,6 +2,13 @@
 
 // Run with -DNPROG=3 -DNPREDS=1
 
+/*
+  	ListIterator<Integer> it = list.listIterator();
+	while(it.hasNext()) {
+	    it.next();
+	    it.set(4);
+	}
+ */
 
 ptr_t list = 1;
 ptr_t it = 2;
