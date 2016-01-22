@@ -43,19 +43,19 @@ void body(abstract_heapt *heap) {
   if (getP(heap, list, i) < result_min) {
     result_min=getP(heap, list, i);
   }
+  i++;
 }
 
 _Bool assertion(abstract_heapt *heap) {
-  return is_path(heap, list, null_ptr) == bool_true &&
-    result_min == min(heap, list, null_ptr);
+  return is_path(heap, list, null_ptr) && result_min == min(heap, list, null_ptr);
 }
 
 _Bool inv_check(abstract_heapt *heap) {
   listIterator(heap, it, list, i);
-  return result_min == min(heap, list, it);
+  return !alias(heap, list, it) && result_min == min(heap, list, it);
 }
 
 _Bool inv_assume(abstract_heapt *heap) {
   listIterator(heap, it, list, i);
-  return result_min == min(heap, list, it);
+  return !alias(heap, list, it) && result_min == min(heap, list, it);
 }
