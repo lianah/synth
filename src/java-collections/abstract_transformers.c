@@ -604,7 +604,7 @@ static bool_t path_forall(const abstract_heapt *heap,
 
 
 static void assume_consistent_node(const abstract_heapt *heap,
-			      node_t nx) {
+				   node_t nx) {
   if (nx == null_node)
     return;
 
@@ -649,6 +649,140 @@ static void assume_consistent_node(const abstract_heapt *heap,
   
 }
 
+#ifdef NSETPROG
+
+
+/** Helper functions **/
+
+/*
+ * Dereference p -- which node does p point to?
+ */
+static node_t deref_set(const abstract_heapt *heap,
+			ptr_t p) {
+  // Ensure p is a real pointer.
+  Assume(p < NSETPROG);
+  Assert (heap->set_ptr[p] != INVALID, "INV_ERROR: deref");
+  Assert (heap->set_ptr[p] < NSETNODES, "Node must be within bounds");
+  return heap->set_ptr[p];
+}
+
+
+static void assign_set_size(abstract_heapt *heap,
+		     node_t nx,
+		     word_t size) {
+  Assume( nx < NSETNODES);
+  heap->set_size[nx] = size;
+}
+
+static void assign_set_ptr(abstract_heapt *heap,
+		    ptr_t x,
+		    node_t nx) {
+  Assume(x < NSETPROG);
+  Assume(nx < NSETNODES);
+  heap->set_ptr[x] = nx;
+}
+
+static void assign_set_predicate(abstract_heapt *heap,
+			  node_t nx,
+			  predicate_index_t pi,
+			  bool_t pred_val) {
+  Assume(nx < NSETNODES);
+  Assume(pi < NPREDS);
+  heap->set_universal[nx][pi] = pred_val;
+}
+
+static word_t get_set_size(const abstract_heapt *heap,
+			   node_t nx) {
+  Assume(nx < NSETNODES);
+  return heap->set_size[nx];
+}
+
+static bool_t get_set_predicate(const abstract_heapt *heap,
+				node_t nx,
+				predicate_index_t pi) {
+  Assume(nx < NSETNODES);
+  Assume(pi < NPREDS);
+  return heap->set_universal[nx][pi];
+}
+
+static node_t set_alloc(abstract_heapt *heap) {
+  node_t n;
+  Assume(heap->set_nnodes < NSETNODES);
+  return heap->set_nnodes++;
+}
+
+
+static void assume_consistent_set_node(const abstract_heapt *heap,
+				       node_t nx) {
+  // witnesses for the negated universals (i.e. existentials)
+  data_t vals[NPREDS];
+  
+  // we can only have as many witnesses as the length
+  // we only need as many as predicates since each val is unconstrained 
+  word_t num_nodes = get_set_size(heap, nx);
+
+  word_t pi, j;
+
+  // indicates that there are no negated predicates
+
+  for (pi = 0; pi < NPREDS; ++pi) {
+    _Bool no_neg = 1;
+    _Bool neg = 0;
+    if (get_set_predicate(heap, nx, pi) == bool_true) {
+      // we assume the positive predicates hold on all the witness values
+      for (j = 0; j < NPREDS; ++j) {
+	
+	if (j >= num_nodes)
+	  continue;
+#ifdef __CPROVER
+	Assume(eval_pred(pi, vals[j]));
+#endif	
+      }
+    } else if (get_set_predicate(heap, nx, pi) == bool_false) {
+      // we check that each negative predicates (existentials) holds
+      // for at least one value
+      for (j = 0; j < NPREDS; ++j) {
+	if (j >= num_nodes)
+	  continue;
+	neg = neg || !eval_pred(pi, vals[j]);
+	no_neg = 0;
+      }
+    }
+#ifdef __CPROVER    
+    Assume(no_neg || neg);
+#endif    
+  }
+}
+
+
+
+
+static void assume_set_is_valid(const abstract_heapt* heap) {
+  // ensure predicates are consistent
+  ptr_t i = 0;
+
+  for (; i < NSETPROG; ++i) {
+    node_t nx = heap->set_ptr[i]; // cannot use deref because assertion would fail
+    Assume (nx < NSETNODES);
+    predicate_index_t pi = 0;
+    for (; pi < NPREDS; ++pi) {
+      // if (nx == null_node) {
+      //	Assume(pred_val == bool_true);
+      //}
+      bool_t pred_val = get_set_predicate(heap, nx, pi);
+      Assume (pred_val == bool_true ||
+	      pred_val == bool_false);
+      word_t size = get_set_size(heap, nx);
+      if (size == 0) {
+	Assume(pred_val == bool_true);
+      }
+    }
+    assume_consistent_set_node(heap, nx);
+  }
+
+}
+
+#endif /* NSETPROG */
 
 static void assume_consistent(const abstract_heapt *heap) {
   word_t i;
@@ -765,7 +899,6 @@ _Bool is_minimal(const abstract_heapt *heap) {
       return 0;
   }
 
- 
   return 1;
 }
 
@@ -803,6 +936,11 @@ _Bool valid_abstract_heap(const abstract_heapt *heap) {
 
   if (!is_minimal(heap))
     return 0;
+
+#ifdef NSETPROG
+  assume_set_is_valid(heap);
+#endif /* NSETPROG */
+
   assume_consistent(heap);
   return 1;
 }
@@ -1370,3 +1508,162 @@ index_t nextIndex(abstract_heapt *heap,
   return -1;
 }
 
+#ifdef NSETPROG
+
+
+/* Creates a new set */
+void set_abstract_new(abstract_heapt *heap,
+		      ptr_t x) {
+  Assume(x < NSETPROG);
+
+  // Just allocate a new node and have x point to it.
+  node_t nx = set_alloc(heap);
+  assign_set_size(heap, nx, 0);
+  assign_set_ptr(heap, x, nx);
+  predicate_index_t pi = 0;
+  for (; pi < NPREDS; ++pi) {
+    // empty set so forall P(x) vaucously holds
+    assign_set_predicate(heap, nx, pi, bool_true);
+  }
+}
+
+
+/* Assigns two sets */
+void set_assign(abstract_heapt *heap,
+		ptr_t x,
+		ptr_t y) {
+  Assume(x < NSETPROG);
+  Assume(y < NSETPROG);
+
+  node_t py = deref_set(heap, y);
+  assign_set_ptr(heap, x, py);
+}
+
+/* Check if two sets alias */
+_Bool set_alias(const abstract_heapt *heap,
+		ptr_t x,
+		ptr_t y) {
+  node_t xn = deref_set(heap, x);
+  node_t yn = deref_set(heap, y);
+
+  return xn == yn;
+}
+
+
+word_t set_size(const abstract_heapt* heap, ptr_t set) {
+  node_t set_node = deref_set(heap, set);
+  Assume (set_node < NSETNODES);
+  return get_set_size(heap, set_node);
+}
+
+_Bool set_contains(const abstract_heapt* heap,
+		  ptr_t set,
+		  data_t value,
+		  predicate_index_t pi) {
+  node_t set_node = deref_set(heap, set);
+  Assume (set_node < NSETNODES);
+  // P(i) = \lambda x. x != value, so we are checking ! forall P(i):
+  // exists \lambda x. x == value
+  bool_t pred = get_set_predicate(heap, set_node, pi);
+  if (pred == bool_false)
+    return 1;
+  if (pred == bool_true)
+    return 0;
+  // otherwise we return non-det
+  _Bool res;
+  return res;
+}
+
+_Bool set_remove(abstract_heapt* heap,
+		 ptr_t set,
+		 data_t value,
+		 predicate_index_t pi) {
+  if (!set_contains(heap, set, value, pi)) {
+    return 0;
+  }
+  node_t set_node = deref_set(heap, set);
+  
+  assign_set_predicate(heap, set_node, pi, bool_false);
+  int set_size = get_set_size(heap, set_node);
+  Assert (set_size >= 1, "Cannot remove from empty set.");
+  assign_set_size(heap, set_node, s_sub(set_size, 1));
+  return 1;
+}
+
+void set_add(abstract_heapt* heap,
+	     ptr_t set,
+	     data_t value,
+	     predicate_index_t p) {
+  if (set_contains(heap, set, value, p))
+    return;
+
+  node_t set_node = deref_set(heap, set);
+  Assume (set_node < NSETNODES);
+  
+  // update the size
+  assign_set_size(heap, set_node,
+		  s_add(get_set_size(heap, set_node), 1));
+  
+  // update the predicates accordingly
+  predicate_index_t pi = 0;
+  for (; pi < NPREDS; ++pi) {
+    // if the predicate does not hold for this value
+    // it does not hold for all values
+    if (!eval_pred(pi, value)) {
+      assign_set_predicate(heap, set_node, pi, bool_false);
+    }
+    // if this is the only element in the set
+    if (eval_pred(pi, value) &&
+	get_set_size(heap, set_node) == 1) {
+      assign_set_predicate(heap, set_node, pi, bool_true);
+    }
+    // otherwise leave it unchanged 
+  }
+}
+
+bool_t set_forall(const abstract_heapt *heap,
+		  ptr_t x,
+		  predicate_index_t pi) {
+  node_t set_node = deref_set(heap, x);
+  Assert (pi < NPREDS, "Predicate index out of bounds");
+  return heap->set_universal[set_node][pi];
+}
+
+
+bool_t set_sorted(const abstract_heapt *heap,
+		  ptr_t x) {
+  Assert (0,"Unimplemented");
+  return bool_unknown;
+}
+
+data_t set_min(const abstract_heapt *heap,
+	       ptr_t x) {
+  Assert (0,"Unimplemented");
+  return nondet_data_t();
+}
+
+data_t set_max(const abstract_heapt *heap,
+	       ptr_t x) {
+  Assert (0,"Unimplemented");
+  return nondet_data_t();
+}
+
+ptr_t set_iterator(const abstract_heapt* heap, ptr_t set) {
+  Assert (0,"Unimplemented");
+  return 0;
+}
+data_t set_iterator_get(const abstract_heapt* heap, ptr_t set_it) {
+  Assert (0,"Unimplemented");
+  return nondet_data_t();
+}
+_Bool set_iterator_hasNext(const abstract_heapt* heap, ptr_t set_it) {
+  Assert (0,"Unimplemented");
+  return 0;
+}
+data_t set_iterator_next(const abstract_heapt* heap, ptr_t set_it) {
+  Assert (0,"Unimplemented");
+  return 0;
+}
+
+
+#endif

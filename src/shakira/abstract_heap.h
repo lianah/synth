@@ -51,6 +51,9 @@ void debug_assert (_Bool x, char* tag);
 
 #define NABSNODES (2*NPROG + 1 + NSLACK)
 
+#ifdef NSETPROG
+#define NSETNODES NSETPROG + 1
+#endif
 
 typedef word_t ptr_t;
 typedef word_t node_t;
@@ -118,7 +121,36 @@ typedef struct abstract_heap {
 
   // A map from nodes to the max value on the edge 
   data_t max[NABSNODES];
+    
+  /**** These are data-structures for set variables ***/
 
+#ifdef NSETPROG  
+  node_t set_ptr[NSETPROG];
+
+  // A map from set node to number of elements.
+  word_t set_size[NSETNODES];
+
+  // A map from nodes to the value of the universal predicates
+  bool_t set_universal[NSETNODES][NPREDS];
+
+  // How many nodes are currently allocated?
+  word_t set_nnodes;
+
+  // TODO: implement these at some point
+  // A map from nodes to the value of the sorted predicate
+  // bool_t set_sorted[NSETNODES];
+
+  // A map from nodes to the min value on the edge
+  // data_t set_min[NSETNODES];
+
+  // A map from nodes to the max value on the edge 
+  // data_t set_max[NSETNODES];
+
+  // LSH: do we really need this?
+  // A map from nodes to the data stored in each node. 
+  // data_t set_data[NSETNODES];
+
+#endif  
 } abstract_heapt;
 
 node_t deref(const abstract_heapt *heap,
@@ -371,6 +403,80 @@ void dump_heap(abstract_heapt *heap,
 	       const char* pretty_args);
 #endif
 
+
+#ifdef NSETPROG
+
+
+/*************************
+ *
+ *  Set abstract operators 
+ * 
+ ************************/
+
+
+word_t set_size(const abstract_heapt* heap,
+		ptr_t set);
+
+// pi is a predicate of the form \lambda x . x != value
+_Bool set_contains(const abstract_heapt* heap,
+		  ptr_t set,
+		  data_t value,
+		  predicate_index_t pi);
+// pi is a predicate of the form \lambda x . x != value
+_Bool set_remove(abstract_heapt* heap,
+		ptr_t set,
+		data_t value,
+		predicate_index_t pi);
+
+void set_add(abstract_heapt* heap,
+	     ptr_t set,
+	     data_t value,
+	     predicate_index_t pi);
+
+
+/* Creates a new set */
+void set_abstract_new(abstract_heapt *heap,
+                  ptr_t x);
+
+/* Assigns two sets */
+void set_assign(abstract_heapt *heap,
+		ptr_t x,
+		ptr_t y);
+
+
+_Bool set_alias(const abstract_heapt *heap,
+		ptr_t x,
+		ptr_t y);
+
+
+ptr_t set_iterator(const abstract_heapt* heap, ptr_t set);
+data_t set_iterator_get(const abstract_heapt* heap, ptr_t set_it);
+_Bool set_iterator_hasNext(const abstract_heapt* heap, ptr_t set_it);
+data_t set_iterator_next(const abstract_heapt* heap, ptr_t set_it);
+
+
+/*************************
+ *
+ *  Set abstract predicates 
+ * 
+ ************************/
+
+bool_t set_forall(const abstract_heapt *heap,
+		  ptr_t x,
+		  predicate_index_t pi);
+
+
+bool_t set_sorted(const abstract_heapt *heap,
+		  ptr_t x);
+
+data_t set_min(const abstract_heapt *heap,
+	       ptr_t x);
+
+data_t set_max(const abstract_heapt *heap,
+	       ptr_t x);
+
+
+#endif
 
 /* #define circular(h, x) (!is_path(h, x, null_ptr)) */
 
