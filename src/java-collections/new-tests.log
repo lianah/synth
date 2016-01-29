@@ -1,0 +1,63 @@
+nohup: ignoring input
+Running ./shakira.sh  ../../tests/java-collections/javaset-const-safe.c -DNPROG=1 -DNPREDS=2 -DNSETPROG=2  
+ [0;32m[SUCCESS][0m SAFE - Invariant holds. 
+ VERIFICATION SUCCESSFUL Runtime decision procedure: 0.74s [runlim] time:			1.77 seconds [runlim] space:			99.7 MB exit code 0
+Running ./shakira.sh  ../../tests/java-collections/javaset-const-unsafe.c -DNPROG=1 -DNPREDS=2 -DNSETPROG=2  
+ [0;31m[FAIL][0m   INV_FAIL: Base case. doesn't match expected: INV_FAIL: Property entailment.
+Traceback (most recent call last):
+  File "./pretty-heap.py", line 93, in <module>
+    processHeap(heaps[i], i)
+  File "./pretty-heap.py", line 65, in processHeap
+    print r'node%d%d [label="%s [%d]"];' % (prefix, n, nodeptrs(n, ptrs), d)
+  File "./pretty-heap.py", line 8, in nodeptrs
+    return ', '.join([ptrname(p) for p in xrange(len(ptrs)) if ptrs[p] == n])
+TypeError: object of type 'int' has no len()
+Warning: <stdin>: syntax error in line 4 near ''
+ Counterexample heap in ../../tests/java-collections/javaset-const-unsafe.c.png
+  INV_FAIL: Base case.  Runtime decision procedure: 0.73s [runlim] time:			1.75 seconds [runlim] space:			99.4 MB exit code 10
+Running ./shakira.sh  ../../tests/java-collections/javaset-symbolic-safe.c -DNPROG=1 -DNPREDS=2 -DNSETPROG=2  
+ [0;32m[SUCCESS][0m SAFE - Invariant holds. 
+ VERIFICATION SUCCESSFUL Runtime decision procedure: 0.62s [runlim] time:			1.65 seconds [runlim] space:			99.4 MB exit code 0
+Running ./shakira.sh  ../../tests/java-collections/javaset-symbolic-unsafe.c -DNPROG=1 -DNPREDS=2 -DNSETPROG=2  
+ [0;31m[FAIL][0m   INV_FAIL: Base case. doesn't match expected: INV_FAIL: Inductive step.
+Traceback (most recent call last):
+  File "./pretty-heap.py", line 93, in <module>
+    processHeap(heaps[i], i)
+  File "./pretty-heap.py", line 65, in processHeap
+    print r'node%d%d [label="%s [%d]"];' % (prefix, n, nodeptrs(n, ptrs), d)
+  File "./pretty-heap.py", line 8, in nodeptrs
+    return ', '.join([ptrname(p) for p in xrange(len(ptrs)) if ptrs[p] == n])
+TypeError: object of type 'int' has no len()
+Warning: <stdin>: syntax error in line 4 near ''
+ Counterexample heap in ../../tests/java-collections/javaset-symbolic-unsafe.c.png
+  INV_FAIL: Base case.  Runtime decision procedure: 0.664s [runlim] time:			1.75 seconds [runlim] space:			100.2 MB exit code 10
+Running ./shakira.sh  ../../tests/java-collections/javaset-list-copy-safe.c -DNPROG=3 -DNSETPROG=2 -DNPREDS=11 -DNSLACK=2  
+ [0;32m[SUCCESS][0m SAFE - Invariant holds. 
+ VERIFICATION SUCCESSFUL Runtime decision procedure: 53.328s [runlim] time:			126.64 seconds [runlim] space:			439.3 MB exit code 0
+Running ./shakira.sh  ../../tests/java-collections/javaset-list-copy-unsafe.c -DNPROG=3 -DNSETPROG=2 -DNPREDS=1 -DNSLACK=2  
+ [0;32m[SUCCESS][0m Counterexample heap in ../../tests/java-collections/javaset-list-copy-unsafe.c.png
+  INV_FAIL: Property entailment.  Runtime decision procedure: 3.813s [runlim] time:			5.85 seconds [runlim] space:			111.7 MB exit code 10
+Running ./shakira.sh  ../../tests/java-collections/apache_ListUtils-hashCodeForList-safe.c -DNPROG=5  
+ [0;32m[SUCCESS][0m SAFE - Invariant holds. 
+ VERIFICATION SUCCESSFUL Runtime decision procedure: 5.555s [runlim] time:			7.96 seconds [runlim] space:			112.0 MB exit code 0
+Running ./shakira.sh  ../../tests/java-collections/apache_ListUtils-hashCodeForList-unsafe.c -DNPROG=5  
+ [0;32m[SUCCESS][0m Counterexample heap in ../../tests/java-collections/apache_ListUtils-hashCodeForList-unsafe.c.png
+  INV_FAIL: Property entailment.  Runtime decision procedure: 5.2s [runlim] time:			7.55 seconds [runlim] space:			114.9 MB exit code 10
+Running ./shakira.sh  ../../tests/java-collections/apache_ListUtils-isEqualList-safe.c -DNPROG=5  
+ [0;32m[SUCCESS][0m SAFE - Invariant holds. 
+ VERIFICATION SUCCESSFUL Runtime decision procedure: 102.027s [runlim] time:			106.33 seconds [runlim] space:			132.2 MB exit code 0
+Running ./shakira.sh  ../../tests/java-collections/apache_ListUtils-isEqualList-unsafe.c -DNPROG=5  
+ [0;32m[SUCCESS][0m Counterexample heap in ../../tests/java-collections/apache_ListUtils-isEqualList-unsafe.c.png
+  INV_FAIL: Property entailment.  Runtime decision procedure: 97.032s [runlim] time:			101.22 seconds [runlim] space:			131.4 MB exit code 10
+Running ./shakira.sh  ../../tests/java-collections/guava_Ints-max-safe.c -DNPROG=3  
+ [0;31m[FAIL][0m ERROR in output. 
+   [runlim] time:			600.05 seconds [runlim] space:			129.5 MB exit code 1
+Running ./shakira.sh  ../../tests/java-collections/guava_Ints-max-unsafe.c -DNPROG=4 -DNPREDS=1 -DNSLACK=2  
+ [0;32m[SUCCESS][0m Counterexample heap in ../../tests/java-collections/guava_Ints-max-unsafe.c.png
+  INV_FAIL: Base case.  Runtime decision procedure: 102.004s [runlim] time:			107.43 seconds [runlim] space:			153.8 MB exit code 10
+Running ./shakira.sh  ../../tests/java-collections/guava_Ints-min-safe.c -DNPROG=3  
+ [0;31m[FAIL][0m ERROR in output. 
+   [runlim] time:			600.08 seconds [runlim] space:			130.1 MB exit code 1
+Running ./shakira.sh  ../../tests/java-collections/guava_Ints-min-unsafe.c -DNPROG=3  
+ [0;32m[SUCCESS][0m Counterexample heap in ../../tests/java-collections/guava_Ints-min-unsafe.c.png
+  INV_FAIL: Base case.  Runtime decision procedure: 507.265s [runlim] time:			510.71 seconds [runlim] space:			122.2 MB exit code 10
