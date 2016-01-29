@@ -1,5 +1,14 @@
 #include "abstract_heap.h"
 
+/**
+   void foo(int idx) {
+     Assume (forall_assume(heap, list, it, v == 0));
+     Assume(0 <= idx && idx < size(heap, list));
+     ListIterator it = list.listIterator(list.size());
+     Assert (list.get(idx) == 0);
+   }
+ **/
+
 // Run with -DNPROG=2 -DNPREDS=1 -DNSLACK=1
 
 ptr_t list = 1;
@@ -11,6 +20,7 @@ void pre(abstract_heapt *heap) {
   Assume (forall_assume(heap, list, it, 0));
   idx = nondet_word_t();
   Assume(0 <= idx && idx < size(heap, list));
+  
 }
 
 _Bool is0(data_t val) {

@@ -2,6 +2,17 @@
 
 // Run with -DNPROG=3 -DNPREDS=1
 
+/**
+void foo (List list) {
+   int idx = 0;
+   while (idx < list.size()) {
+   // INVARIANT: forall_assume(heap, list, it, 0)
+     list.set(idx, 4);
+     idx++;
+   }
+   Assert (forall_assume(heap, list, null_ptr, 0));
+}
+ **/
 
 ptr_t list = 1;
 ptr_t it = 2;
@@ -28,7 +39,7 @@ void pre(abstract_heapt *heap) {
 }
 
 _Bool cond(abstract_heapt *heap) {
-  return 0 <= idx && idx < size(heap, list);
+  return 0 <= idx && idx < size(heap, list),;
 }
 
 void body(abstract_heapt *heap) {

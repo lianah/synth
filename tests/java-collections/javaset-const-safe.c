@@ -1,11 +1,11 @@
 /** 
-
+void foo () {
   Set s = new HashSet();
   s.add(4);
   s.add(5);
   s.remove(4);
   Assert (s.size() == 1);
-  
+}  
 **/
 
 #include "abstract_heap.h"

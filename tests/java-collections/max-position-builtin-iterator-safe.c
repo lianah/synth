@@ -2,6 +2,25 @@
 
 // Run with -DNPROG=3 and -DNPREDS=1 and -DNSLACK=1
 
+/**
+  void foo (List lit) {
+  Assume(!is_null(heap, list));
+  int m = list.get(0);
+  int idx = 1;
+  while (idx < list.size()) {
+    // INVARIANT: idx <= size(heap, list) && idx > 0 &&
+    //             m == max(heap, list, it)
+    int current = getP(heap, list, idx);
+    if (current > m) {
+      m = current; 
+    }
+    idx++;
+  }
+  Assert(is_path(heap, list, null_ptr) == bool_true &&
+         m == max(heap, list, null_ptr););
+   }
+ **/
+
 ptr_t list = 1;
 ptr_t it = 2;
 

@@ -2,6 +2,28 @@
 
 // Run with -DNPROG=5 -DNPREDS=1 -DNSLACK=2
 
+
+/**
+   void foo (List list) {
+   List less = new List();
+   List greater = new List();
+   Iterator it = list.iterator(); 
+   while(it.hasNext()) {
+     // INVARIANT is_path(heap, list, it) &&
+     // ((is_null(heap, less) && is_null(heap, greater)) || !alias(heap, less, greater))  &&
+     // (alias(heap, less, it) || max(heap, less, it) < pivot) &&
+     // (alias(heap, greater, it) || min(heap, greater, it) >= pivot);
+     int current = it.next();
+     if (isLess(current)) {
+       less.add(current);
+     } else {
+       greater.add(current);
+     }
+   }
+   Assert ((alias(heap, less, null_ptr) || max(heap, less, null_ptr) < pivot) &&
+          (alias(heap, greater, null_ptr) || min(heap, greater, null_ptr) >= pivot));
+}
+ **/
 ptr_t list = 1;
 ptr_t less = 2;
 ptr_t greater = 3;

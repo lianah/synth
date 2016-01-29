@@ -3,12 +3,24 @@
 // Run with -DNPROG=5 -DNPREDS=1 -DNSLACK=2
 
 /*
-        Assume(copy.size() == data.size());
-	
-	for (int i = 0; i < 10; ++i) {
-	    copy.set(i, data.get(i));
-	}
 
+  void foo(List list) {
+    Assume (! empty(heap, list));
+    Assume (size(heap, copy) == size(heap, list));
+    Assume(!alias(heap, list, copy));
+    int i = 0;
+    while (i < list.size()) {
+     // INVARIANT: size(heap, copy) == size(heap, list) &&
+                   forall_assume(heap, list, i, 0) == forall_assume(heap, copy, i, 0);
+     int current = list.get(i);
+     copy.set(i, current);
+     i = i + 1;
+    }
+    Assert (((forall(heap, list, null_ptr, 0) == bool_true &&
+	   forall(heap, copy, null_ptr, 0) == bool_true) ||
+	  (forall(heap, list, null_ptr, 0) == bool_false &&
+	   forall(heap, copy, null_ptr, 0) == bool_false)));
+  }
 
  */
 

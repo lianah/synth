@@ -2,13 +2,18 @@
 
 // Run with -DNPROG=3 -DNPREDS=1 
 
-/*	ListIterator<Integer> it = data.listIterator();
-	while(it.hasNext()) {
-	    Integer current = it.next();
-	    if (current != 0) {
-		it.remove();
-	    }
-	}
+/*
+  void foo (List data) {
+  ListIterator<Integer> it = data.listIterator();
+  while(it.hasNext()) {
+    // INVARIANT: forall(heap, list, it, 0)
+    Integer current = it.next();
+    if (current != 0) {
+      it.remove();
+      }
+   }
+   Assert (forall(heap, list, null_ptr, 0));
+   }
 */
 
 ptr_t list = 1;

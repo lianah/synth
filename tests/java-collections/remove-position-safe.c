@@ -3,16 +3,20 @@
 // Run with -DNPROG=3 -DNPREDS=1 -DNSLACK=2
 
 /*
-	List<Integer> data = new ArrayList<>();
 
+      void foo(List data) {
+	List<Integer> data = new ArrayList<>();
   	int i = 0;
 	while (i < data.size()) {
+	   // INVARIANT: forall_assume(heap, list, it, 0);
 	    if (data.get(i) < 0) {
 		data.remove(i);
 	    } else {
 		i++;
 	    }
 	}
+	Assert (forall(heap, list, null_ptr, 0));
+      }
 */
 
 ptr_t list = 1;

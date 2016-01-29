@@ -1,14 +1,11 @@
 /*
   private static void sort(List<Integer> list) {
     int min, temp;
-    int n;
-
+    int n = list.size();
     for (int j = 0; j < list.size()-1; j++) {
        //Inv: sorted(list,j,_,max1) && max1 <= min1 && forall(j+1,n,min1<=v) && exists(j+1,n,min1)
-
   	min = j;
   	for (int i = j+1; i < n; i++) {
-
 	// Inv: forall(j+1,i,min<=v) && exists(j+1,i,min)
   	    if (list.get(i) < list.get(min)) {
   		min = i;
@@ -21,6 +18,22 @@
   }
 
 */
+
+/**
+void selection(List list) {
+   Iterator it = list.iterator();
+   while(it.hasNext()) {
+     // INVARIANT: is_path(heap, list, it) == bool_true &&
+     //    (alias(heap, list, it) || (sorted(heap, list, it) == bool_true && 
+     //    (alias(heap, it, null_ptr) || max(heap, list, it) <= min(heap, it, null_ptr)))); 
+     int curr_min = getMin(list, it);
+     Assume(alias(heap, it, null_ptr) || curr_min == min(heap, it, null_ptr));
+     it.add(curr_min);
+   }
+   Assert (is_path(heap, list, null_ptr) == bool_true && 
+          sorted(heap, list, null_ptr) == bool_true);
+}
+ **/
 
 #include "abstract_heap.h"
 

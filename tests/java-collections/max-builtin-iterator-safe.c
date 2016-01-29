@@ -2,6 +2,24 @@
 
 // Run with -DNPROG=3 and -DNPREDS=1 and -DNSLACK=1
 
+/**
+   void foo (List list) {
+       Iterator it = list.iterator(); 
+       Assume(!is_null(heap, list));
+       int m = it.next();
+       while(it.hasNext()) {
+       // INVARIANAT: is_path(heap, list, it) == bool_true &&
+                      (!alias(heap, list, it) && m == max(heap, list, it));
+         int current = next(heap, it);
+         if (current > m) {
+           m = current; 
+         }
+       }
+       Assert (is_path(heap, list, null_ptr) == bool_true &&
+               m == max(heap, list, null_ptr));
+   }
+ **/
+
 ptr_t list = 1;
 ptr_t it = 2;
 

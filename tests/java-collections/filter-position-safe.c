@@ -2,6 +2,21 @@
 
 // Run with -DNPROG=3 -DNPREDS=2 -DNSLACK=2
 
+/**
+   void foo (List list) {
+   int idx = 0;
+   while (idx < list.size()) {
+     // INVARIANT: forall_assume(heap, list, it, val >= 10)
+     current = list.get(idx);
+     if (isLess(current)) {
+        list.remove(idx);
+    }  else {
+     idx++;
+    }  
+   }
+   Assert (forall(heap, list, null_ptr, 1) == bool_true);
+ **/
+
 ptr_t list = 1;
 ptr_t it = 2;
 

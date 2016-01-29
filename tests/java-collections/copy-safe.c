@@ -1,6 +1,28 @@
 #include "abstract_heap.h"
 
 // Run with -DNPROG=4 -DNPREDS=1 -DNSLACK=2
+/**
+
+   void foo(List list) {
+    Assume (! empty(heap, list));
+    List copy = new List(); 
+    Iterator it = list.iterator();
+    while (it.hasNext()) {
+    // INVARIANT: path_len(heap, copy, null_ptr) == path_len(heap, list, it) &&
+    // forall_assume(heap, list, it, 0) == forall_assume(heap, copy, null_ptr, 0);
+      current = it.next();
+      copy.add(current);
+   }
+
+   Assert (path_len(heap, list, null_ptr) == path_len(heap, copy, null_ptr) &&
+    ((forall(heap, list, null_ptr, 0) == bool_true &&
+      forall(heap, copy, null_ptr, 0) == bool_true) ||
+     (forall(heap, list, null_ptr, 0) == bool_false &&
+      forall(heap, copy, null_ptr, 0) == bool_false)));
+   }
+
+**/
+
 
 ptr_t list = 1;
 ptr_t copy = 2;

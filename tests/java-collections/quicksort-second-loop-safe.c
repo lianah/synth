@@ -2,6 +2,31 @@
 
 // Run with -DNPROG=5 -DNPREDS=1 -DNSLACK=2
 
+/**
+ void foo (List list) {
+   Iterator it = list.iterator(); 
+   Assume(hasNext(heap, it));
+   int pivot = it.next();
+   List less = new List();
+   List greater = new List();
+   quicksortFirstLoop(list, less, greater, pivot);
+   Assume((alias(heap, less, null_ptr) || max(heap, less, null_ptr) < pivot) &&
+          (alias(heap, greater, null_ptr) || min(heap, greater, null_ptr) >= pivot));
+   Assume(alias(heap, less, null_ptr) || sorted(heap, less, null_ptr));
+   Assume(alias(heap, greater, null_ptr) || sorted(heap, greater, null_ptr));
+   Iterator it = greater.iterator();
+   while(it.hasNext()) {
+      // INVARIANT: (alias(heap, less, null_ptr) || alias(heap, it, null_ptr) || 
+      //	  max(heap, less, null_ptr) <= min(heap, it, null_ptr)) &&
+      //    (alias(heap, less, null_ptr) || sorted(heap, less, null_ptr)) &&
+      //    (alias(heap, it, null_ptr) || sorted(heap, it, null_ptr));
+      current = next(heap, it);
+      add(heap, less, current);
+   }
+   Assert (alias(heap, less, null_ptr) || sorted(heap, less, null_ptr));
+}
+**/
+
 ptr_t list = 1;
 ptr_t less = 2;
 ptr_t greater = 3;

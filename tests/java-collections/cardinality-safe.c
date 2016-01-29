@@ -2,6 +2,16 @@
 
 // Run with -DNPROG=2 -DNPREDS=3
 
+/**
+   void foo(List list) {
+     Assume(!empty(list));
+     Assume (forall_assume(heap, list, null_ptr, 0) == 0);
+     Assume (forall_assume(heap, list, null_ptr, 1) == 0);
+     Assume (forall_assume(heap, list, null_ptr, 2) == 0);
+     Assert (path_len(heap, list, null_ptr) >= 3);
+   }
+ **/
+
 ptr_t list = 1;
 
 void pre(abstract_heapt *heap) {

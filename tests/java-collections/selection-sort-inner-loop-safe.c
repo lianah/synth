@@ -1,17 +1,21 @@
 /*
-ListIterator<Integer> it = list.listIterator();
-Integer min = it.next();
 
-while(it.hasNext()) {
-    //Inv: forall(list,i,min <=v) && exists(list,i, min == v)
-    
+int selection(List list) {
+  Assume(!is_null(heap, list));
+  ListIterator<Integer> it = list.listIterator();
+  Integer min = it.next();
+  while(it.hasNext()) {
+    //Inv: is_path(heap, list, it) == bool_true &&
+          (!alias(heap, list, it) && m == min(heap, list, it))
     Integer current = it.next();
     if (current < min) {
 	min = current;
     }
+  }
+  Assert (is_path(heap, list, null_ptr) == bool_true &&
+          (alias(heap, list, null_ptr) || m == min(heap, list, null_ptr)));
+  return min;
 }
-
-//assert(forall(list,n,min <= v) && exists(list,n,min == v));
 */
 
 #include "abstract_heap.h"

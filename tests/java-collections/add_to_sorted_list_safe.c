@@ -2,6 +2,16 @@
 
 // Run with -DNPROG=2 and -DNPRED=0 and -DNSLACK=1
 
+/**
+  void foo(List list) {
+    Assume (sorted(list));
+    list.add(10);
+    list.add(11);
+    Assert (sorted(list));
+  } 
+
+ **/
+
 ptr_t list = 1;
 ptr_t it = 2;
 

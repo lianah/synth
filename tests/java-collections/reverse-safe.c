@@ -3,14 +3,22 @@
 // Run with -DNPROG=5 -DNPREDS=1
 
 /*
-  
+void foo reverse (List data) {
+  List reversed = new List();
   ListIterator<Integer> it = data.listIterator();
   ListIterator<Integer> it2 = reversed.listIterator();
   while(it.hasNext()) {
+    // INVARIANT: path_len(heap, reversed, null_ptr) == path_len(heap, list, it) && 
+    // forall(heap, list, it, 0) == forall(heap, reversed, null_ptr, 0) &&  
+    // is_path(heap, list, it) && alias(heap, it2, reversed) &&
+    //  !alias(heap, list, reversed)
     Integer current = it.next();
     it2.add(current);
     it2 = reversed.listIterator();
  }
+ Assert ((path_len(heap, list, null_ptr) == path_len(heap, reversed, null_ptr) &&
+         forall(heap, list, null_ptr, 0) == forall(heap, reversed, null_ptr, 0));
+} 
 */
 
 ptr_t list = 1;

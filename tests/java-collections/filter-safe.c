@@ -1,4 +1,16 @@
 #include "abstract_heap.h"
+/**
+   void foo(List list) {
+   Iterator it = list.iterator();
+   while (it.hasNext()) {
+     // INVARIANT: forall(heap, list, it, 1) == bool_true
+     current = next(heap, it);
+     if (isLess(current)) {
+        it.remove();
+   }
+   Assert(forall(heap, list, null_ptr, 1) == bool_true);
+  }
+ **/
 
 // Run with -DNPROG=3 -DNPREDS=2 -DNSLACK=2
 

@@ -2,6 +2,17 @@
 
 // Run with -DNPROG=4 -DNPREDS=3
 
+/**
+   void foo (List list, Iterator it1, Iterator it2) {
+       Assume(forall_assume(heap, list, it2, val <= 0));
+       Assume(forall_assume(heap, it1, null_ptr, val >= 0));
+       Assume(is_path(heap, it1, it2) &&
+              is_path(heap, list, it1) &&
+              path_len(heap, it1, it2) > 1);
+      Assert (forall(heap, it1, it2, val != 0) == bool_false);
+   }
+ **/
+
 ptr_t list = 1;
 ptr_t it1 = 2;
 ptr_t it2 = 3;

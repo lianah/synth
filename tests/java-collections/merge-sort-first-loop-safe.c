@@ -24,6 +24,40 @@ while i <= m,
   -- use ia to iterate over a and ib to iterate over b
  */
 
+/**
+   List c sort (List a, List b) {
+      int ia = 0;
+      int ib = 0;
+      List c = new List();
+      Assume(alias(heap, a, null_ptr) || sorted(heap, a, null_ptr));
+      Assume(alias(heap, b, null_ptr) || sorted(heap, b, null_ptr));
+      while ( 0 <= ia && ia < a.size() && 
+             0 <= ib && ib <  b.size()) {
+	  // INVARIANT: (alias(heap, a, null_ptr) || sorted(heap, a, null_ptr)) &&
+          //             (alias(heap, b, null_ptr) || sorted(heap, b, null_ptr)) &&
+	  //     	 (alias(heap, c, null_ptr) || sorted(heap, c, null_ptr)) && 
+	  //		 (alias(heap, ita, null_ptr) || 
+	  //		 alias(heap, c, null_ptr) || 
+	  //		 max(heap, c, null_ptr) <= min(heap, ita, null_ptr)) && 
+          //		 (alias(heap, itb, null_ptr) || 
+	  //		 alias(heap, c, null_ptr) || 
+	  //		 max(heap, c, null_ptr) <= min(heap, itb, null_ptr));
+	  int currenta = getP(heap, a, ia);
+	  int currentb = getP(heap, b, ib);
+	  if (currenta < currentb) {
+	    add(heap, c, currenta);
+	    ia++;
+	    }
+	  else {
+	    add(heap, c, currentb);
+	    ib++;
+	  }
+       }
+      Assert (alias(heap, c, null_ptr) || sorted(heap, c, null_ptr));
+      return c;
+   }
+ **/
+
 // Run with -DNPROG=6 -DNPREDS=1 -DNSLACK=2
 
 ptr_t a = 1;

@@ -1,5 +1,23 @@
 #include "abstract_heap.h"
 
+/**
+   void foo (List list) {
+   Assume(forall_assume(heap, list, null_ptr, 1));
+   Iterator it = list.iterator();
+   while(it.hasNext()) {
+     // INVARIANT: path_len(heap, copy, null_ptr) == path_len(heap, list, it) &&
+     forall(heap, copy, null_ptr, 1) == bool_true &&
+     forall(heap, list, null_ptr, 1) == bool_true &&
+     is_path(heap, list, it)
+     int current = it.next();
+     copy.add(current);
+   }
+   Assert (path_len(heap, list, null_ptr) == path_len(heap, copy, null_ptr) &&
+         forall(heap, copy, null_ptr, 0) == bool_true);
+   }
+
+ **/
+
 // Run with -DNPROG=4 -DNPREDS=2
 
 ptr_t list = 1;

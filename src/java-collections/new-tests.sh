@@ -7,7 +7,7 @@ pretty_args[0]="set"
 
 tests[1]="javaset-const-unsafe.c"
 args[1]="-DNPROG=1 -DNPREDS=2 -DNSETPROG=2"
-expected[1]="INV_FAIL: Property entailment."
+expected[1]="INV_FAIL: Base case."
 pretty_args[1]="set"
 
 tests[2]="javaset-symbolic-safe.c"
@@ -17,11 +17,11 @@ pretty_args[2]="set"
 
 tests[3]="javaset-symbolic-unsafe.c"
 args[3]="-DNPROG=1 -DNPREDS=2 -DNSETPROG=2"
-expected[3]="INV_FAIL: Inductive step."
+expected[3]="INV_FAIL: Base case."
 pretty_args[3]="set"
 
 tests[4]="javaset-list-copy-safe.c"
-args[4]="-DNPROG=3 -DNSETPROG=2 -DNPREDS=11 -DNSLACK=2"
+args[4]="-DNPROG=3 -DNSETPROG=2 -DNPREDS=1 -DNSLACK=2"
 expected[4]="VERIFICATION SUCCESSFUL"
 pretty_args[4]="set it"
 

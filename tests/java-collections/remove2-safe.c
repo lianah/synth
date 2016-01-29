@@ -2,11 +2,16 @@
 
 // Run with -DNPROG=3 -DNPRED=1 
 
-/*	ListIterator<Integer> it = data.listIterator();
-	while(it.hasNext()) {
-	    it.next();
-	    it.remove();
-	}
+/*
+void foo (List data) {
+  ListIterator<Integer> it = data.listIterator();
+  while(it.hasNext()) {
+  // INVARIANT: path_len(heap, list, it) == 0
+    it.next();
+    it.remove();
+  }
+  Assert (size(heap, list) == 0);
+}  
 */
 
 ptr_t list = 1;

@@ -3,13 +3,18 @@
 // Run with -DNPROG=2 -DNPRED=1 -DNSLACK=1
 
 /*
-  
-  List<Integer> data = new ArrayList<>();
-  int k = ??;
-  
-  while (k >= 0) {
-       data.remove(k);
+  void foo (List list, int k ) {
+    int init_size = list.size();
+    init_k = k;
+    Assume(list.size() > k);
+    Assume( k >= 0);
+    while (k >= 0) {
+       // INVARIANT: s_add(s_sub(init_k, k), size(heap, list)) == init_size
+       list.remove(0);
        k = k - 1;
+    }
+    Assert (size(heap, list) == s_sub(init_size, init_k));
+    return list;
   }
 */
 

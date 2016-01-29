@@ -3,11 +3,15 @@
 // Run with -DNPROG=3 -DNPREDS=1
 
 /*
+  void foo (List list) {
   	ListIterator<Integer> it = list.listIterator();
 	while(it.hasNext()) {
+	    // INVARIANT forall(heap, list, it, 0) == bool_true
 	    it.next();
 	    it.set(4);
 	}
+      Assert (forall(heap, list, null_ptr, 0) == bool_true);
+    }	
  */
 
 ptr_t list = 1;

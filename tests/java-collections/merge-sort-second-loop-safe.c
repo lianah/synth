@@ -7,6 +7,29 @@
 
 // Run with -DNPROG=4 -DNPREDS=1 -DNSLACK=1
 
+/**
+   List merge(List a, List b) {
+     int ia = 0;
+     // assume the two input lists are sorted
+     Assume(alias(heap, a, null_ptr) || sorted(heap, a, null_ptr));
+     Assume(alias(heap, c, null_ptr) || sorted(heap, c, null_ptr));
+     Assume(alias(heap, a, null_ptr) || 
+            alias(heap, c, null_ptr) || 
+	    max(heap, c, null_ptr) <= min(heap, a, null_ptr));
+     while (0 <= ia && ia < a.size()) {
+        // INVARIANT: (alias(heap, a, null_ptr) || sorted(heap, a, null_ptr)) &&
+        //    (alias(heap, c, null_ptr) || sorted(heap, c, null_ptr)) && 
+	//    (alias(heap, ita, null_ptr) || 
+	//     alias(heap, c, null_ptr) || 
+	//     max(heap, c, null_ptr) <= min(heap, ita, null_ptr))
+        int currenta = a.get(ia);
+	c.add(currenta);
+     }
+     Assert (alias(heap, c, null_ptr) || sorted(heap, c, null_ptr));
+     return c;
+     }
+ **/
+
 ptr_t a = 1;
 ptr_t c = 2;
 ptr_t ita = 3;
