@@ -1,6 +1,6 @@
 #include "abstract_heap.h"
 
-// Run with -DNPROG=3
+// Run with -DNPROG=5
 
 /*    public static int hashCodeForList(final Collection<?> list) {
         if (list == null) {
@@ -32,34 +32,51 @@ void init_predicates() {
 }
 
 void init_heap(abstract_heapt *heap) {
-  heap->is_iterator[list] = 0;
-  heap->is_iterator[it] = 1;
+  heap->is_iterator[list1] = 0;
+  heap->is_iterator[list2] = 0;
+  heap->is_iterator[it1] = 1;
+  heap->is_iterator[it2] = 1;
 }
 
 void pre(abstract_heapt *heap) {
-  hashCode=1;
-  iterator(heap, it, list);
+  if (empty(heap, list1))
+    hashCode1=0;
+  else
+    hashCode1=1;
+  if (empty(heap, list2))
+    hashCode2=0;
+  else
+    hashCode2=1;
+
+  iterator(heap, it1, list1);
+  iterator(heap, it2, list2);
 }
 
 _Bool cond(abstract_heapt *heap) {
-  return hasNext(heap, it);
+  return hasNext(heap, it1) || hasNext(heap, it2);
 }
 
 void body(abstract_heapt *heap) {
-  obj=next(heap, it);
-  hashCode=31 * hashCode + obj;
+  if (hasNext(heap, it1))
+  {
+    obj1=next(heap, it1);
+    hashCode1=31 * hashCode1 + obj1;
+  }
+  if (hasNext(heap, it2))
+  {
+    obj2=next(heap, it2);
+    hashCode2=31 * hashCode2 + obj2;
+  }
 }
 
 _Bool assertion(abstract_heapt *heap) {
-  return is_path(heap, list, null_ptr) && result_max == max(heap, list, null_ptr);
+  return !alias(heap, list1, list2) || hashCode1 == hashCode2;
 }
 
 _Bool inv_check(abstract_heapt *heap) {
-  listIterator(heap, it, list, i);
-  return !alias(heap, list, it) && result_max == max(heap, list, it);
+  return is_path(heap, list1, it1) && is_path(heap, list2, it2) && (!alias(heap, list1, list2) || (alias(heap, it1, it2) && hashCode1 == hashCode2));
 }
 
 _Bool inv_assume(abstract_heapt *heap) {
-  listIterator(heap, it, list, i);
-  return !alias(heap, list, it) && result_max == max(heap, list, it);
+  return is_path(heap, list1, it1) && is_path(heap, list2, it2) && (!alias(heap, list1, list2) || (alias(heap, it1, it2) && hashCode1 == hashCode2));
 }
