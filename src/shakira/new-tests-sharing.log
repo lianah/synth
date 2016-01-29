@@ -3,14 +3,6 @@ Running ./shakira.sh  ../../tests/java-collections/javaset-const-safe.c -DNPROG=
  VERIFICATION SUCCESSFUL Runtime decision procedure: 0.679s [runlim] time:			2.92 seconds [runlim] space:			103.9 MB exit code 0
 Running ./shakira.sh  ../../tests/java-collections/javaset-const-unsafe.c -DNPROG=1 -DNPREDS=2 -DNSETPROG=2  
  [SUCCESS]Traceback (most recent call last):
-  File "./pretty-heap.py", line 92, in <module>
-    processHeap(heaps[i], i)
-  File "./pretty-heap.py", line 65, in processHeap
-    print r'node%d%d [label="%s [%d]"];' % (prefix, n, nodeptrs(n, ptrs), d)
-  File "./pretty-heap.py", line 8, in nodeptrs
-    return ', '.join([ptrname(p) for p in xrange(len(ptrs)) if ptrs[p] == n])
-TypeError: object of type 'int' has no len()
-Warning: <stdin>: syntax error in line 4 near ''
  Counterexample heap in ../../tests/java-collections/javaset-const-unsafe.c.png
   INV_FAIL: Base case.  Runtime decision procedure: 0.38s [runlim] time:			1.92 seconds [runlim] space:			101.2 MB exit code 10
 Running ./shakira.sh  ../../tests/java-collections/javaset-symbolic-safe.c -DNPROG=1 -DNPREDS=2 -DNSETPROG=2  
@@ -18,14 +10,6 @@ Running ./shakira.sh  ../../tests/java-collections/javaset-symbolic-safe.c -DNPR
  VERIFICATION SUCCESSFUL Runtime decision procedure: 0.65s [runlim] time:			2.83 seconds [runlim] space:			102.5 MB exit code 0
 Running ./shakira.sh  ../../tests/java-collections/javaset-symbolic-unsafe.c -DNPROG=1 -DNPREDS=2 -DNSETPROG=2  
  [SUCCESS]Traceback (most recent call last):
-  File "./pretty-heap.py", line 92, in <module>
-    processHeap(heaps[i], i)
-  File "./pretty-heap.py", line 65, in processHeap
-    print r'node%d%d [label="%s [%d]"];' % (prefix, n, nodeptrs(n, ptrs), d)
-  File "./pretty-heap.py", line 8, in nodeptrs
-    return ', '.join([ptrname(p) for p in xrange(len(ptrs)) if ptrs[p] == n])
-TypeError: object of type 'int' has no len()
-Warning: <stdin>: syntax error in line 4 near ''
  Counterexample heap in ../../tests/java-collections/javaset-symbolic-unsafe.c.png
   INV_FAIL: Base case.  Runtime decision procedure: 0.654s [runlim] time:			2.92 seconds [runlim] space:			102.3 MB exit code 10
 Running ./shakira.sh  ../../tests/java-collections/javaset-list-copy-safe.c -DNPROG=3 -DNSETPROG=2 -DNPREDS=1 -DNSLACK=2  

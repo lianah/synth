@@ -177,7 +177,8 @@ def readFromFile(fname, name, results):
         if not line:
             return
         # line has file name
-        file_name = re.findall("tests/"+name+"/(.*)\.c", line)
+        file_name = re.findall("tests/java-collections/(.*)\.c", line)
+
         # print line
         (problem, safe) = processName(file_name[0])
         problem = problem.replace("_", "-")
@@ -193,6 +194,7 @@ def readFromFile(fname, name, results):
             line = f.readline()
         line = line.replace('\t',"")
         times = re.findall("Runtime decision procedure: ([\d\.]*)s.*\[runlim] time:([\d\.]*) seconds \[runlim\] space:([\d\.]*)", line)
+
         # this is a time-out since we did not print the dec proc run-time
         if len(times) == 0:
             times = re.findall(".*\[runlim] time:([\d\.]*) seconds \[runlim\] space:([\d\.]*)", line)
